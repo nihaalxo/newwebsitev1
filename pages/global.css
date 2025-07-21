@@ -1,0 +1,108 @@
+/* Global CSS variables for scaling system */
+:root {
+  /* default scale = 1 */
+  --design-scale: 1;
+}
+
+/* Fullscreen wrapper for home page (with scroll, always 100vh) */
+.fullscreenWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: y mandatory;
+  background: #000;
+}
+.fullscreenWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* Snap each 1080px section to full screen */
+.fullscreenWrapper section {
+  scroll-snap-align: start;
+}
+
+/* Viewport wrapper for other pages (fixed height with inner scroll) */
+.viewportWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-y: none;
+  background: #000;
+}
+.viewportWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* Inner content scaled to 1920px width (used by both page types) */
+.designContainer {
+  flex: 0 0 auto;
+  position: relative;
+  width: 1920px;
+  zoom: var(--design-scale);
+  background: transparent;
+  z-index: 20;
+}
+
+/* Global fonts - used by both pages */
+@font-face {
+  font-family: "Gilmer";
+  src: url("/Gilmer Light.otf");
+  font-weight: 300;
+}
+@font-face {
+  font-family: "Gilmer";
+  src: url("/Gilmer Medium.otf");
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Nasalization";
+  src: url("/nasalization-rg.otf");
+  font-weight: 400;
+}
+
+/* Tailwind CSS imports - used by both pages */
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@layer theme, base, components, utilities;
+/* stylelint-disable-next-line at-rule-no-unknown */
+@config "../tailwind.config.js";
+
+/* Global HTML/body styles - used by both pages */
+html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Global Tailwind base styles */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-width: 0;
+  }
+
+  body {
+    /* stylelint-disable-next-line at-rule-no-unknown */
+    @apply leading-[normal];
+  }
+}
