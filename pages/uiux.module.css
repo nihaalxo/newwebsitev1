@@ -73,7 +73,7 @@
   left: 0;
   background-color: #000;
   width: 1920px;
-  height: 4261.3px;
+  height: 3620px;
 }
 .cbb79e5Fa5548ba9ed8Dfe948bIcon {
   position: absolute;
@@ -178,8 +178,8 @@
 }
 .nihaalNazeerFootballOnTh {
   position: absolute;
-  top: 1837px;
-  left: 165px;
+  top: 1079.29px;
+  right: 165px;
   border-radius: 25px;
   width: 729px;
   height: 554px;
@@ -187,7 +187,7 @@
 }
 .a6Fe7546a8B0c34c4fd0846a10Icon {
   position: absolute;
-  top: 2595.29px;
+  top: 1837px;
   left: 165px;
   border-radius: 25px;
   width: 729px;
@@ -196,8 +196,8 @@
 }
 .nihaalNazeerFootballOnTh1 {
   position: absolute;
-  bottom: 354.71px;
-  left: 165px;
+  top: 1837px;
+  right: 165px;
   border-radius: 25px;
   width: 729px;
   height: 554px;
@@ -205,8 +205,8 @@
 }
 .a273ec7aa54352B44444e75a92Icon {
   position: absolute;
-  top: 1079.29px;
-  right: 165px;
+  top: 2595.29px;
+  left: 165px;
   border-radius: 25px;
   width: 729px;
   height: 554px;
@@ -303,8 +303,8 @@
 .staticAction {
   margin: 0;
   position: absolute;
-  top: 3181px;
-  left: 165px;
+  top: 2423px;
+  right: 165px;
   font-size: inherit;
   font-weight: 500;
   font-family: inherit;
@@ -315,8 +315,8 @@
 .typographicPosters {
   margin: 0;
   position: absolute;
-  top: 2423px;
-  right: 165px;
+  top: 3181px;
+  left: 165px;
   font-size: inherit;
   font-weight: 500;
   font-family: inherit;
@@ -416,6 +416,14 @@
   display: inline-block;
   width: 97px;
 }
+.div4 {
+  position: absolute;
+  top: 2625px;
+  left: 755px;
+  font-weight: 500;
+  display: inline-block;
+  width: 97px;
+}
 .web19207Child1 {
   position: absolute;
   top: 2619px;
@@ -425,53 +433,11 @@
   width: 134px;
   height: 55px;
 }
-.web19207Child2 {
-  position: absolute;
-  top: 3377px;
-  left: 736px;
-  border-radius: 13px;
-  background-color: #000;
-  width: 134px;
-  height: 55px;
-}
-.web19207Child3 {
-  position: absolute;
-  top: 2619px;
-  right: 189px;
-  border-radius: 13px;
-  background-color: #000;
-  width: 134px;
-  height: 55px;
-}
-.div4 {
-  position: absolute;
-  top: 2625px;
-  left: 755px;
-  font-weight: 500;
-  display: inline-block;
-  width: 97px;
-}
-.div5 {
-  position: absolute;
-  top: 3383px;
-  left: 755px;
-  font-weight: 500;
-  display: inline-block;
-  width: 97px;
-}
-.div6 {
-  position: absolute;
-  top: 2625px;
-  right: 208px;
-  font-weight: 500;
-  display: inline-block;
-  width: 97px;
-}
 .web19207 {
   position: relative;
   background-color: #000;
   width: 100%;
-  height: 4262px;
+  height: 3620px;
   text-align: center;
   font-size: 36px;
   color: #fff;
@@ -479,3 +445,101 @@
 }
 
 /* UI/UX page CSS - using global scaling classes */
+
+/* ── CSS Grid for projects ─────────────────────────────────────────────── */
+.projectsGrid {
+  position: absolute;
+  /* exactly where the first row used to start: */
+  top: 1079.29px;
+  left: 165px;
+  /* container spans from 165px to 1920 - 165 = 1755px ⇒ width 1590px */
+  width: 1590px;
+  display: grid;
+  /* two 730px columns, 130px gutter: (1590 – 2×730 = 130) */
+  grid-template-columns: repeat(2, 730px);
+  column-gap: 130px;
+  /* Each row is 758px total (554px image + 204px gap) */
+  grid-template-rows: repeat(3, 758px);
+  row-gap: 0;
+}
+
+/* ── individual card styling ───────────────────────────────────── */
+.card {
+  width: 730px;
+  height: 758px;
+  display: grid;
+  grid-template-areas:
+    "image image"
+    "title title";
+  grid-template-rows: 554px 204px;
+  grid-template-columns: 1fr;
+  gap: 0;
+  position: relative;
+}
+
+.cardContent {
+  grid-area: image;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 25px;
+  object-fit: cover;
+}
+
+.cardTitle {
+  grid-area: title;
+  margin: 0;
+  font-size: inherit;
+  font-weight: 500;
+  font-family: inherit;
+  align-self: start;
+  padding-top: 31.71px;
+}
+
+.dateBox {
+  position: absolute;
+  top: 24px; /* 24px from top edge of image */
+  right: 24px; /* 24px from right edge of image */
+  width: 134px;
+  height: 55px;
+  background: #000;
+  border-radius: 13px;
+  z-index: 10; /* Higher than image */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.date {
+  font-weight: 500;
+  display: inline-block;
+  width: 97px;
+  text-align: center;
+  z-index: 11; /* Higher than date box */
+}
+
+/* ── project link styling ───────────────────────────────────── */
+.projectLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.projectLink:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
+.projectLink:hover .cardImage {
+  box-shadow: 0 8px 25px rgba(0, 221, 255, 0.3);
+}
+
+.projectLink:hover .cardTitle {
+  text-shadow: 0 0 10px rgba(0, 221, 255, 0.8);
+}

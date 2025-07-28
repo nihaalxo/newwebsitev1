@@ -1,13 +1,19 @@
 import type { NextPage } from "next";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
+import { useRouter } from "next/router";
 import emailjs from '@emailjs/browser';
 import styles from "./main.module.css";
 import useDesignScale from "../hooks/useDesignScale";
+import { useVideoSound } from "../hooks/useVideoSound";
+import { SoundContext } from "./_app";
 
 
 
 const Web19202: NextPage = () => {
+  const router = useRouter();
+  const { soundEnabled } = useContext(SoundContext);
+  const { addVideoRef, videoRefs } = useVideoSound();
   useDesignScale(); // Apply the scaling system
 
   // Intersection Observer for UI element animations
@@ -73,7 +79,6 @@ const Web19202: NextPage = () => {
     };
   }, []);
   
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const videoTimes = useRef<number[]>([]);
   const [showHeroElements, setShowHeroElements] = useState(false);
   const [showAboutElements, setShowAboutElements] = useState(false);
@@ -125,11 +130,11 @@ const Web19202: NextPage = () => {
       (entries) => {
         entries.forEach((entry) => {
           const video = entry.target as HTMLVideoElement;
-          const videoIndex = videoRefs.current.findIndex(v => v === video);
+          const videoIndex = videoRefs.findIndex((v: HTMLVideoElement | null) => v === video);
 
           if (entry.isIntersecting) {
             // Pause all other videos first
-            videoRefs.current.forEach((otherVideo, index) => {
+            videoRefs.forEach((otherVideo: HTMLVideoElement | null, index: number) => {
               if (otherVideo && otherVideo !== video) {
                 videoTimes.current[index] = otherVideo.currentTime;
                 otherVideo.pause();
@@ -157,20 +162,20 @@ const Web19202: NextPage = () => {
     );
 
     // Observe all videos
-    videoRefs.current.forEach((video) => {
+    videoRefs.forEach((video: HTMLVideoElement | null) => {
       if (video) {
         observer.observe(video);
       }
     });
 
     return () => {
-      videoRefs.current.forEach((video) => {
+      videoRefs.forEach((video: HTMLVideoElement | null) => {
         if (video) {
           observer.unobserve(video);
         }
       });
     };
-  }, []);
+  }, [soundEnabled]); // Re-run when sound preference changes
 
   // Timer for hero elements animation
   useEffect(() => {
@@ -183,7 +188,7 @@ const Web19202: NextPage = () => {
 
   // Timer for contact elements animation
   useEffect(() => {
-    const contactVideo = videoRefs.current[1]; // comp1 video
+    const contactVideo = videoRefs[1]; // comp1 video
 
     const handleVideoPlay = () => {
       console.log('Contact video started playing, starting 8 second timer');
@@ -353,10 +358,10 @@ const Web19202: NextPage = () => {
           >
             <video
               ref={(el) => {
-                videoRefs.current[0] = el;
+                addVideoRef(el, 0);
               }}
               className="absolute inset-0 w-full h-full object-cover"
-              muted
+              muted={!soundEnabled}
               loop
               playsInline
             >
@@ -544,10 +549,10 @@ const Web19202: NextPage = () => {
           >
       <video
               ref={(el) => {
-                videoRefs.current[3] = el;
+                addVideoRef(el, 3);
               }}
               className="absolute inset-0 w-full h-full object-cover"
-        muted
+        muted={!soundEnabled}
         loop
               playsInline
       >
@@ -624,7 +629,7 @@ const Web19202: NextPage = () => {
                     opacity: displayIndex === 1 ? 1 : 0.5
                   }}
                   onClick={() => {
-                    window.location.href = '/immersive';
+                    router.push('/immersive');
                   }}
                 />
                 <button
@@ -637,7 +642,7 @@ const Web19202: NextPage = () => {
                     opacity: displayIndex === 2 ? 1 : 0.5
                   }}
                   onClick={() => {
-                    window.location.href = '/branding';
+                    router.push('/branding');
                   }}
                 />
                 <button
@@ -650,7 +655,7 @@ const Web19202: NextPage = () => {
                     opacity: displayIndex === 3 ? 1 : 0.5
                   }}
                   onClick={() => {
-                    window.location.href = '/multidisciplinary';
+                    router.push('/multidisciplinary');
                   }}
                 />
                 <button
@@ -663,7 +668,7 @@ const Web19202: NextPage = () => {
                     opacity: displayIndex === 4 ? 1 : 0.5
                   }}
                   onClick={() => {
-                    window.location.href = '/uiux';
+                    router.push('/uiux');
                   }}
                 />
                 {/* Clone of first slide (button1) */}
@@ -751,22 +756,27 @@ const Web19202: NextPage = () => {
           >
       <video
               ref={(el) => {
-                videoRefs.current[2] = el;
+                addVideoRef(el, 2);
               }}
               className="absolute inset-0 w-full h-full object-cover"
-        muted
+        muted={!soundEnabled}
         loop
               playsInline
       >
         <source src="/tutorialfullanimation0000-3500_2.compressed.mp4" />
       </video>
-            <div
-              className="absolute bottom-[49px] left-[50px] rounded-[23px] w-[344px] h-[160px] [backdrop-filter:blur(20px)] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-            />
-            <h4 className={`m-0 absolute bottom-[95px] left-[77px] text-[length:inherit] font-medium font-[Gilmer] inline-block w-[273px] h-[86px] transition-all duration-1000 ease-out ${showTutorialElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.2s' }}>
-              <p className="m-0">Enter 3D Website</p>
-              <p className="m-0">(PC only)</p>
-            </h4>
+            <a
+              href="https://interactive.nihaalnazeer.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`absolute bottom-[49px] left-[50px] rounded-[23px] w-[344px] h-[160px] [backdrop-filter:blur(20px)] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:border-cyan-400 hover:shadow-[0_8px_32px_rgba(34,211,238,0.4)] hover:bg-[rgba(34,211,238,0.3)] transition-all duration-300 cursor-pointer flex items-center justify-center ${showTutorialElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              style={{ transitionDelay: '0.2s' }}
+            >
+              <h4 className="m-0 text-[length:inherit] font-medium font-[Gilmer] text-center hover:text-cyan-400 transition-colors duration-300">
+                <p className="m-0">Enter 3D Website</p>
+                <p className="m-0">(PC only)</p>
+              </h4>
+            </a>
           </section>
           <section
             className={`relative h-[1080px] w-full bg-[#000] transition-opacity duration-1000 ease-out`}
@@ -774,15 +784,32 @@ const Web19202: NextPage = () => {
           >
             <video
               ref={(el) => {
-                videoRefs.current[1] = el;
+                addVideoRef(el, 1);
               }}
               className="absolute inset-0 w-full h-full object-cover"
-              muted
+              muted={!soundEnabled}
               playsInline
               onLoadedMetadata={(e) => {
                 const video = e.target as HTMLVideoElement;
+                // Set volume to 50%
+                video.volume = 0.5;
                 // Set to last frame when metadata is loaded
                 video.addEventListener('timeupdate', () => {
+                  // Fade out effect - start 5 seconds before the end
+                  const fadeStartTime = video.duration - 5; // Start fade 5 seconds before end
+                  const currentTime = video.currentTime;
+                  
+                  if (currentTime >= fadeStartTime) {
+                    // Calculate fade progress (0 to 1 over 5 seconds)
+                    const fadeProgress = (currentTime - fadeStartTime) / 5;
+                    // Fade from 0.5 to 0
+                    video.volume = 0.5 * (1 - fadeProgress);
+                  } else {
+                    // Keep volume at 50% before fade starts
+                    video.volume = 0.5;
+                  }
+                  
+                  // Pause at last frame
                   if (video.currentTime >= video.duration - 0.1) {
                     video.pause();
                   }
@@ -882,7 +909,7 @@ const Web19202: NextPage = () => {
         sizes="100vw"
               alt="Up arrow"
               src="/downarrow.png"
-            />
+      />
             <a
               href="mailto:nihaalnazeerxo@gmail.com"
               className={`[text-decoration:none] absolute bottom-[59px] left-[179px] rounded-2xl w-[502px] h-[95px] text-[26px] text-[inherit] font-[Gilmer] [backdrop-filter:blur(20px)] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:border-cyan-400 hover:shadow-[0_8px_32px_rgba(34,211,238,0.4)] hover:bg-[rgba(34,211,238,0.3)] transition-all duration-150 cursor-pointer ${showContactElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}

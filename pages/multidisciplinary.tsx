@@ -1,14 +1,113 @@
 import type { NextPage } from "next"; 
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/router";
 import styles from "./multidisciplinary.module.css";
 import useDesignScale from "../hooks/useDesignScale";
 
+// Project interface for type safety
+interface Project {
+  key: string;
+  title: string;
+  imgSrc: string;
+  imgAlt: string;
+  date: string;
+  url: string;
+}
+
+// Project data array - easy to add/remove projects
+const PROJECTS: Project[] = [
+  {
+    key: "fortune",
+    title: "Fortune Teller - Interactive Pamphlet",
+    imgSrc: "/Fortune Teller - Interactive Pamphlet.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/fortune-teller-interactive-pamphlet",
+  },
+  {
+    key: "telephone",
+    title: "Telephone - Publication Design",
+    imgSrc: "/Telephone - Publication Design.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/telephone-publication-design",
+  },
+  {
+    key: "memory",
+    title: "Memory Palace - Blender Animation",
+    imgSrc: "/Memory Palace - Blender Animation.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/memory-palace-blender-animation",
+  },
+  {
+    key: "static",
+    title: "Static Action - Animation",
+    imgSrc: "/Static Action - Animation.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/static-action-animation",
+  },
+  {
+    key: "light",
+    title: "Light and Dark - Animation",
+    imgSrc: "/Light and Dark - Animation.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/light-and-dark-animation",
+  },
+  {
+    key: "mental",
+    title: "Mental Health - Advocate",
+    imgSrc: "/Mental Health - Advocate.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/mental-health-advocate",
+  },
+  {
+    key: "typographic",
+    title: "Typographic Posters",
+    imgSrc: "/Typographic Posters.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/typographic-posters",
+  },
+  {
+    key: "mind-designer",
+    title: "Mind of a Designer - Short Film",
+    imgSrc: "/Mind of a Designer - Short Film.png",
+    imgAlt: "Mind of a Designer short film",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/mind-of-a-designer-short-film",
+  },
+];
+
+// ProjectCard component for consistent styling
+const ProjectCard: React.FC<Project> = ({ title, imgSrc, imgAlt, date, url }) => (
+  <a href={url} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+    <div className={styles.card}>
+      <div className={styles.cardContent}>
+        <Image
+          className={styles.cardImage}
+          width={729}
+          height={554}
+          sizes="100vw"
+          alt={imgAlt}
+          src={imgSrc}
+        />
+        <div className={styles.dateBox}>
+          <div className={styles.date}>{date}</div>
+        </div>
+      </div>
+      <h2 className={styles.cardTitle}>{title}</h2>
+    </div>
+  </a>
+);
 
 const MultidisciplinaryPage: NextPage = () => {
+  const router = useRouter();
   useDesignScale(); // Apply the scaling system
-
-
 
   // Set black background to match container
   useEffect(() => {
@@ -23,7 +122,17 @@ const MultidisciplinaryPage: NextPage = () => {
 
   const goBack = () => {
     // Navigate to main page and set portfolio section as active with multidisciplinary project (button 3)
-    window.location.href = '/?section=portfoliosection&button=3';
+    router.push('/?section=portfoliosection&button=3');
+  };
+
+  const goToNext = () => {
+    // Navigate to branding page (previous in sequence)
+    router.push('/branding');
+  };
+
+  const goToPrevious = () => {
+    // Navigate to UI/UX page (next in sequence)
+    router.push('/uiux');
   };
 
   return (
@@ -34,7 +143,7 @@ const MultidisciplinaryPage: NextPage = () => {
         <div className="relative bg-black w-full text-left text-[32px] text-[#fff] font-[Nasalization]">
           <div className={styles.web19207} style={{ 
             width: '1920px',
-            height: '4262px',
+            height: '4378px',
             backgroundColor: 'black !important'
           }}>
       <section className={styles.section6} id="multidisciplinarysection" style={{ backgroundColor: 'black' }} />
@@ -75,123 +184,57 @@ const MultidisciplinaryPage: NextPage = () => {
         alt="Down Arrow"
         src="/downarrow.png"
       />
-      <Image
-        className={styles.cbb79e5Fa5548ba9ed8Dfe948bIcon1}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/3cbb79e5fa5548ba9ed8dfe948b10a0d-rw-19201@2x.png"
-      />
-      <Image
-        className={styles.nihaalNazeerFootballOnTh}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/nihaal-nazeer--football-on-the-vision-pro--google-chrome-7-15-2025-1-18-42-am@2x.png"
-      />
-      <Image
-        className={styles.a6Fe7546a8B0c34c4fd0846a10Icon}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/524185a6fe7546a8b0c34c4fd0846a10-rw-1920@2x.png"
-      />
-      <Image
-        className={styles.nihaalNazeerFootballOnTh1}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/nihaal-nazeer--football-on-the-vision-pro--google-chrome-7-15-2025-1-20-26-am@2x.png"
-      />
-      <Image
-        className={styles.nihaalNazeerFootballOnTh2}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/nihaal-nazeer--football-on-the-vision-pro--google-chrome-7-15-2025-1-21-13-am@2x.png"
-      />
-      <Image
-        className={styles.e5c1ffcDdee46bcAf30F9dd52aIcon}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/3e5c1ffcddee46bcaf30f9dd52a41abd-rw-1200@2x.png"
-      />
-      <Image
-        className={styles.a273ec7aa54352B44444e75a92Icon}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/57a273ec7aa54352b44444e75a92cdb2-rw-1920@2x.png"
-      />
-      <button className={styles.vectorParent} id="rightbutton">
+      
+      {/* CSS Grid container for projects */}
+      <div className={styles.projectsGrid}>
+        {PROJECTS.map(project => (
+          <ProjectCard
+            key={project.key}
+            title={project.title}
+            imgSrc={project.imgSrc}
+            imgAlt={project.imgAlt}
+            date={project.date}
+            url={project.url}
+          />
+        ))}
+      </div>
+
+      <button className={styles.vectorParent} id="leftarrow" onClick={goToPrevious}>
         <Image
           className={styles.groupChild}
-          width={55}
-          height={55}
-          sizes="100vw"
-          alt=""
-          src="/line-6.svg"
-        />
-        <Image
-          className={styles.groupItem}
-          width={55}
-          height={55}
-          sizes="100vw"
-          alt=""
-          src="/line-7.svg"
-        />
-      </button>
-      <button className={styles.vectorGroup} id="leftbutton">
-        <Image
-          className={styles.groupChild}
-          width={55}
-          height={55}
+          width={26.1}
+          height={26.1}
           sizes="100vw"
           alt=""
           src="/line-61.svg"
         />
         <Image
           className={styles.groupItem}
-          width={55}
-          height={55}
+          width={26.1}
+          height={26.1}
           sizes="100vw"
           alt=""
           src="/line-71.svg"
         />
       </button>
-      <h2 className={styles.fortuneTeller}>
-        Fortune Teller - Interactive Pamphlet
-      </h2>
-      <h2 className={styles.mentalHealth}>Mental Health - Advocate</h2>
-      <h2 className={styles.memoryPalace}>Memory Palace - Blender Animation</h2>
-      <h2 className={styles.lightAndDark}>Light and Dark - Animation</h2>
-      <h2 className={styles.telephonePublication}>
-        Telephone - Publication Design
-      </h2>
-      <h2 className={styles.staticAction}>Static Action - Animation</h2>
-      <h2 className={styles.typographicPosters}>Typographic Posters</h2>
-      <div className={styles.web19207Child} />
-      <div className={styles.web19207Item} />
-      <div className={styles.web19207Inner} />
-      <div className={styles.rectangleDiv} />
-      <div className={styles.div}>2024</div>
-      <div className={styles.div1}>2024</div>
-      <div className={styles.div2}>2024</div>
-      <div className={styles.div3}>2024</div>
-      <div className={styles.web19207Child1} />
-      <div className={styles.web19207Child2} />
-      <div className={styles.web19207Child3} />
-      <div className={styles.div4}>2024</div>
-      <div className={styles.div5}>2024</div>
-      <div className={styles.div6}>2024</div>
+      <button className={styles.vectorGroup} id="rightarrow" onClick={goToNext}>
+        <Image
+          className={styles.groupChild}
+          width={26.1}
+          height={26.1}
+          sizes="100vw"
+          alt=""
+          src="/line-61.svg"
+        />
+        <Image
+          className={styles.groupItem}
+          width={26.1}
+          height={26.1}
+          sizes="100vw"
+          alt=""
+          src="/line-71.svg"
+        />
+      </button>
           </div>
         </div>
       </div>

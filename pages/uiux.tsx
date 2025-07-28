@@ -1,11 +1,96 @@
 import type { NextPage } from "next"; 
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/router";
 import styles from "./uiux.module.css";
 import useDesignScale from "../hooks/useDesignScale";
 
+// Project interface for type safety
+interface Project {
+  key: string;
+  title: string;
+  imgSrc: string;
+  imgAlt: string;
+  date: string;
+  url: string;
+}
+
+// Project data array - easy to add/remove projects
+const PROJECTS: Project[] = [
+  {
+    key: "escape-room",
+    title: "Escape Room - Game Design",
+    imgSrc: "/Escape Room - Game Design.png",
+    imgAlt: "",
+    date: "2023",
+    url: "https://nihaalnazeer.myportfolio.com/escape-room-game-design",
+  },
+  {
+    key: "instagram-redesign",
+    title: "Apple Vision - Instagram Redesign",
+    imgSrc: "/Apple Vision - Instagram Redesign.png",
+    imgAlt: "",
+    date: "2023",
+    url: "https://nihaalnazeer.myportfolio.com/apple-vision-instagram-redesign",
+  },
+  {
+    key: "green-print",
+    title: "Green Print - App Design",
+    imgSrc: "/Green Print - App Design.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/green-print-app-design",
+  },
+  {
+    key: "butterfly-garden",
+    title: "Butterfly Garden - UI Design/Animation",
+    imgSrc: "/Butterfly Garden - UI DesignAnimation.png",
+    imgAlt: "",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/butterfly-garden-ui-designanimation",
+  },
+  {
+    key: "lean-website",
+    title: "Lean - Website Design",
+    imgSrc: "/Lean - Website Design.png",
+    imgAlt: "",
+    date: "2023",
+    url: "https://nihaalnazeer.myportfolio.com/lean-website-design",
+  },
+  {
+    key: "ehteraz-app",
+    title: "Ehteraz Covid App - Redesign",
+    imgSrc: "/Ehteraz Covid App - Redesign.png",
+    imgAlt: "Ehteraz Covid app redesign",
+    date: "2024",
+    url: "https://nihaalnazeer.myportfolio.com/ehteraz-covid-app-redesign",
+  },
+];
+
+// ProjectCard component for consistent styling
+const ProjectCard: React.FC<Project> = ({ title, imgSrc, imgAlt, date, url }) => (
+  <a href={url} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+    <div className={styles.card}>
+      <div className={styles.cardContent}>
+        <Image
+          className={styles.cardImage}
+          width={729}
+          height={554}
+          sizes="100vw"
+          alt={imgAlt}
+          src={imgSrc}
+        />
+        <div className={styles.dateBox}>
+          <div className={styles.date}>{date}</div>
+        </div>
+      </div>
+      <h2 className={styles.cardTitle}>{title}</h2>
+    </div>
+  </a>
+);
 
 const UIUXPage: NextPage = () => {
+  const router = useRouter();
   useDesignScale(); // Apply the scaling system
 
   // Set black background to match container
@@ -21,7 +106,17 @@ const UIUXPage: NextPage = () => {
 
   const goBack = () => {
     // Navigate to main page and set portfolio section as active with UI/UX project (button 4)
-    window.location.href = '/?section=portfoliosection&button=4';
+    router.push('/?section=portfoliosection&button=4');
+  };
+
+  const goToNext = () => {
+    // Navigate to multidisciplinary page (previous in sequence)
+    router.push('/multidisciplinary');
+  };
+
+  const goToPrevious = () => {
+    // Navigate to immersive page (next in sequence)
+    router.push('/immersive');
   };
 
   return (
@@ -32,7 +127,7 @@ const UIUXPage: NextPage = () => {
         <div className="relative bg-black w-full text-left text-[32px] text-[#fff] font-[Nasalization]">
           <div className={styles.web19207} style={{ 
             width: '1920px',
-            height: '4262px',
+            height: '3620px',
             backgroundColor: 'black !important'
           }}>
       <section className={styles.section6} id="uiuxsection" style={{ backgroundColor: 'black' }} />
@@ -73,63 +168,22 @@ const UIUXPage: NextPage = () => {
         alt="Down Arrow"
         src="/downarrow.png"
       />
-      <Image
-        className={styles.cbb79e5Fa5548ba9ed8Dfe948bIcon1}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/3cbb79e5fa5548ba9ed8dfe948b10a0d-rw-19201@2x.png"
-      />
-      <Image
-        className={styles.nihaalNazeerFootballOnTh}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/nihaal-nazeer--football-on-the-vision-pro--google-chrome-7-15-2025-1-18-42-am@2x.png"
-      />
-      <Image
-        className={styles.a6Fe7546a8B0c34c4fd0846a10Icon}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/524185a6fe7546a8b0c34c4fd0846a10-rw-1920@2x.png"
-      />
-      <Image
-        className={styles.nihaalNazeerFootballOnTh1}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/nihaal-nazeer--football-on-the-vision-pro--google-chrome-7-15-2025-1-20-26-am@2x.png"
-      />
-      <Image
-        className={styles.a273ec7aa54352B44444e75a92Icon}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/a273ec7aa54352b44444e75a92-rw-1920@2x.png"
-      />
-      <Image
-        className={styles.e5c1ffcDdee46bcAf30F9dd52aIcon}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/e5c1ffcdee46bcaf30f9dd52a-rw-1920@2x.png"
-      />
-      <Image
-        className={styles.nihaalNazeerFootballOnTh2}
-        width={729}
-        height={554}
-        sizes="100vw"
-        alt=""
-        src="/nihaal-nazeer--football-on-the-vision-pro--google-chrome-7-15-2025-1-20-26-am@2x.png"
-      />
-      <button className={styles.vectorParent} id="leftarrow">
+      
+      {/* CSS Grid container for projects */}
+      <div className={styles.projectsGrid}>
+        {PROJECTS.map(project => (
+          <ProjectCard
+            key={project.key}
+            title={project.title}
+            imgSrc={project.imgSrc}
+            imgAlt={project.imgAlt}
+            date={project.date}
+            url={project.url}
+          />
+        ))}
+      </div>
+
+      <button className={styles.vectorParent} id="leftarrow" onClick={goToPrevious}>
         <Image
           className={styles.groupChild}
           width={26.1}
@@ -147,7 +201,7 @@ const UIUXPage: NextPage = () => {
           src="/line-71.svg"
         />
       </button>
-      <button className={styles.vectorGroup} id="rightarrow">
+      <button className={styles.vectorGroup} id="rightarrow" onClick={goToNext}>
         <Image
           className={styles.groupChild}
           width={26.1}
@@ -165,55 +219,6 @@ const UIUXPage: NextPage = () => {
           src="/line-71.svg"
         />
       </button>
-      <h4 className={styles.fortuneTeller}>
-        <p className="m-0">UI/UX PROJECT 1</p>
-      </h4>
-      <h4 className={styles.telephonePublication}>
-        <p className="m-0">UI/UX PROJECT 2</p>
-      </h4>
-      <h4 className={styles.memoryPalace}>
-        <p className="m-0">UI/UX PROJECT 3</p>
-      </h4>
-      <h4 className={styles.staticAction}>
-        <p className="m-0">UI/UX PROJECT 4</p>
-      </h4>
-      <h4 className={styles.typographicPosters}>
-        <p className="m-0">UI/UX PROJECT 5</p>
-      </h4>
-      <h4 className={styles.mentalHealth}>
-        <p className="m-0">UI/UX PROJECT 6</p>
-      </h4>
-      <h4 className={styles.lightAndDark}>
-        <p className="m-0">UI/UX PROJECT 7</p>
-      </h4>
-      <div className={styles.web19207Child} />
-      <div className={styles.web19207Item} />
-      <div className={styles.web19207Inner} />
-      <div className={styles.rectangleDiv} />
-      <div className={styles.div}>
-        <p className="m-0">2024</p>
-      </div>
-      <div className={styles.div1}>
-        <p className="m-0">2024</p>
-      </div>
-      <div className={styles.div2}>
-        <p className="m-0">2024</p>
-      </div>
-      <div className={styles.div3}>
-        <p className="m-0">2024</p>
-      </div>
-      <div className={styles.web19207Child1} />
-      <div className={styles.web19207Child2} />
-      <div className={styles.web19207Child3} />
-      <div className={styles.div4}>
-        <p className="m-0">2024</p>
-      </div>
-      <div className={styles.div5}>
-        <p className="m-0">2024</p>
-      </div>
-      <div className={styles.div6}>
-        <p className="m-0">2024</p>
-      </div>
           </div>
         </div>
       </div>
