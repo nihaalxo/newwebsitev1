@@ -76,7 +76,7 @@ const PROJECTS: Project[] = [
   {
     key: "mind-designer",
     title: "Mind of a Designer - Short Film",
-    imgSrc: "/MindofaDesigner-Short Film.png",
+    imgSrc: "/MindofaDesigner-ShortFilm.png",
     imgAlt: "Mind of a Designer short film",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/mind-of-a-designer-short-film",

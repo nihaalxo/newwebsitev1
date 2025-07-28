@@ -83,6 +83,7 @@
   width: 730px;
   height: 554px;
   object-fit: cover;
+  z-index: 10;
 }
 .chatgptLogoIcon {
   position: absolute;

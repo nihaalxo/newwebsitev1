@@ -28,7 +28,7 @@ const PROJECTS: Project[] = [
   {
     key: "instagram-redesign",
     title: "Apple Vision - Instagram Redesign",
-    imgSrc: "/Apple Vision-InstagramRedesign.png",
+    imgSrc: "/AppleVision-InstagramRedesign.png",
     imgAlt: "",
     date: "2023",
     url: "https://nihaalnazeer.myportfolio.com/apple-vision-instagram-redesign",
