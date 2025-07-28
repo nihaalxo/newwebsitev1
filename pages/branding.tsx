@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
   {
     key: "original-machines",
     title: "Original Machines - Branding",
-    imgSrc: "/Original Machines - Branding.png",
+    imgSrc: "/Original%20Machines%20-%20Branding.png",
     imgAlt: "Original Machines branding project",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/original-machines-branding",
@@ -28,7 +28,7 @@ const PROJECTS: Project[] = [
   {
     key: "my-chaii-london",
     title: "My Chaii London - Rebranding",
-    imgSrc: "/My Chaii London - Rebranding.png",
+    imgSrc: "/My%20Chaii%20London%20-%20Rebranding.png",
     imgAlt: "My Chaii London rebranding project",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/my-chaii-london-rebranding",
@@ -36,7 +36,7 @@ const PROJECTS: Project[] = [
   {
     key: "silklon-serione",
     title: "Silklon & Serione - Branding Design",
-    imgSrc: "/Silklon & Serione - Branding Design.png",
+    imgSrc: "/Silklon%20%26%20Serione%20-%20Branding%20Design.png",
     imgAlt: "Silklon & Serione branding design",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/silklon-and-serione-branding-design",
@@ -44,7 +44,7 @@ const PROJECTS: Project[] = [
   {
     key: "rgfc-branding",
     title: "RGFC - Branding and Jersey Design",
-    imgSrc: "/RGFC - Branding and Jersey Design.png",
+    imgSrc: "/RGFC%20-%20Branding%20and%20Jersey%20Design.png",
     imgAlt: "RGFC branding and jersey design",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/rgfc-jersey-design",

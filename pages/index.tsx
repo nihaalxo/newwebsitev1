@@ -586,7 +586,7 @@ const Web19202: NextPage = () => {
               transform: `translateX(-50%)`
             }}
             alt="Powers Banner"
-            src="/powers banner.png"
+            src="/powers%20banner.png"
           />
 
       <section

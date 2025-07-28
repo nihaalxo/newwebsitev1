@@ -60,12 +60,12 @@
 /* Global fonts - used by both pages */
 @font-face {
   font-family: "Gilmer";
-  src: url("/Gilmer Light.otf");
+  src: url("/Gilmer%20Light.otf");
   font-weight: 300;
 }
 @font-face {
   font-family: "Gilmer";
-  src: url("/Gilmer Medium.otf");
+  src: url("/Gilmer%20Medium.otf");
   font-weight: 500;
 }
 @font-face {
