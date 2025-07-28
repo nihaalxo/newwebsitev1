@@ -81,10 +81,14 @@ const ProjectCard: React.FC<Project> = ({ title, imgSrc, imgAlt, date, url }) =>
           src={imgSrc}
         />
         <div className={styles.dateBox}>
-          <div className={styles.date}>{date}</div>
+          <div className={styles.date} style={{
+            fontSize: 'calc(36px * var(--viewport-scale, 1))'
+          }}>{date}</div>
         </div>
       </div>
-      <h2 className={styles.cardTitle}>{title}</h2>
+      <h2 className={styles.cardTitle} style={{
+        fontSize: 'calc(36px * var(--viewport-scale, 1))'
+      }}>{title}</h2>
     </div>
   </a>
 );
@@ -157,7 +161,9 @@ const UIUXPage: NextPage = () => {
           src="/line-71.svg"
         />
       </button>
-      <h1 className={styles.uiux} id="titletext">
+      <h1 className={styles.uiux} id="titletext" style={{
+        fontSize: 'calc(126px * var(--viewport-scale, 1))'
+      }}>
         <p className={styles.nihaal}>UI/UX</p>
       </h1>
       <Image

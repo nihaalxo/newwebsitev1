@@ -17,25 +17,42 @@ function debounce<T extends (...args: any[]) => any>(
   return debounced;
 }
 
-export default function useDesignScale() {
+const useDesignScale = () => {
   useEffect(() => {
-    const apply = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const scale = Math.min(vw / 1920, vh / 1080);
-      console.log('design-scale =', scale, 'vw:', vw, 'vh:', vh);
-      document.documentElement.style.setProperty('--design-scale', String(scale));
+    const updateDesignScale = () => {
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate scale based on viewport dimensions relative to 1920x1080
+      const widthScale = viewportWidth / 1920;
+      const heightScale = viewportHeight / 1080;
+      
+      // Use the smaller scale to ensure everything fits
+      const scale = Math.min(widthScale, heightScale);
+      
+      // Set CSS custom property for design scale (used for images/videos)
+      document.documentElement.style.setProperty('--design-scale', scale.toString());
+      
+      // Only apply viewport-based scaling on mobile/tablet devices (width < 1024px)
+      const isMobileOrTablet = viewportWidth < 1024;
+      if (isMobileOrTablet) {
+        document.documentElement.style.setProperty('--viewport-scale', scale.toString());
+      } else {
+        // On desktop, use 1 (no scaling) to keep original pixel values
+        document.documentElement.style.setProperty('--viewport-scale', '1');
+      }
     };
 
-    const debounced = debounce(apply, 50);
-    window.addEventListener('resize', debounced);
-    window.addEventListener('orientationchange', apply);
-    apply();
+    // Initial update
+    updateDesignScale();
+
+    // Update on resize
+    window.addEventListener('resize', updateDesignScale);
 
     return () => {
-      window.removeEventListener('resize', debounced);
-      window.removeEventListener('orientationchange', apply);
-      debounced.cancel();
+      window.removeEventListener('resize', updateDesignScale);
     };
   }, []);
-} 
+};
+
+export default useDesignScale; 

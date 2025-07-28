@@ -368,8 +368,9 @@ const Web19202: NextPage = () => {
               <source src="/finalheroshot.compressed.mp4" />
             </video>
             <button
-              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[60px] left-[536px] text-[22px] font-[Nasalization] text-[#fff] text-left inline-block w-[122px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[60px] left-[536px] font-[Nasalization] text-[#fff] text-left inline-block w-[122px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
               style={{
+                fontSize: 'calc(22px * var(--viewport-scale, 1))',
                 transitionDelay: '0.2s',
                 transitionProperty: 'opacity, transform'
               }}
@@ -383,8 +384,9 @@ const Web19202: NextPage = () => {
         BIODATA
       </button>
             <button
-              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[60px] left-[1007px] text-[22px] font-[Nasalization] text-[#fff] text-left inline-block w-[190px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[60px] left-[1007px] font-[Nasalization] text-[#fff] text-left inline-block w-[190px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
               style={{
+                fontSize: 'calc(22px * var(--viewport-scale, 1))',
                 transitionDelay: '0.4s',
                 transitionProperty: 'opacity, transform'
               }}
@@ -398,8 +400,9 @@ const Web19202: NextPage = () => {
         SECRET LAIR
       </button>
             <button
-              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[61px] left-[1276px] text-[22px] font-[Nasalization] text-[#fff] text-left inline-block w-[129px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[61px] left-[1276px] font-[Nasalization] text-[#fff] text-left inline-block w-[129px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
               style={{
+                fontSize: 'calc(22px * var(--viewport-scale, 1))',
                 transitionDelay: '0.6s',
                 transitionProperty: 'opacity, transform'
               }}
@@ -413,8 +416,9 @@ const Web19202: NextPage = () => {
         CONTACT
       </button>
             <button
-              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[61px] left-[757px] text-[22px] font-[Nasalization] text-[#fff] text-left inline-block w-[152px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+              className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[61px] left-[757px] font-[Nasalization] text-[#fff] text-left inline-block w-[152px] h-[41px] transition-all duration-1000 ease-out hover:scale-105 hover:text-cyan-400 hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
               style={{
+                fontSize: 'calc(22px * var(--viewport-scale, 1))',
                 transitionDelay: '0.8s',
                 transitionProperty: 'opacity, transform'
               }}
@@ -427,51 +431,37 @@ const Web19202: NextPage = () => {
             >
         PORTFOLIO
       </button>
-            <div className={`absolute top-[71.5px] left-[91.5px] w-[1737px] h-[5px] overflow-hidden transition-all duration-1000 ease-out ${showHeroElements ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDelay: '1.0s' }}>
-      <Image
-                className="w-full h-full transition-all duration-1000 ease-out"
-        width={1737}
-        height={5}
-        sizes="100vw"
-        alt=""
-        src="/group-868.svg"
-                style={{
-                  transform: showHeroElements ? 'scaleX(1)' : 'scaleX(0)',
-                  transformOrigin: 'center'
-                }}
-      />
-            </div>
-            <h1 className={`m-0 absolute top-[462px] left-[92px] text-[145px] font-normal font-[inherit] inline-block w-[599px] h-[157px] [filter:drop-shadow(0px_3px_15px_rgba(0,_221,_255,_0.7))] [text-shadow:0_0_20px_rgba(255,255,255,0.6)] [color:rgba(255,255,255,0.75)] [mix-blend-mode:hard-light] transition-all duration-1000 ease-out ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`} style={{ transitionDelay: '1.2s' }}>
+
+            <h1 className={`m-0 absolute top-[462px] left-[91px] font-normal font-[inherit] inline-block w-[599px] h-[157px] [filter:drop-shadow(0px_3px_15px_rgba(0,_221,_255,_0.7))] [text-shadow:0_0_20px_rgba(255,255,255,0.6)] [color:rgba(255,255,255,0.75)] [mix-blend-mode:hard-light] transition-all duration-1000 ease-out ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`} style={{ 
+              fontSize: 'calc(145px * var(--viewport-scale, 1))',
+              transitionDelay: '1.2s'
+            }}>
         <p className="m-0">NIHAAL</p>
       </h1>
-            <h1 className={`m-0 absolute top-[462px] right-[90px] text-[145px] font-normal font-[inherit] inline-block w-[647px] h-[157px] [filter:drop-shadow(0px_3px_15px_rgba(0,_221,_255,_0.7))] [text-shadow:0_0_20px_rgba(255,255,255,0.6)] [color:rgba(255,255,255,0.75)] [mix-blend-mode:hard-light] transition-all duration-1000 ease-out ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`} style={{ transitionDelay: '1.4s' }}>
+            <h1 className={`m-0 absolute top-[462px] right-[85px] font-normal font-[inherit] inline-block w-[647px] h-[157px] [filter:drop-shadow(0px_3px_15px_rgba(0,_221,_255,_0.7))] [text-shadow:0_0_20px_rgba(255,255,255,0.6)] [color:rgba(255,255,255,0.75)] [mix-blend-mode:hard-light] transition-all duration-1000 ease-out ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`} style={{ 
+              fontSize: 'calc(145px * var(--viewport-scale, 1))',
+              transitionDelay: '1.4s'
+            }}>
         <p className="m-0">NAZEER</p>
       </h1>
-            <button className={`cursor-pointer [border:none] p-0 bg-[transparent] absolute top-[960.7px] right-[91.5px] w-[38px] h-[45.6px] transition-all duration-1000 ease-out ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`} style={{ transitionDelay: '1.6s' }}>
-        <div className="absolute h-[calc(100%_+_5px)] top-[-5px] bottom-[0px] left-[calc(50%_-_5px)] border-[#fff] border-solid border-r-[5px] box-border w-[10px]" />
-        <Image
-          className="absolute bottom-[-4.6px] left-[-2.5px] w-[26.1px] h-[26.1px]"
-          width={26.1}
-          height={26.1}
-          sizes="100vw"
-          alt=""
-          src="/line-2.svg"
-        />
-        <Image
-          className="absolute right-[-4.6px] bottom-[-4.6px] w-[26.1px] h-[26.1px]"
-          width={26.1}
-          height={26.1}
-          sizes="100vw"
-          alt=""
-          src="/line-3.svg"
-        />
-      </button>
+            <Image
+              className={`absolute top-[960.7px] right-[91.5px] w-[38px] h-[45.6px] transition-all duration-1000 ease-out ${showHeroElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+              style={{ transitionDelay: '1.6s' }}
+              width={38}
+              height={46}
+              sizes="100vw"
+              alt="Down arrow"
+              src="/downarrow.png"
+            />
           </section>
           <section
             className={`relative h-[1080px] w-full bg-[#000] flex items-center justify-center overflow-hidden transition-opacity duration-1000 ease-out`}
             id="aboutsection"
           >
-            <h2 className="m-0 absolute top-[387px] left-[303px] text-[42px] font-light font-[Gilmer] text-center inline-block w-[1316px] h-[306px]" style={{ zIndex: 10 }}>
+            <h2 className="m-0 absolute top-[387px] left-[303px] font-light font-[Gilmer] text-center inline-block w-[1316px] h-[306px]" style={{ 
+              fontSize: 'calc(42px * var(--viewport-scale, 1))',
+              zIndex: 10 
+            }}>
               <p className="m-0">
                 Future-focused multidisciplinary designer with a passion for immersive
                 technology, UI/UX, and storytelling. Creator of an interactive 3D
@@ -527,19 +517,34 @@ const Web19202: NextPage = () => {
               alt=""
               src="/section3missions@2x.png"
             />
-            <h3 className={`m-0 absolute top-[878px] left-[854px] text-[length:inherit] font-normal font-[inherit] text-center inline-block w-[210px] h-[89px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.2s' }}>
+            <h3 className={`m-0 absolute top-[878px] left-[854px] font-normal font-[inherit] text-center inline-block w-[210px] h-[89px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(42px * var(--viewport-scale, 1))',
+              transitionDelay: '0.2s' 
+            }}>
               <p className="m-0">Immersive Designer</p>
             </h3>
-            <h3 className={`m-0 absolute top-[838px] left-[598px] text-[length:inherit] font-normal font-[inherit] text-center inline-block w-[180px] h-[87px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.4s' }}>
+            <h3 className={`m-0 absolute top-[838px] left-[598px] font-normal font-[inherit] text-center inline-block w-[180px] h-[87px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(42px * var(--viewport-scale, 1))',
+              transitionDelay: '0.4s' 
+            }}>
               <p className="m-0">Brand Designer</p>
             </h3>
-            <h3 className={`m-0 absolute top-[838px] left-[1160px] text-[length:inherit] font-normal font-[inherit] text-center inline-block w-[174px] h-[87px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.6s' }}>
+            <h3 className={`m-0 absolute top-[838px] left-[1160px] font-normal font-[inherit] text-center inline-block w-[174px] h-[87px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(42px * var(--viewport-scale, 1))',
+              transitionDelay: '0.6s' 
+            }}>
               <p className="m-0">UI/UX Designer</p>
             </h3>
-            <h3 className={`m-0 absolute top-[814px] left-[346px] text-[length:inherit] font-normal font-[inherit] text-center inline-block w-[194px] h-[90px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.8s' }}>
+            <h3 className={`m-0 absolute top-[814px] left-[346px] font-normal font-[inherit] text-center inline-block w-[194px] h-[90px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(42px * var(--viewport-scale, 1))',
+              transitionDelay: '0.8s' 
+            }}>
               <p className="m-0">Graphic Designer</p>
             </h3>
-            <h3 className={`m-0 absolute top-[814px] left-[1410px] text-[length:inherit] font-normal font-[inherit] text-center inline-block w-[124px] h-[87px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '1.0s' }}>
+            <h3 className={`m-0 absolute top-[814px] left-[1410px] font-normal font-[inherit] text-center inline-block w-[124px] h-[87px] [text-shadow:0px_3px_6px_#00fff8] transition-all duration-1000 ease-out ${showMissionsElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(42px * var(--viewport-scale, 1))',
+              transitionDelay: '1.0s' 
+            }}>
               <p className="m-0">Video Editor</p>
             </h3>
           </section>
@@ -566,10 +571,16 @@ const Web19202: NextPage = () => {
               alt=""
               src="/section4powers.svg"
             />
-            <h4 className={`m-0 absolute top-[998px] left-[60px] text-2xl font-normal font-[inherit] inline-block w-[542px] h-[30px] transition-all duration-1000 ease-out ${showPowersElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.2s' }}>
+            <h4 className={`m-0 absolute top-[998px] left-[60px] font-normal font-[inherit] inline-block w-[542px] h-[30px] transition-all duration-1000 ease-out ${showPowersElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(24px * var(--viewport-scale, 1))',
+              transitionDelay: '0.2s' 
+            }}>
               <p className="m-0">BA Hons : Graphic and Media Design | UAL</p>
             </h4>
-            <h4 className={`m-0 absolute top-[1000px] right-[59px] text-2xl font-normal font-[inherit] inline-block w-[513px] h-[27px] transition-all duration-1000 ease-out ${showPowersElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.4s' }}>
+            <h4 className={`m-0 absolute top-[1000px] right-[59px] font-normal font-[inherit] inline-block w-[513px] h-[27px] transition-all duration-1000 ease-out ${showPowersElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(24px * var(--viewport-scale, 1))',
+              transitionDelay: '0.4s' 
+            }}>
               <p className="m-0">CertHE : Design, Screen and Media | UAL</p>
             </h4>
           </section>
@@ -593,7 +604,10 @@ const Web19202: NextPage = () => {
             className={`relative h-[1080px] w-full bg-[#000] flex items-center justify-center overflow-hidden transition-opacity duration-1000 ease-out`}
         id="portfoliosection"
           >
-            <h1 className={`m-0 absolute top-[37px] left-[363px] text-[200px] font-normal font-[inherit] inline-block w-[1196px] h-[230px] transition-all duration-1000 ease-out ${showPortfolioElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.2s' }}>
+            <h1 className={`m-0 absolute top-[37px] left-[363px] font-normal font-[inherit] inline-block w-[1196px] h-[230px] transition-all duration-1000 ease-out ${showPortfolioElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(200px * var(--viewport-scale, 1))',
+              transitionDelay: '0.2s' 
+            }}>
         <p className="m-0">PORTFOLIO</p>
       </h1>
             <div className="absolute top-[155px] left-[0px] w-[1920px] h-[554px] overflow-hidden">
@@ -745,7 +759,15 @@ const Web19202: NextPage = () => {
             <div
               className="absolute bottom-[49px] right-[50px] rounded-[23px] w-[389px] h-[194px] [backdrop-filter:blur(20px)] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
             />
-            <h4 className={`m-0 absolute bottom-[95px] right-[94px] text-[length:inherit] font-medium font-[Gilmer] inline-block w-[317px] h-[120px] transition-all duration-1000 ease-out ${showPortfolioElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ transitionDelay: '0.4s' }}>
+            <h4 className={`m-0 absolute bottom-[95px] right-[94px] font-medium font-[Gilmer] inline-block w-[317px] h-[120px] transition-all duration-1000 ease-out ${showPortfolioElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`} style={{ 
+              fontSize: 'calc(24px * var(--viewport-scale, 1))',
+              transitionDelay: '0.4s',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              textAlign: 'left'
+            }}>
               <p className="m-0">next page for 3D portfolio experience</p>
               <p className="m-0">(PC only)</p>
             </h4>
@@ -772,7 +794,9 @@ const Web19202: NextPage = () => {
               className={`absolute bottom-[49px] left-[50px] rounded-[23px] w-[344px] h-[160px] [backdrop-filter:blur(20px)] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:border-cyan-400 hover:shadow-[0_8px_32px_rgba(34,211,238,0.4)] hover:bg-[rgba(34,211,238,0.3)] transition-all duration-300 cursor-pointer flex items-center justify-center ${showTutorialElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
               style={{ transitionDelay: '0.2s' }}
             >
-              <h4 className="m-0 text-[length:inherit] font-medium font-[Gilmer] text-center hover:text-cyan-400 transition-colors duration-300">
+              <h4 className="m-0 font-medium font-[Gilmer] text-center hover:text-cyan-400 transition-colors duration-300" style={{
+                fontSize: 'calc(24px * var(--viewport-scale, 1))'
+              }}>
                 <p className="m-0">Enter 3D Website</p>
                 <p className="m-0">(PC only)</p>
               </h4>
@@ -818,7 +842,10 @@ const Web19202: NextPage = () => {
             >
               <source src="/comp_1.compressed.mp4" />
             </video>
-            <h1 className={`m-0 absolute top-[60px] left-[60px] text-8xl font-normal font-[inherit] inline-block w-[312px] h-[239px] transition-all duration-1000 ease-out ${showContactElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`} style={{ transitionDelay: '0.2s' }}>
+            <h1 className={`m-0 absolute top-[60px] left-[60px] font-normal font-[inherit] inline-block w-[312px] h-[239px] transition-all duration-1000 ease-out ${showContactElements ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`} style={{ 
+              fontSize: 'calc(96px * var(--viewport-scale, 1))',
+              transitionDelay: '0.2s' 
+            }}>
         Get in Touch
       </h1>
             <div
@@ -835,7 +862,10 @@ const Web19202: NextPage = () => {
             />
             <input
               className={`[border:none] [outline:none] bg-[transparent] absolute top-[298px] left-[80px] rounded-[23px] w-[581px] h-[95px] transition-all duration-1000 ease-out font-[Gilmer] font-medium text-white z-10 ${showContactElements && showFormElements && !showThankYou ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
-              style={{ transitionDelay: '0.4s' }}
+              style={{ 
+                fontSize: 'calc(24px * var(--viewport-scale, 1))',
+                transitionDelay: '0.4s' 
+              }}
               type="text"
               placeholder="Name"
               value={formData.name}
@@ -843,7 +873,10 @@ const Web19202: NextPage = () => {
             />
             <input
               className={`[border:none] [outline:none] bg-[transparent] absolute top-[408px] left-[80px] rounded-[23px] w-[581px] h-[95px] transition-all duration-1000 ease-out font-[Gilmer] font-medium text-white z-10 ${showContactElements && showFormElements && !showThankYou ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
-              style={{ transitionDelay: '0.6s' }}
+              style={{ 
+                fontSize: 'calc(24px * var(--viewport-scale, 1))',
+                transitionDelay: '0.6s' 
+              }}
               type="email"
               placeholder="Email"
               value={formData.email}
@@ -851,7 +884,10 @@ const Web19202: NextPage = () => {
             />
             <textarea
               className={`[border:none] bg-[transparent] [outline:none] absolute top-[538px] left-[80px] rounded-none w-[581px] h-[240px] transition-all duration-1000 ease-out font-[Gilmer] font-medium text-white resize-none z-10 ${showContactElements && showFormElements && !showThankYou ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
-              style={{ transitionDelay: '0.8s' }}
+              style={{ 
+                fontSize: 'calc(24px * var(--viewport-scale, 1))',
+                transitionDelay: '0.8s' 
+              }}
               placeholder="Message"
               value={formData.message}
               onChange={(e) => handleInputChange('message', e.target.value)}
@@ -878,7 +914,9 @@ const Web19202: NextPage = () => {
               }}
               onClick={handleSubmit}
             >
-              <span className="absolute left-[calc(50%-5px)] top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-[32px] font-[Nasalization] uppercase">
+              <span className="absolute left-[calc(50%-5px)] top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-[Nasalization] uppercase" style={{
+                fontSize: 'calc(32px * var(--viewport-scale, 1))'
+              }}>
                 Send
               </span>
             </button>
@@ -926,7 +964,9 @@ const Web19202: NextPage = () => {
                 alt="Email"
           src="/path-1.svg"
         />
-              <div className="absolute w-[calc(100%_-_130px)] top-[calc(50%_-_17.5px)] left-[106.21px] font-medium inline-block h-[39px]">
+              <div className="absolute w-[calc(100%_-_130px)] top-[calc(50%_-_17.5px)] left-[106.21px] font-medium inline-block h-[39px]" style={{
+                fontSize: 'calc(26px * var(--viewport-scale, 1))'
+              }}>
           nihaalnazeerxo@gmail.com
         </div>
       </a>
