@@ -245,7 +245,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <SoundContext.Provider value={{ soundEnabled, setSoundEnabled }}>
       <Fragment>
         <Head>
-          <title>updatedwebsite</title>
+          <title>Nihaal Nazeer Portfolio</title>
           <link rel="icon" href="/logo.png" />
           <meta
             name="viewport"

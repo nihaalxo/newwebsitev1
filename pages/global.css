@@ -2,6 +2,7 @@
 :root {
   /* default scale = 1 */
   --design-scale: 1;
+  --viewport-scale: 1;
 }
 
 /* Fullscreen wrapper for home page (with scroll, always 100vh) */
@@ -75,12 +76,7 @@
 }
 
 /* Tailwind CSS imports - used by both pages */
-@import "tailwindcss/preflight.css" layer(base);
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
-@layer theme, base, components, utilities;
-/* stylelint-disable-next-line at-rule-no-unknown */
-@config "../tailwind.config.js";
+@import "tailwindcss";
 
 /* Global HTML/body styles - used by both pages */
 html {
