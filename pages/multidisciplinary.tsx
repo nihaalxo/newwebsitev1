@@ -153,7 +153,7 @@ const MultidisciplinaryPage: NextPage = () => {
         height={554}
         sizes="100vw"
         alt=""
-        src="/3cbb79e5fa5548ba9ed8dfe948b10a0d-rw-1920@2x.png"
+        src="/button3.png"
       />
       <button className={styles.backButton} id="backarrow" onClick={goBack}>
         <Image
