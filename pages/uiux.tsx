@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
   {
     key: "escape-room",
     title: "Escape Room - Game Design",
-    imgSrc: "/Escape%20Room%20-%20Game%20Design.png",
+    imgSrc: "/Escape Room-Game Design.png",
     imgAlt: "",
     date: "2023",
     url: "https://nihaalnazeer.myportfolio.com/escape-room-game-design",
@@ -28,7 +28,7 @@ const PROJECTS: Project[] = [
   {
     key: "instagram-redesign",
     title: "Apple Vision - Instagram Redesign",
-    imgSrc: "/Apple%20Vision%20-%20Instagram%20Redesign.png",
+    imgSrc: "/Apple Vision-InstagramRedesign.png",
     imgAlt: "",
     date: "2023",
     url: "https://nihaalnazeer.myportfolio.com/apple-vision-instagram-redesign",
@@ -36,7 +36,7 @@ const PROJECTS: Project[] = [
   {
     key: "green-print",
     title: "Green Print - App Design",
-    imgSrc: "/Green%20Print%20-%20App%20Design.png",
+    imgSrc: "/GreenPrint-AppDesign.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/green-print-app-design",
@@ -44,7 +44,7 @@ const PROJECTS: Project[] = [
   {
     key: "butterfly-garden",
     title: "Butterfly Garden - UI Design/Animation",
-    imgSrc: "/Butterfly%20Garden%20-%20UI%20DesignAnimation.png",
+    imgSrc: "/Butterfly Garden-UI DesignAnimation.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/butterfly-garden-ui-designanimation",
@@ -52,7 +52,7 @@ const PROJECTS: Project[] = [
   {
     key: "lean-website",
     title: "Lean - Website Design",
-    imgSrc: "/Lean%20-%20Website%20Design.png",
+    imgSrc: "/Lean-WebsiteDesign.png",
     imgAlt: "",
     date: "2023",
     url: "https://nihaalnazeer.myportfolio.com/lean-website-design",
@@ -60,7 +60,7 @@ const PROJECTS: Project[] = [
   {
     key: "ehteraz-app",
     title: "Ehteraz Covid App - Redesign",
-    imgSrc: "/Ehteraz%20Covid%20App%20-%20Redesign.png",
+    imgSrc: "/Ehteraz Covid App-Redesign.png",
     imgAlt: "Ehteraz Covid app redesign",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/ehteraz-covid-app-redesign",

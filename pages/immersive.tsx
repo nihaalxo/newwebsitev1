@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
   {
     key: "immersive-netflix",
     title: "Immersive Netflix for Apple's Vision Pro",
-    imgSrc: "/Immersive%20Netflix%20for%20Apple's%20Vision%20Pro.png",
+    imgSrc: "/ImmersiveNetflixforApple'sVisionPro.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/immersive-netflix-for-apples-vision-pro",
@@ -28,7 +28,7 @@ const PROJECTS: Project[] = [
   {
     key: "football-vision",
     title: "Football On the Vision Pro",
-    imgSrc: "/Football%20On%20the%20Vision%20Pro.png",
+    imgSrc: "/FootballOntheVisionPro.png",
     imgAlt: "",
     date: "2025",
     url: "https://nihaalnazeer.myportfolio.com/football-on-the-vision-pro",
@@ -36,7 +36,7 @@ const PROJECTS: Project[] = [
   {
     key: "immersive-portfolio",
     title: "Immersive Portfolio Website",
-    imgSrc: "/Immersive%20Portfolio%20Website.png",
+    imgSrc: "/ImmersivePortfolioWebsite.png",
     imgAlt: "",
     date: "2025",
     url: "https://nihaalnazeer.myportfolio.com/immersive-portfolio-website",

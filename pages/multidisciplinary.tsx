@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
   {
     key: "fortune",
     title: "Fortune Teller - Interactive Pamphlet",
-    imgSrc: "/Fortune%20Teller%20-%20Interactive%20Pamphlet.png",
+    imgSrc: "/Fortune Teller-InteractivePamphlet.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/fortune-teller-interactive-pamphlet",
@@ -28,7 +28,7 @@ const PROJECTS: Project[] = [
   {
     key: "telephone",
     title: "Telephone - Publication Design",
-    imgSrc: "/Telephone%20-%20Publication%20Design.png",
+    imgSrc: "/Telephone-PublicationDesign.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/telephone-publication-design",
@@ -36,7 +36,7 @@ const PROJECTS: Project[] = [
   {
     key: "memory",
     title: "Memory Palace - Blender Animation",
-    imgSrc: "/Memory%20Palace%20-%20Blender%20Animation.png",
+    imgSrc: "/MemoryPalace-BlenderAnimation.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/memory-palace-blender-animation",
@@ -44,7 +44,7 @@ const PROJECTS: Project[] = [
   {
     key: "static",
     title: "Static Action - Animation",
-    imgSrc: "/Static%20Action%20-%20Animation.png",
+    imgSrc: "/Static Action-Animation.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/static-action-animation",
@@ -52,7 +52,7 @@ const PROJECTS: Project[] = [
   {
     key: "light",
     title: "Light and Dark - Animation",
-    imgSrc: "/Light%20and%20Dark%20-%20Animation.png",
+    imgSrc: "/LightandDark-Animation.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/light-and-dark-animation",
@@ -60,7 +60,7 @@ const PROJECTS: Project[] = [
   {
     key: "mental",
     title: "Mental Health - Advocate",
-    imgSrc: "/Mental%20Health%20-%20Advocate.png",
+    imgSrc: "/Mental Health-Advocate.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/mental-health-advocate",
@@ -68,7 +68,7 @@ const PROJECTS: Project[] = [
   {
     key: "typographic",
     title: "Typographic Posters",
-    imgSrc: "/Typographic%20Posters.png",
+    imgSrc: "/TypographicPosters.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/typographic-posters",
@@ -76,7 +76,7 @@ const PROJECTS: Project[] = [
   {
     key: "mind-designer",
     title: "Mind of a Designer - Short Film",
-    imgSrc: "/Mind%20of%20a%20Designer%20-%20Short%20Film.png",
+    imgSrc: "/MindofaDesigner-Short Film.png",
     imgAlt: "Mind of a Designer short film",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/mind-of-a-designer-short-film",
