@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
   {
     key: "original-machines",
     title: "Original Machines - Branding",
-    imgSrc: "/Original Machines-Branding.png",
+    imgSrc: "/OriginalMachines-Branding.png",
     imgAlt: "Original Machines branding project",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/original-machines-branding",
@@ -36,7 +36,7 @@ const PROJECTS: Project[] = [
   {
     key: "silklon-serione",
     title: "Silklon & Serione - Branding Design",
-    imgSrc: "/Silklon&Serione-Branding Design.png",
+    imgSrc: "/Silklon&Serione-BrandingDesign.png",
     imgAlt: "Silklon & Serione branding design",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/silklon-and-serione-branding-design",

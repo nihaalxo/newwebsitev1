@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
   {
     key: "fortune",
     title: "Fortune Teller - Interactive Pamphlet",
-    imgSrc: "/Fortune Teller-InteractivePamphlet.png",
+    imgSrc: "/FortuneTeller-InteractivePamphlet.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/fortune-teller-interactive-pamphlet",
@@ -44,7 +44,7 @@ const PROJECTS: Project[] = [
   {
     key: "static",
     title: "Static Action - Animation",
-    imgSrc: "/Static Action-Animation.png",
+    imgSrc: "/StaticAction-Animation.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/static-action-animation",
@@ -60,7 +60,7 @@ const PROJECTS: Project[] = [
   {
     key: "mental",
     title: "Mental Health - Advocate",
-    imgSrc: "/Mental Health-Advocate.png",
+    imgSrc: "/MentalHealth-Advocate.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/mental-health-advocate",

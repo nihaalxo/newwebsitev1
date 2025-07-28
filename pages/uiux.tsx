@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
   {
     key: "escape-room",
     title: "Escape Room - Game Design",
-    imgSrc: "/Escape Room-Game Design.png",
+    imgSrc: "/EscapeRoom-GameDesign.png",
     imgAlt: "",
     date: "2023",
     url: "https://nihaalnazeer.myportfolio.com/escape-room-game-design",
@@ -44,7 +44,7 @@ const PROJECTS: Project[] = [
   {
     key: "butterfly-garden",
     title: "Butterfly Garden - UI Design/Animation",
-    imgSrc: "/Butterfly Garden-UI DesignAnimation.png",
+    imgSrc: "/ButterflyGarden-UIDesignAnimation.png",
     imgAlt: "",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/butterfly-garden-ui-designanimation",
@@ -60,7 +60,7 @@ const PROJECTS: Project[] = [
   {
     key: "ehteraz-app",
     title: "Ehteraz Covid App - Redesign",
-    imgSrc: "/Ehteraz Covid App-Redesign.png",
+    imgSrc: "/EhterazCovidApp-Redesign.png",
     imgAlt: "Ehteraz Covid app redesign",
     date: "2024",
     url: "https://nihaalnazeer.myportfolio.com/ehteraz-covid-app-redesign",
