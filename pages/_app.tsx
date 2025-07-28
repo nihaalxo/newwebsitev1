@@ -210,6 +210,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Fragment>
         <Head>
           <title>updatedwebsite</title>
+          <link rel="icon" href="/logo.png" />
           <meta
             name="viewport"
             content="minimum-scale=1, initial-scale=1, width=device-width"
