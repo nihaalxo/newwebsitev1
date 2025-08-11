@@ -16,6 +16,24 @@ const Web19202: NextPage = () => {
   const { addVideoRef, videoRefs } = useVideoSound();
   useDesignScale(); // Apply the scaling system
 
+  // Force video reload when domain changes
+  useEffect(() => {
+    const forceVideoReload = () => {
+      const videos = document.querySelectorAll('video');
+      videos.forEach((video, index) => {
+        if (video.src) {
+          console.log(`Reloading video ${index}: ${video.src}`);
+          video.load();
+          video.play().catch(err => console.error(`Failed to play video ${index}:`, err));
+        }
+      });
+    };
+
+    // Reload videos after a short delay to ensure page is ready
+    const timer = setTimeout(forceVideoReload, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Intersection Observer for UI element animations
   useEffect(() => {
     const observerOptions = {
@@ -334,6 +352,19 @@ const Web19202: NextPage = () => {
         playsInline
         autoPlay
         style={{ left: '-50px' }}
+        onError={(e) => {
+          console.error('Left banner video error:', e);
+          // Retry loading after a delay
+          setTimeout(() => {
+            const video = e.currentTarget as HTMLVideoElement;
+            if (video) {
+              video.load();
+              video.play().catch(err => console.error('Left banner retry failed:', err));
+            }
+          }, 1000);
+        }}
+        onLoadStart={() => console.log('Left banner video loading started')}
+        onCanPlay={() => console.log('Left banner video can play')}
       >
         <source src="/leftsidebanner.mp4" />
       </video>
@@ -346,6 +377,19 @@ const Web19202: NextPage = () => {
         playsInline
         autoPlay
         style={{ right: '-50px' }}
+        onError={(e) => {
+          console.error('Right banner video error:', e);
+          // Retry loading after a delay
+          setTimeout(() => {
+            const video = e.currentTarget as HTMLVideoElement;
+            if (video) {
+              video.load();
+              video.play().catch(err => console.error('Right banner retry failed:', err));
+            }
+          }, 1000);
+        }}
+        onLoadStart={() => console.log('Right banner video loading started')}
+        onCanPlay={() => console.log('Right banner video can play')}
       >
         <source src="/rightsidebanner.mp4" />
       </video>
@@ -365,9 +409,19 @@ const Web19202: NextPage = () => {
               loop
               playsInline
               autoPlay
-              onError={(e) => console.error('Video error:', e)}
-              onLoadStart={() => console.log('Video loading started')}
-              onCanPlay={() => console.log('Video can play')}
+              onError={(e) => {
+                console.error('Hero video error:', e);
+                // Try to reload the video after a short delay
+                setTimeout(() => {
+                  const videoElement = e.currentTarget as HTMLVideoElement;
+                  if (videoElement) {
+                    videoElement.load();
+                    videoElement.play().catch((err: Error) => console.error('Failed to play video after reload:', err));
+                  }
+                }, 1000);
+              }}
+              onLoadStart={() => console.log('Hero video loading started')}
+              onCanPlay={() => console.log('Hero video can play')}
               style={{ width: '100%', height: '100%' }}
             >
               <source src="/finalheroshot.compressed.mp4" />
