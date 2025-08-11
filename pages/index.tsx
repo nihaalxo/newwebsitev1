@@ -360,10 +360,15 @@ const Web19202: NextPage = () => {
               ref={(el) => {
                 addVideoRef(el, 0);
               }}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover z-0"
               muted={!soundEnabled}
               loop
               playsInline
+              autoPlay
+              onError={(e) => console.error('Video error:', e)}
+              onLoadStart={() => console.log('Video loading started')}
+              onCanPlay={() => console.log('Video can play')}
+              style={{ width: '100%', height: '100%' }}
             >
               <source src="/finalheroshot.compressed.mp4" />
             </video>
