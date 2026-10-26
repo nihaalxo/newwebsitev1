@@ -25,7 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
+# local env files: they hold your admin password and Supabase keys
 .env*.local
 
 # vercel
@@ -33,3 +33,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# Local-mode content IS committed: .cms/content.json and public/uploads are the site's content until you move to
+# Supabase. Only ignore the half-written files a crash mid-save or mid-upload could leave behind.
+/.cms/*.tmp
+/public/uploads/**/*.part

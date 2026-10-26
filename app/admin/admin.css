@@ -1,0 +1,1402 @@
+/* Site admin.
+   Utilitarian on purpose: the public site's palette, type and cut-corner device, none of its cinema.
+   Every rule is scoped to .adm (the admin shell and the sign-in page) or to an adm-* class, so nothing here reaches
+   the public site or the case study inside the preview, which loads components/site/site.css alongside this file.
+   Gilmer has only two weights: 300 for reading, 500 for labels, controls and headings. */
+
+.adm,
+.adm-preview-bar {
+  --a-bg: var(--void, #04070a);
+  --a-panel: var(--deep, #0a1117);
+  --a-field: #0c141b;
+  --a-line: var(--line, rgba(147, 167, 179, 0.18));
+  --a-line-strong: var(--line-strong, rgba(234, 243, 246, 0.3));
+  --a-text: var(--bone, #eaf3f6);
+  --a-muted: var(--mist, #93a7b3);
+  --a-accent: var(--seam, #6ff3ff);
+  --a-accent-soft: var(--seam-soft, rgba(111, 243, 255, 0.32));
+  --a-accent-wash: rgba(111, 243, 255, 0.07);
+  --a-accent-ink: var(--seam-ink, #021316);
+  --a-warn: var(--tape, #ffd21f);
+  --a-warn-wash: rgba(255, 210, 31, 0.08);
+  --a-warn-ink: var(--tape-ink, #0b0a06);
+  --a-font: var(--f-text, 'Avenir Next', system-ui, sans-serif);
+  --a-title: var(--f-title, var(--a-font));
+  --a-gutter: clamp(16px, 3vw, 40px);
+  --a-top: 60px;
+  --a-cut: 10px;
+}
+
+.adm {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--a-bg);
+  color: var(--a-text);
+  font-family: var(--a-font);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.55;
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.adm :focus-visible {
+  outline: 2px solid var(--a-accent);
+  outline-offset: 2px;
+}
+
+.adm h1,
+.adm h2,
+.adm h3,
+.adm p {
+  margin: 0;
+}
+
+.adm img,
+.adm video {
+  display: block;
+  max-width: 100%;
+}
+
+.adm strong {
+  font-weight: 500;
+}
+
+.adm-vh {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.adm-skip {
+  position: fixed;
+  top: -80px;
+  left: 16px;
+  z-index: 60;
+  padding: 12px 16px;
+  background: var(--a-accent);
+  color: var(--a-accent-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+.adm-skip:focus {
+  top: 12px;
+}
+.adm .adm-skip:focus-visible {
+  outline: 2px solid var(--a-accent-ink);
+  outline-offset: -5px;
+}
+
+/* ---------- shell ---------- */
+
+.adm-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(4, 7, 10, 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--a-line);
+}
+
+.adm-top-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 28px;
+  max-width: 1240px;
+  min-height: var(--a-top);
+  margin-inline: auto;
+  padding: 0 var(--a-gutter);
+}
+
+.adm-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--a-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.adm-brand-name {
+  font: 400 12px/1 var(--a-title);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.adm-brand-sub {
+  padding-left: 10px;
+  border-left: 1px solid var(--a-line-strong);
+  color: var(--a-muted);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.adm-xmark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: var(--a-accent);
+  stroke-width: 2.4;
+  stroke-linecap: square;
+  filter: drop-shadow(0 0 6px var(--a-accent-soft));
+}
+
+.adm-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
+.adm-nav a {
+  padding: 19px 0 17px;
+  border-bottom: 2px solid transparent;
+  color: var(--a-muted);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.adm-nav a:hover {
+  color: var(--a-text);
+}
+.adm-nav a[aria-current='page'] {
+  color: var(--a-text);
+  border-bottom-color: var(--a-accent);
+}
+
+.adm-top-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin-left: auto;
+  padding-block: 8px;
+}
+
+.adm-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--a-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+.adm-mode::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--a-muted);
+}
+.adm-mode[data-mode='supabase']::before {
+  background: var(--a-accent);
+  box-shadow: 0 0 8px var(--a-accent-soft);
+}
+
+/* Narrower screens: the bar wraps onto more rows, so it scrolls away instead of covering the form. */
+@media (max-width: 1023px) {
+  .adm-top {
+    position: static;
+  }
+  .adm-top-end {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    border-top: 1px solid var(--a-line);
+  }
+}
+
+.adm-main {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 32px var(--a-gutter) 64px;
+}
+.adm-main:focus {
+  outline: none;
+}
+
+/* ---------- page heading ---------- */
+
+.adm-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--a-line);
+}
+
+.adm-h1 {
+  font: 400 clamp(1.3rem, 1.05rem + 1vw, 1.8rem) / 1.15 var(--a-title);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.adm-h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.adm-lede {
+  margin-top: 10px;
+  max-width: 64ch;
+  color: var(--a-muted);
+}
+
+.adm-crumb {
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.adm-crumb a {
+  color: var(--a-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--a-line-strong);
+  text-underline-offset: 4px;
+}
+.adm-crumb a:hover {
+  color: var(--a-text);
+  text-decoration-color: var(--a-accent);
+}
+
+.adm-state-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.adm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 9px;
+  border: 1px solid var(--a-line-strong);
+  color: var(--a-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.adm-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+}
+.adm-badge[data-status='published'] {
+  border-color: rgba(111, 243, 255, 0.45);
+  color: var(--a-text);
+}
+.adm-badge[data-status='published']::before {
+  border-color: var(--a-accent);
+  background: var(--a-accent);
+  box-shadow: 0 0 8px var(--a-accent-soft);
+}
+
+/* ---------- buttons ---------- */
+
+.adm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--a-line-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--a-text);
+  font-family: var(--a-font);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.adm-btn:hover {
+  border-color: var(--a-accent);
+  background: var(--a-accent-wash);
+}
+.adm-btn:disabled,
+.adm-btn[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.adm-btn:disabled:hover,
+.adm-btn[aria-disabled='true']:hover {
+  border-color: var(--a-line-strong);
+  background: transparent;
+}
+
+/* The cut corner is the site's identity device; outlines go inside it so clip-path can't hide them. */
+.adm-btn-primary,
+.adm-btn-danger {
+  border-color: transparent;
+  clip-path: polygon(0 0, calc(100% - var(--a-cut)) 0, 100% var(--a-cut), 100% 100%, 0 100%);
+}
+.adm-btn-primary {
+  background: var(--a-accent);
+  color: var(--a-accent-ink);
+}
+.adm-btn-primary:hover {
+  border-color: transparent;
+  background: #a6f8ff;
+}
+.adm-btn-primary[aria-disabled='true']:hover {
+  border-color: transparent;
+  background: var(--a-accent);
+}
+.adm .adm-btn-primary:focus-visible {
+  outline: 2px solid var(--a-accent-ink);
+  outline-offset: -5px;
+}
+.adm-btn-danger {
+  background: var(--a-warn);
+  color: var(--a-warn-ink);
+}
+.adm-btn-danger:hover {
+  border-color: transparent;
+  background: #ffe066;
+}
+.adm-btn-danger[aria-disabled='true']:hover {
+  border-color: transparent;
+  background: var(--a-warn);
+}
+.adm .adm-btn-danger:focus-visible {
+  outline: 2px solid var(--a-warn-ink);
+  outline-offset: -5px;
+}
+
+.adm-btn-quiet {
+  border-color: transparent;
+  color: var(--a-muted);
+  padding-inline: 10px;
+}
+.adm-btn-quiet:hover {
+  border-color: transparent;
+  background: none;
+  color: var(--a-text);
+  text-decoration: underline;
+  text-decoration-color: var(--a-accent);
+  text-underline-offset: 4px;
+}
+
+.adm-btn-small {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+.adm-btn-small.adm-btn-quiet {
+  padding-inline: 8px;
+}
+
+.adm-btn-block {
+  width: 100%;
+}
+
+.adm-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--a-line);
+  background: transparent;
+  color: var(--a-text);
+  cursor: pointer;
+}
+.adm-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.adm-icon-btn:hover {
+  border-color: var(--a-accent);
+  background: var(--a-accent-wash);
+}
+.adm-icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.adm-icon-btn:disabled:hover {
+  border-color: var(--a-line);
+  background: transparent;
+}
+
+/* ---------- fields ---------- */
+
+.adm-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.adm-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.adm-label {
+  padding: 0;
+  color: var(--a-text);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.adm-req {
+  margin-left: 10px;
+  color: var(--a-muted);
+  font-size: 13px;
+  font-weight: 300;
+}
+
+.adm-help {
+  max-width: 68ch;
+  color: var(--a-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.adm-help strong {
+  color: var(--a-text);
+}
+
+.adm-input {
+  width: 100%;
+  min-height: 46px;
+  margin: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--a-line);
+  border-bottom-color: var(--a-line-strong);
+  border-radius: 0;
+  background: var(--a-field);
+  color: var(--a-text);
+  font-family: var(--a-font);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.45;
+}
+.adm-input::placeholder {
+  color: rgba(147, 167, 179, 0.6);
+}
+.adm-input:hover {
+  border-color: var(--a-line-strong);
+}
+.adm .adm-input:focus-visible {
+  outline: 2px solid var(--a-accent);
+  outline-offset: 0;
+  border-color: transparent;
+}
+.adm-input[aria-invalid='true'] {
+  border-color: var(--a-warn);
+}
+textarea.adm-input {
+  min-height: 0;
+  resize: vertical;
+}
+.adm-select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393A7B3' stroke-width='1.8'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  cursor: pointer;
+}
+.adm-select option {
+  background: var(--a-panel);
+  color: var(--a-text);
+}
+
+.adm-count {
+  color: var(--a-muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.adm-count[data-over='true'] {
+  color: var(--a-warn);
+}
+
+.adm-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--a-warn);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.adm-error-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 2px;
+}
+
+.adm-alert {
+  padding: 12px 14px;
+  border-left: 3px solid var(--a-warn);
+  background: var(--a-warn-wash);
+  color: var(--a-text);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* A switch: a real checkbox laid over the track, so it keeps native keyboard and form behaviour. */
+.adm-switch {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.adm-switch-control {
+  position: relative;
+  flex: none;
+  width: 42px;
+  height: 24px;
+  margin-top: 1px;
+}
+.adm-switch-control input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.adm-switch-control input:disabled {
+  cursor: not-allowed;
+}
+.adm-switch-track {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--a-line-strong);
+  border-radius: 12px;
+  background: var(--a-field);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+.adm-switch-track::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--a-muted);
+  transition: transform 0.15s var(--ease-out, ease-out);
+}
+.adm-switch-control input:checked + .adm-switch-track {
+  border-color: var(--a-accent);
+  background: var(--a-accent);
+}
+.adm-switch-control input:checked + .adm-switch-track::before {
+  transform: translateX(18px);
+  background: var(--a-accent-ink);
+}
+.adm-switch-control input:hover + .adm-switch-track {
+  border-color: var(--a-accent);
+}
+.adm-switch-control input:focus-visible + .adm-switch-track {
+  outline: 2px solid var(--a-accent);
+  outline-offset: 3px;
+}
+.adm-switch-text {
+  display: grid;
+  gap: 2px;
+}
+.adm-switch-text .adm-label {
+  cursor: pointer;
+}
+
+/* Radio options drawn as chips. */
+.adm-choice {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.adm-choice legend {
+  margin-bottom: 10px;
+}
+.adm-choice-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.adm-chip {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  min-width: 110px;
+  padding: 9px 14px;
+  border: 1px solid var(--a-line);
+  cursor: pointer;
+}
+.adm-chip input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.adm-chip-label {
+  font-size: 15px;
+  font-weight: 500;
+}
+.adm-chip-help {
+  color: var(--a-muted);
+  font-size: 13px;
+}
+.adm-chip:hover {
+  border-color: var(--a-line-strong);
+}
+.adm-chip:has(input:checked) {
+  border-color: var(--a-accent);
+  background: var(--a-accent-wash);
+}
+.adm-chip:has(input:focus-visible) {
+  outline: 2px solid var(--a-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- media ---------- */
+
+.adm-drop {
+  display: grid;
+  place-items: center;
+  min-height: 168px;
+  padding: 24px;
+  border: 1px dashed var(--a-line-strong);
+  background: var(--a-field);
+  color: var(--a-muted);
+  text-align: center;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+.adm-drop[data-over='true'] {
+  border-color: var(--a-accent);
+  background: var(--a-accent-wash);
+}
+.adm-drop[data-invalid='true'] {
+  border-color: var(--a-warn);
+}
+.adm-drop[data-filled='true'] {
+  place-items: stretch;
+  min-height: 0;
+  padding: 0;
+  border-style: solid;
+  border-color: var(--a-line);
+  background: #000;
+}
+.adm-drop-compact {
+  min-height: 0;
+  padding: 18px;
+}
+.adm-drop-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.adm-drop-empty p {
+  font-size: 15px;
+}
+.adm-drop-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--a-accent);
+}
+
+.adm-media-preview {
+  width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+}
+
+.adm-media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.adm-media-size {
+  color: var(--a-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.adm-progress {
+  display: grid;
+  gap: 6px;
+  color: var(--a-text);
+  font-size: 14px;
+  font-weight: 500;
+}
+.adm-progress progress {
+  width: 100%;
+  height: 4px;
+  border: 0;
+  background: var(--a-line);
+  appearance: none;
+}
+.adm-progress progress::-webkit-progress-bar {
+  background: var(--a-line);
+}
+.adm-progress progress::-webkit-progress-value {
+  background: var(--a-accent);
+  box-shadow: 0 0 8px var(--a-accent-soft);
+}
+.adm-progress progress::-moz-progress-bar {
+  background: var(--a-accent);
+}
+/* Indeterminate: a slow sweep along the bar. */
+.adm-progress progress:indeterminate {
+  background: linear-gradient(90deg, transparent, var(--a-accent), transparent) 0 0 / 40% 100% no-repeat, var(--a-line);
+  animation: adm-sweep 1.2s linear infinite;
+}
+.adm-progress progress:indeterminate::-webkit-progress-bar {
+  background: transparent;
+}
+.adm-progress progress:indeterminate::-moz-progress-bar {
+  background: transparent;
+}
+@keyframes adm-sweep {
+  from {
+    background-position: -40% 0, 0 0;
+  }
+  to {
+    background-position: 140% 0, 0 0;
+  }
+}
+
+.adm-poster {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--a-line);
+}
+.adm-poster-thumb {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--a-field);
+  color: var(--a-muted);
+  font-size: 13px;
+  text-align: center;
+}
+.adm-poster-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.adm-poster-body {
+  display: grid;
+  gap: 8px;
+}
+@media (max-width: 559px) {
+  .adm-poster {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.adm-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.adm-gallery-item {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--a-line);
+  background: var(--a-field);
+}
+.adm-gallery-item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #000;
+}
+.adm-gallery-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.adm-gallery-tools .adm-btn-quiet {
+  margin-left: auto;
+}
+
+/* ---------- forms with sections (project editor, settings) ---------- */
+
+.adm-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+@media (min-width: 1080px) {
+  .adm-editor {
+    grid-template-columns: 180px minmax(0, 780px);
+    gap: 56px;
+  }
+}
+
+.adm-toc {
+  display: none;
+}
+@media (min-width: 1080px) {
+  .adm-toc {
+    display: block;
+    position: sticky;
+    top: calc(var(--a-top) + 28px);
+    align-self: start;
+    padding-top: 36px;
+  }
+}
+.adm-toc ol {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--a-line);
+}
+.adm-toc a {
+  display: block;
+  margin-left: -1px;
+  padding: 7px 14px;
+  border-left: 1px solid transparent;
+  color: var(--a-muted);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.adm-toc a:hover {
+  border-left-color: var(--a-accent);
+  color: var(--a-text);
+}
+
+.adm-form {
+  min-width: 0;
+}
+
+.adm-section {
+  display: grid;
+  gap: 24px;
+  padding-block: 36px;
+  border-top: 1px solid var(--a-line);
+  scroll-margin-top: calc(var(--a-top) + 12px);
+}
+.adm-section:first-child {
+  border-top: 0;
+}
+
+.adm-section-intro {
+  max-width: 64ch;
+  margin-top: -12px;
+  color: var(--a-muted);
+}
+
+.adm-grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (min-width: 700px) {
+  .adm-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* The sticky bar that carries the save state and the actions. */
+/* Reserve its height (measured into --adm-bar-h by useStickyBarHeight) so a field reached with Tab scrolls clear of
+   it instead of sitting underneath (WCAG 2.4.11). */
+html:has(.adm-bar) {
+  scroll-padding-bottom: calc(var(--adm-bar-h, 72px) + 16px);
+}
+.adm-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-inline: calc(-1 * var(--a-gutter));
+  padding: 12px var(--a-gutter) calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--a-line);
+  background: rgba(4, 7, 10, 0.94);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.adm-bar-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 240px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+.adm-bar-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--a-muted);
+}
+.adm-bar-status[data-tone='saved'] {
+  color: var(--a-text);
+}
+.adm-bar-status[data-tone='saved']::before {
+  border-color: var(--a-accent);
+  background: var(--a-accent);
+  box-shadow: 0 0 8px var(--a-accent-soft);
+}
+.adm-bar-status[data-tone='dirty']::before {
+  border-color: var(--a-warn);
+}
+.adm-bar-status[data-tone='error'] {
+  color: var(--a-warn);
+}
+.adm-bar-status[data-tone='error']::before {
+  border-color: var(--a-warn);
+  background: var(--a-warn);
+}
+.adm-bar-status[data-tone='busy'] {
+  color: var(--a-muted);
+}
+.adm-bar-status[data-tone='busy']::before {
+  border-color: var(--a-accent);
+  animation: adm-pulse 1s ease-in-out infinite alternate;
+}
+@keyframes adm-pulse {
+  to {
+    background: var(--a-accent);
+  }
+}
+
+.adm-bar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 599px) {
+  .adm-bar .adm-btn {
+    min-height: 40px;
+    padding-inline: 12px;
+    font-size: 14px;
+  }
+}
+
+/* An in-place "are you sure?" for deleting a project or removing a block. */
+.adm-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding-left: 12px;
+  border-left: 3px solid var(--a-warn);
+}
+.adm-confirm p {
+  flex: 1 1 260px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ---------- story blocks ---------- */
+
+.adm-prompts {
+  padding: 16px 18px;
+  border-left: 2px solid var(--a-accent);
+  background: var(--a-accent-wash);
+}
+.adm-prompts p {
+  font-weight: 500;
+}
+.adm-prompts ul {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--a-muted);
+}
+
+.adm-story {
+  display: grid;
+  gap: 16px;
+}
+
+.adm-story-empty {
+  color: var(--a-muted);
+}
+
+.adm-blocks {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.adm-block {
+  border: 1px solid var(--a-line);
+  background: var(--a-panel);
+}
+
+.adm-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 8px 8px 16px;
+  border-bottom: 1px solid var(--a-line);
+}
+.adm-block-head .adm-confirm {
+  flex: 1 1 100%;
+  margin: 4px 0;
+}
+
+.adm-block-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.adm-block-title:focus {
+  outline: none;
+}
+.adm-block-title:focus-visible {
+  outline: 2px solid var(--a-accent);
+  outline-offset: 4px;
+}
+
+.adm-block-pos {
+  color: var(--a-muted);
+  font-size: 13px;
+}
+
+.adm-block-tools {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.adm-block-body {
+  display: grid;
+  gap: 20px;
+  padding: 18px 16px 20px;
+}
+
+.adm-add {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px dashed var(--a-line-strong);
+}
+.adm-add .adm-label:focus {
+  outline: none;
+}
+/* Focus lands here after the last block is removed; keyboard users still need to see it. */
+.adm-add .adm-label:focus-visible {
+  outline: 2px solid var(--a-accent);
+  outline-offset: 4px;
+}
+.adm-add-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- accent colour ---------- */
+
+.adm-accent-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.adm-color {
+  width: 56px;
+  height: 46px;
+  padding: 4px;
+  border: 1px solid var(--a-line-strong);
+  border-radius: 0;
+  background: var(--a-field);
+  cursor: pointer;
+}
+.adm-color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.adm-color::-webkit-color-swatch {
+  border: 0;
+}
+.adm-color::-moz-color-swatch {
+  border: 0;
+}
+.adm-accent-hex {
+  width: 8.5em;
+}
+.adm-accent-hex .adm-input {
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+}
+/* A small stand-in for the top of a case study, lit by the chosen colour. */
+.adm-accent-preview {
+  --c: 16px;
+  display: flex;
+  align-items: flex-end;
+  height: 112px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--adm-accent) 40%, transparent);
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--adm-accent) 24%, transparent), transparent 72%),
+    var(--a-panel);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+  font: 400 13px/1 var(--a-title);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---------- project list ---------- */
+
+.adm-list-help {
+  max-width: 72ch;
+  margin-top: 20px;
+  color: var(--a-muted);
+  font-size: 15px;
+}
+
+.adm-list-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 20px;
+}
+
+.adm-rows {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--a-line);
+}
+
+.adm-row {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--a-line);
+}
+
+.adm-thumb {
+  --c: 10px;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--a-panel);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+  color: var(--a-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.adm-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.adm-row-main {
+  min-width: 0;
+}
+.adm-row-title {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.adm-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 6px;
+  color: var(--a-muted);
+  font-size: 14px;
+}
+
+.adm-row-move {
+  display: flex;
+  gap: 6px;
+}
+
+@media (max-width: 799px) {
+  .adm-row {
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'thumb main main'
+      'feature feature feature'
+      'move move edit';
+    gap: 12px 16px;
+  }
+  .adm-thumb {
+    grid-area: thumb;
+  }
+  .adm-row-main {
+    grid-area: main;
+  }
+  .adm-row-feature {
+    grid-area: feature;
+  }
+  .adm-row-move {
+    grid-area: move;
+  }
+  .adm-row-edit {
+    grid-area: edit;
+  }
+}
+
+.adm-empty {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: 720px;
+  margin-top: 32px;
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px dashed var(--a-line-strong);
+}
+.adm-empty ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 22px;
+  color: var(--a-muted);
+}
+
+/* ---------- sign in ---------- */
+
+.adm-login {
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.adm-login-panel {
+  display: grid;
+  gap: 24px;
+  width: min(420px, 100%);
+  padding: clamp(24px, 6vw, 36px);
+  border: 1px solid var(--a-line);
+  background: var(--a-panel);
+}
+
+.adm-login-form {
+  display: grid;
+  gap: 18px;
+}
+
+/* ---------- case-study preview ---------- */
+
+/* Sits where the site's own top bar would, in the space the case-study page already leaves for it. */
+.adm-preview-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 20px;
+  min-height: var(--bar, 64px);
+  padding: env(safe-area-inset-top, 0px) max(var(--a-gutter), env(safe-area-inset-right, 0px)) 0
+    max(var(--a-gutter), env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid var(--a-line);
+  background: rgba(4, 7, 10, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: var(--a-muted);
+  font: 300 15px/1.4 var(--a-font);
+}
+.adm-preview-bar p {
+  margin: 0;
+}
+.adm-preview-bar strong {
+  color: var(--a-text);
+  font-weight: 500;
+}
+.adm-preview-bar a {
+  color: var(--a-text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--a-accent);
+  text-underline-offset: 4px;
+}
+.adm-preview-bar a:focus-visible {
+  outline: 2px solid var(--a-accent);
+  outline-offset: 3px;
+}
+/* The case study's own draft notice sticks just below the bar instead of under it. */
+.adm-preview-bar ~ .page .cs-preview {
+  top: var(--bar, 64px);
+}
+
+/* ---------- motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .adm *,
+  .adm *::before,
+  .adm *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

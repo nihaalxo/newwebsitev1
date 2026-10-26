@@ -1,0 +1,1786 @@
+/* The public site and the case-study page (also imported by the admin's draft preview).
+   The footage is the page: a full-bleed hero film with the name set like a title card, the first row of work rising
+   over its bottom, a 12-column grid of plates in uneven rows, then the Lair and the contact film as cinematic bands.
+   One identity device, the X emblem's diagonal cut, appears on plates, frames and solid buttons.
+   Type: Nasalization for title cards, the name, section titles and small signage; Gilmer Light for reading at 17px and
+   up; Gilmer Medium for labels, buttons, card titles and anything smaller. */
+
+/* ---------- shell ---------- */
+.site {
+  --overlap: clamp(120px, 17vh, 200px);
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+.site > main {
+  flex: 1 0 auto;
+}
+/* Paint the notch area so content never shows through above the fixed bar. */
+.site::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 40;
+  background: var(--void);
+}
+.site ::selection,
+.cs ::selection {
+  background: rgba(111, 243, 255, 0.28);
+  color: #fff;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1360px;
+  margin-inline: auto;
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+.skip {
+  position: fixed;
+  left: 16px;
+  top: -80px;
+  z-index: 60;
+  padding: 12px 16px;
+  background: var(--seam);
+  color: var(--seam-ink);
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+}
+.skip:focus {
+  top: calc(12px + env(safe-area-inset-top, 0px));
+}
+.skip:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 2px;
+}
+
+/* Display type renders crisper with grayscale smoothing; body copy keeps the default so Light stays full-bodied. */
+.brand,
+.name,
+.title-l,
+.title-s,
+.tape,
+.film-card,
+.contact-title,
+.email,
+.cs-title,
+.cs-next-title {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links inside running text glow along a seam-coloured underline. */
+.lead a,
+.credit a,
+.statement a,
+.lair-copy p a,
+.cs-text a,
+.cs-quote a,
+.facts a,
+.foot p a,
+.status a {
+  color: var(--bone);
+  text-decoration-line: underline;
+  text-decoration-color: var(--seam);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-shadow 0.25s ease;
+}
+:is(.lead, .credit, .statement, .lair-copy p, .cs-text, .cs-quote, .facts, .foot p, .status) a:hover {
+  text-shadow: 0 0 14px var(--seam-soft);
+}
+
+.xmark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: var(--seam);
+  stroke-width: 2.4;
+  stroke-linecap: square;
+  filter: drop-shadow(0 0 6px var(--seam-soft));
+}
+
+/* ---------- top bar ---------- */
+.bar {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: var(--bar);
+  border-bottom: 1px solid transparent;
+  background-color: rgba(4, 7, 10, 0);
+  /* An explicit zero blur gives the frost a starting value, so it builds with the tint instead of popping on. */
+  -webkit-backdrop-filter: blur(0px) saturate(1);
+  backdrop-filter: blur(0px) saturate(1);
+  transition:
+    background-color 0.4s var(--ease-out),
+    border-color 0.4s ease,
+    -webkit-backdrop-filter 0.4s var(--ease-out),
+    backdrop-filter 0.4s var(--ease-out);
+}
+.bar.solid {
+  background-color: rgba(4, 7, 10, 0.78);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom-color: var(--line);
+}
+.bar .wrap {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font: 400 13px/1 var(--f-title);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.bar-end {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 36px);
+}
+.nav {
+  display: flex;
+  gap: clamp(14px, 2.6vw, 36px);
+}
+.nav a {
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--bone);
+  opacity: 0.82;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    opacity 0.2s ease,
+    text-shadow 0.25s ease;
+}
+.nav a:hover {
+  opacity: 1;
+  text-shadow: 0 0 14px var(--seam-soft);
+}
+/* Sound and Motion: two switches in one visual language, each showing its current state in its icon. */
+.bar-toggles {
+  display: flex;
+  gap: 8px;
+}
+.bar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--bone);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.bar-toggle:hover {
+  border-color: var(--line-strong);
+}
+.bar-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+.bar-toggle[aria-pressed='true'] {
+  border-color: var(--seam);
+  box-shadow: 0 0 14px var(--seam-soft);
+}
+.sound .wave,
+.sound .mute,
+.motion .trail,
+.motion .hold {
+  transition: opacity 0.2s ease;
+}
+.sound .wave,
+.motion .trail {
+  opacity: 0;
+}
+.sound[aria-pressed='true'] .wave,
+.motion[aria-pressed='true'] .trail {
+  opacity: 1;
+}
+.sound[aria-pressed='true'] .mute,
+.motion[aria-pressed='true'] .hold {
+  opacity: 0;
+}
+/* The bar sheds in steps as it narrows, so the name, the links and both switches always fit on one line: first the
+   switches' words (their names stay for screen readers), then About, then the name beside the emblem, then "The". */
+@media (max-width: 799px) {
+  .bar-toggles {
+    gap: 6px;
+  }
+  .bar-toggle {
+    padding: 0 9px;
+  }
+  .bar-toggle .bar-toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 599px) {
+  .nav .wide {
+    display: none;
+  }
+}
+@media (max-width: 519px) {
+  .brand span {
+    display: none;
+  }
+}
+@media (max-width: 439px) {
+  .nav .the {
+    display: none;
+  }
+  .nav {
+    gap: 16px;
+  }
+}
+@media (max-width: 359px) {
+  .nav {
+    gap: 12px;
+  }
+}
+
+/* ---------- hero ---------- */
+.hero {
+  position: relative;
+  display: flex;
+  min-height: clamp(600px, 94svh, 1040px);
+  isolation: isolate;
+  overflow: hidden;
+  /* clip, unlike hidden, is not a scroll container, so the film's view() timeline tracks the page's scroll. */
+  overflow: clip;
+}
+.hero-film {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  background: var(--void);
+}
+/* The film dims and leans back as the work rises over it. */
+@supports (animation-timeline: view()) {
+  .hero-film {
+    animation: film-recede linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 90%;
+  }
+  @keyframes film-recede {
+    to {
+      opacity: 0.28;
+      transform: scale(1.06);
+    }
+  }
+}
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(4, 7, 10, 0.7) 0, rgba(4, 7, 10, 0) 160px),
+    radial-gradient(90% 70% at 0% 100%, rgba(4, 7, 10, 0.78), rgba(4, 7, 10, 0) 62%),
+    linear-gradient(0deg, var(--void) 0, rgba(4, 7, 10, 0.9) calc(var(--overlap) + 20px), rgba(4, 7, 10, 0) 66%);
+}
+.hero-inner {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-top: calc(var(--bar) + env(safe-area-inset-top, 0px) + 18px);
+  padding-bottom: calc(var(--overlap) + 36px);
+}
+.hero-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+}
+
+/* The name as a true title card: one line across the full measure on wide screens, two big lines on phones.
+   Nasalization runs about 9.06em wide for NIHAAL NAZEER at this tracking, so 9.4vw fills roughly 93% of the
+   measure from 560px up, and the 8rem cap keeps it inside the 1248px wrap. */
+.name {
+  margin: 0;
+  font: 400 min(9.4vw, 8rem) / 1 var(--f-title);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--bone);
+  text-shadow: 0 0 22px rgba(111, 243, 255, 0.16);
+}
+/* NAZEER is the longer word (about 4.6em): 17vw sets it at roughly 89% of a phone's measure. */
+@media (max-width: 559px) {
+  .name {
+    font-size: clamp(2.6rem, 17vw, 4.4rem);
+    line-height: 0.98;
+  }
+}
+.name .w {
+  white-space: nowrap;
+}
+/* Each letter strikes like a neon tube catching: hard cuts on and off, then a slow settle to the resting glow. */
+.name .l {
+  animation: strike 1.5s calc(0.25s + var(--d, 0s)) backwards;
+}
+@keyframes strike {
+  0% {
+    color: rgba(234, 243, 246, 0.08);
+    text-shadow: none;
+    animation-timing-function: steps(1, end);
+  }
+  6% {
+    color: #fff;
+    text-shadow: 0 0 30px rgba(111, 243, 255, 0.95), 0 0 2px #fff;
+    animation-timing-function: steps(1, end);
+  }
+  11% {
+    color: rgba(234, 243, 246, 0.14);
+    text-shadow: none;
+    animation-timing-function: steps(1, end);
+  }
+  17% {
+    color: #fff;
+    text-shadow: 0 0 30px rgba(111, 243, 255, 0.95), 0 0 2px #fff;
+    animation-timing-function: steps(1, end);
+  }
+  21% {
+    color: rgba(234, 243, 246, 0.45);
+    text-shadow: 0 0 10px rgba(111, 243, 255, 0.35);
+    animation-timing-function: steps(1, end);
+  }
+  27% {
+    color: #fff;
+    text-shadow: 0 0 44px rgba(111, 243, 255, 0.9), 0 0 3px #fff;
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    color: var(--bone);
+    text-shadow: 0 0 22px rgba(111, 243, 255, 0.16);
+  }
+}
+.lead {
+  margin: 22px 0 0;
+  max-width: 36ch;
+  font-size: clamp(1.25rem, 1.02rem + 0.62vw, 1.6rem);
+  line-height: 1.42;
+  font-weight: 300;
+  text-wrap: pretty;
+  text-shadow: 0 1px 18px rgba(4, 7, 10, 0.7);
+  animation: wake 0.8s 0.95s var(--ease-out) backwards;
+}
+.credit {
+  display: none;
+  margin: 0;
+  padding-left: 14px;
+  border-left: 1px solid var(--seam);
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  animation: wake 0.8s 1.35s var(--ease-out) backwards;
+}
+/* The copy arrives only once the name has struck: opacity alone, no slide. */
+@keyframes wake {
+  from {
+    opacity: 0;
+  }
+}
+@media (min-width: 960px) {
+  .hero-foot {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+    column-gap: 32px;
+  }
+  .name {
+    grid-column: 1 / -1;
+  }
+  .lead {
+    grid-column: 1;
+  }
+  .credit {
+    display: block;
+    grid-column: 2;
+    align-self: end;
+  }
+}
+@media (max-width: 719px) {
+  .site {
+    --overlap: 96px;
+  }
+  .hero {
+    min-height: clamp(500px, 72svh, 640px);
+  }
+}
+
+/* ---------- work ---------- */
+.work {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(-1 * var(--overlap));
+  padding-bottom: clamp(72px, 10vw, 140px);
+}
+/* Clear over the hero film until it pins under the bar, then frosted edge to edge. */
+.filters {
+  position: sticky;
+  top: calc(var(--bar) + env(safe-area-inset-top, 0px));
+  z-index: 5;
+  background-color: rgba(4, 7, 10, 0);
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  transition:
+    background-color 0.3s var(--ease-out),
+    -webkit-backdrop-filter 0.3s var(--ease-out),
+    backdrop-filter 0.3s var(--ease-out);
+}
+.filters.stuck {
+  background-color: rgba(4, 7, 10, 0.82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.tabs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.6vw, 34px);
+  padding-top: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* The track line is a background so the active tab's light isn't clipped by the scroll box. */
+  background: linear-gradient(var(--line), var(--line)) left bottom / 100% 1px no-repeat;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab {
+  position: relative;
+  flex: none;
+  padding: 14px 0 15px;
+  border: 0;
+  background: none;
+  color: var(--mist);
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.tab:focus-visible {
+  outline-offset: -2px;
+}
+.tab sup {
+  margin-left: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mist);
+}
+.tab:hover,
+.tab[aria-pressed='true'] {
+  color: var(--bone);
+}
+.tab::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--seam);
+  box-shadow:
+    0 0 12px var(--seam),
+    0 0 2px var(--seam);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.tab[aria-pressed='true']::after {
+  opacity: 1;
+}
+.count {
+  flex: none;
+  margin: 0 0 0 auto;
+  padding-left: 24px;
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+@media (max-width: 799px) {
+  .count {
+    display: none;
+  }
+}
+@media (max-width: 719px) {
+  .tabs {
+    padding-right: 40px;
+    -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, #000 82%, transparent);
+  }
+}
+
+/* Plates in uneven rows. The column gap is a share of the grid's width (lib/layout.ts COLUMN_GAP), so the aspect
+   ratios computed there keep every plate in a row the same height at any width. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 2.2%;
+  row-gap: clamp(40px, 4.6vw, 64px);
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.card {
+  grid-column: span var(--span, 6);
+  min-width: 0;
+  container-type: inline-size;
+}
+.card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  scroll-margin-top: 150px;
+}
+.card-link:focus-visible {
+  outline-offset: 8px;
+}
+.halo {
+  display: block;
+  transition: filter 0.4s ease;
+}
+.plate {
+  --c: 26px;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: var(--ar, 4 / 3);
+  /* With no cover yet, the plate is lit by the project's own colour rather than showing a placeholder. */
+  background:
+    radial-gradient(80% 90% at 30% 20%, color-mix(in srgb, var(--accent, var(--seam)) 22%, transparent), transparent 70%),
+    var(--deep);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+}
+.plate img,
+.plate video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--ease-out);
+}
+/* The seam light runs along the top, disappears into the cut corner and comes out running down the right edge. */
+.plate::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 45%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--seam), transparent);
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+.plate::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  top: 0;
+  width: 2px;
+  height: 45%;
+  background: linear-gradient(180deg, transparent, var(--seam), transparent);
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+.plate.lit::after {
+  animation: sweep 0.62s cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+.plate.lit::before {
+  animation: drop 0.7s 0.4s var(--ease-out) both;
+}
+@keyframes sweep {
+  from {
+    transform: translateX(-110%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(240%);
+    opacity: 1;
+  }
+}
+@keyframes drop {
+  from {
+    transform: translateY(-110%);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(240%);
+    opacity: 1;
+  }
+}
+/* Hover is state, not motion: it stays under reduced motion. Taps on touch screens never leave a card lit. */
+@media (hover: hover) {
+  :is(.card-link, .cs-next):hover .halo {
+    filter: drop-shadow(0 0 1px var(--seam)) drop-shadow(0 0 24px rgba(111, 243, 255, 0.28));
+  }
+  :is(.card-link, .cs-next):hover .plate :is(img, video) {
+    transform: scale(1.035);
+  }
+  .card-link:hover .card-title,
+  .cs-next:hover .cs-next-title {
+    text-shadow: 0 0 16px var(--seam-soft);
+  }
+}
+:is(.card-link, .cs-next):focus-visible .halo {
+  filter: drop-shadow(0 0 1px var(--seam)) drop-shadow(0 0 24px rgba(111, 243, 255, 0.28));
+}
+:is(.card-link, .cs-next):focus-visible .plate :is(img, video) {
+  transform: scale(1.035);
+}
+.card-link:focus-visible .card-title,
+.cs-next:focus-visible .cs-next-title {
+  text-shadow: 0 0 16px var(--seam-soft);
+}
+.cap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px 18px;
+  margin-top: 16px;
+}
+.card-title {
+  font-size: clamp(1.15rem, 1.05rem + 0.35vw, 1.4rem);
+  font-weight: 500;
+  line-height: 1.25;
+  text-wrap: balance;
+  transition: text-shadow 0.4s ease;
+}
+.card-meta {
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.card-line {
+  grid-column: 1 / -1;
+  max-width: 58ch;
+  margin-top: 6px;
+  color: var(--mist);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+@container (min-width: 500px) {
+  .cap {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .card-meta {
+    padding-top: 4px;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 719px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 40px;
+  }
+  .card {
+    grid-column: auto;
+  }
+  .grid .plate {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* More work: the published projects that aren't featured. */
+.more {
+  margin-top: clamp(80px, 10vw, 140px);
+}
+.results > .more:first-child {
+  margin-top: 40px;
+}
+.title-s {
+  margin: 0;
+  font: 400 clamp(1.25rem, 1rem + 0.8vw, 1.7rem) / 1.2 var(--f-title);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.rows {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--line);
+}
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 15rem) 3.5rem;
+  gap: 20px;
+  align-items: baseline;
+  padding: 17px 0;
+  border-top: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+  scroll-margin-top: 150px;
+  scroll-margin-bottom: 96px;
+}
+.row:focus-visible {
+  outline-offset: 4px;
+}
+.row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 0;
+  height: 1px;
+  background: var(--seam);
+  box-shadow: 0 0 10px var(--seam);
+  transition: width 0.45s ease;
+}
+@media (hover: hover) {
+  .row:hover::before {
+    width: 100%;
+  }
+}
+.row:focus-visible::before {
+  width: 100%;
+}
+.row-title {
+  grid-column: 1;
+  font-size: clamp(1.1rem, 1rem + 0.35vw, 1.3rem);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.row-kind,
+.row-year {
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.row-kind {
+  grid-column: 2;
+}
+.row-year {
+  grid-column: 3;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 639px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) 3.2rem;
+    gap: 2px 12px;
+  }
+  .row-kind {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .row-year {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+/* Positioned with translate/rotate from MoreWork.tsx, so following the cursor never triggers layout. */
+.peek {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 20;
+  width: 260px;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.9;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  transition:
+    opacity 0.2s ease,
+    scale 0.36s var(--ease-out);
+}
+.peek.on {
+  opacity: 1;
+  scale: 1;
+}
+.peek:not([src]) {
+  visibility: hidden;
+}
+
+/* ---------- buttons ---------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 24px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--bone);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+.btn-ghost {
+  border-color: var(--line-strong);
+}
+.btn-ghost:hover {
+  border-color: var(--seam);
+  background-color: rgba(111, 243, 255, 0.06);
+}
+/* The solid seam button is light, not paint: the glow lives on a .lit wrapper because clip-path clips an
+   element's own shadows. */
+.lit {
+  display: inline-flex;
+  filter: drop-shadow(0 0 1px rgba(111, 243, 255, 0.9)) drop-shadow(0 0 14px rgba(111, 243, 255, 0.32));
+  transition: filter 0.3s ease;
+}
+.lit:hover,
+.lit:focus-within {
+  filter: drop-shadow(0 0 1px var(--seam)) drop-shadow(0 0 26px rgba(111, 243, 255, 0.55));
+}
+.btn-seam {
+  --c: 12px;
+  background: var(--seam);
+  color: var(--seam-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+}
+.btn-seam:hover {
+  background-color: #a6f8ff;
+}
+/* Inset, so the focus ring sits inside the cut corner instead of being clipped away. */
+.btn-seam:focus-visible {
+  outline: 2px solid var(--seam-ink);
+  outline-offset: -5px;
+}
+.btn-seam[aria-disabled='true'] {
+  background-color: rgba(111, 243, 255, 0.72);
+  cursor: progress;
+}
+
+/* ---------- the Lair ---------- */
+.lair {
+  position: relative;
+  padding-block: clamp(72px, 10vw, 150px);
+  overflow: hidden;
+  overflow: clip;
+}
+/* A pool of light, not a rule, opens the chapter. */
+.lair::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(58% 72% at 74% 52%, rgba(111, 243, 255, 0.12), transparent 70%);
+}
+.lair-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 80px);
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .lair-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+.title-l {
+  margin: 0;
+  font: 400 clamp(2.2rem, 1.2rem + 3.6vw, 4.2rem) / 1.04 var(--f-title);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  text-shadow: 0 0 22px rgba(111, 243, 255, 0.16);
+}
+.lair-copy p {
+  max-width: 40ch;
+  margin: 22px 0 0;
+  color: var(--mist);
+}
+.lair-copy p strong {
+  color: var(--bone);
+}
+.lair-copy .lair-spec {
+  font-size: 15px;
+  font-weight: 500;
+}
+.keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.keys li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.keys li span {
+  margin-left: 6px;
+}
+.keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 9px;
+  border: 1px solid rgba(111, 243, 255, 0.35);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: #0b1319;
+  color: var(--seam);
+  font: 500 13px/1 var(--f-text);
+  text-shadow: 0 0 8px var(--seam-soft);
+  box-shadow:
+    0 0 16px rgba(111, 243, 255, 0.16),
+    inset 0 0 8px rgba(111, 243, 255, 0.08);
+  transition:
+    transform 0.08s ease-out,
+    border-bottom-width 0.08s ease-out,
+    box-shadow 0.25s ease,
+    color 0.25s ease;
+}
+/* Pressed by the real key: the cap travels down and lights up. Border-box sizing keeps the row from moving. */
+.keys kbd.down {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+  color: #fff;
+  text-shadow: 0 0 10px var(--seam);
+  box-shadow:
+    0 0 26px rgba(111, 243, 255, 0.55),
+    inset 0 0 12px rgba(111, 243, 255, 0.3);
+}
+.on-touch {
+  display: none;
+}
+@media (hover: none) {
+  .on-touch {
+    display: block;
+  }
+}
+.linkish {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bone);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--seam);
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.lair-frame {
+  position: relative;
+  margin: 0;
+  padding: 26px 0 0 26px;
+}
+/* On phones the film comes first, so it starts playing as soon as the reader reaches the band. */
+@media (max-width: 959px) {
+  .lair-frame {
+    order: -1;
+    padding: 22px 0 0 14px;
+  }
+}
+.frame-halo {
+  filter: drop-shadow(0 0 1px rgba(111, 243, 255, 0.7)) drop-shadow(0 0 40px rgba(111, 243, 255, 0.18));
+}
+.frame-clip {
+  --c: 34px;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: var(--deep);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+}
+.frame-clip > img,
+.frame-clip > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Real hazard tape: stripe blocks between the words, crawling along its own length. */
+.tape {
+  position: absolute;
+  z-index: 2;
+  left: -6%;
+  top: 10px;
+  width: 64%;
+  padding: 10px 0;
+  overflow: hidden;
+  background-color: var(--tape);
+  background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0 50%, transparent 50%);
+  background-size: 6px 100%;
+  color: var(--tape-ink);
+  font: 400 12px/1 var(--f-title);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  transform: rotate(-9deg);
+  transform-origin: left top;
+}
+.tape-run {
+  display: inline-flex;
+  align-items: center;
+  animation: crawl 24s linear infinite;
+}
+.tape-run > span {
+  display: inline-flex;
+  align-items: center;
+}
+/* Runs the full height of the tape (the 1em line plus both 10px paddings); the tape's overflow trims it. */
+.tape b {
+  flex: none;
+  width: 34px;
+  height: calc(1em + 20px);
+  margin: -10px 18px;
+  background: repeating-linear-gradient(-45deg, var(--tape-ink) 0 5px, transparent 5px 10px);
+}
+@keyframes crawl {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- about ---------- */
+.about {
+  position: relative;
+  padding-block: clamp(80px, 11vw, 160px);
+}
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px clamp(32px, 6vw, 96px);
+}
+.about-grid > h2 {
+  margin-bottom: clamp(8px, 1.5vw, 20px);
+}
+@media (min-width: 960px) {
+  .about-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  }
+  .about-grid > h2 {
+    grid-column: 1 / -1;
+  }
+}
+.statement p {
+  max-width: 30ch;
+  margin: 0 0 0.8em;
+  font-size: clamp(1.35rem, 1rem + 1.35vw, 2.2rem);
+  font-weight: 300;
+  line-height: 1.32;
+  text-wrap: pretty;
+}
+.statement p:last-child {
+  margin-bottom: 0;
+}
+.statement a {
+  text-underline-offset: 0.18em;
+}
+.about-side {
+  display: grid;
+  gap: 36px;
+  align-content: start;
+}
+.portraits {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 420px;
+}
+.portraits.solo {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 300px;
+}
+.pf {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+.pf-frame {
+  --c: 18px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--deep);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+}
+.pf-frame img,
+.pf-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+.pf figcaption {
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.facts {
+  display: grid;
+  gap: 22px;
+  align-content: start;
+  margin: 0;
+}
+.facts div {
+  display: grid;
+  gap: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.facts dt {
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.facts dd {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+.fact-line {
+  display: block;
+}
+
+/* ---------- contact ---------- */
+.contact {
+  padding-bottom: clamp(72px, 9vw, 130px);
+}
+.contact:not(:has(.film)) {
+  padding-top: clamp(72px, 9vw, 130px);
+}
+.film {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 78svh;
+  overflow: hidden;
+  background: var(--void);
+}
+.film > img,
+.film > video,
+.film > .film-card {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Shown until the film's first frame arrives; the film then dissolves into its own copy of this title. */
+.film-card {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--bone);
+  font: 400 clamp(1.3rem, 0.8rem + 2.8vw, 3.2rem) / 1.15 var(--f-title);
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+/* The film fades in from the page colour at the top and back into it at the bottom. */
+.film::before,
+.film::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.film::before {
+  top: 0;
+  height: 24%;
+  background: linear-gradient(180deg, var(--void), rgba(4, 7, 10, 0));
+}
+.film::after {
+  bottom: 0;
+  height: 30%;
+  background: linear-gradient(0deg, var(--void), rgba(4, 7, 10, 0));
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 48px clamp(32px, 6vw, 96px);
+  margin-top: clamp(32px, 4vw, 56px);
+}
+@media (min-width: 960px) {
+  .contact-grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  }
+}
+.contact-title {
+  max-width: 18ch;
+  margin: 0;
+  font: 400 clamp(1.7rem, 1.1rem + 2.6vw, 3.3rem) / 1.1 var(--f-title);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  text-shadow: 0 0 22px rgba(111, 243, 255, 0.16);
+}
+.contact-title .setup {
+  display: block;
+  margin-bottom: 0.4em;
+  color: var(--mist);
+  font-size: 0.6em;
+}
+.contact-lead {
+  max-width: 30ch;
+  margin: 20px 0 0;
+  font-size: clamp(1.2rem, 1rem + 0.55vw, 1.5rem);
+  font-weight: 300;
+  line-height: 1.42;
+}
+.email {
+  display: inline-block;
+  margin-top: 26px;
+  color: var(--seam);
+  font: 400 clamp(1.15rem, 0.8rem + 1.5vw, 2rem) / 1.3 var(--f-title);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0 22px rgba(111, 243, 255, 0.28);
+}
+.email:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+.contact-form {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+.field {
+  display: grid;
+  gap: 7px;
+}
+.field label {
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.field:focus-within label {
+  color: var(--bone);
+}
+/* Fields read as a lit seam along the bottom, not grey boxes. The .42 edge keeps about 3.7:1 against void. */
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 14px 14px 13px;
+  border: 1px solid var(--line);
+  border-bottom-color: rgba(234, 243, 246, 0.42);
+  border-radius: 0;
+  background: rgba(10, 17, 23, 0.35);
+  color: var(--bone);
+  font: 300 1.125rem/1.4 var(--f-text);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.contact-form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+/* A transparent outline still shows in forced-colours mode; the glow is the indicator everywhere else. */
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible {
+  outline: 2px solid transparent;
+  border-color: rgba(111, 243, 255, 0.35);
+  border-bottom-color: var(--seam);
+  box-shadow:
+    0 1px 0 var(--seam),
+    0 14px 22px -16px rgba(111, 243, 255, 0.8);
+}
+.contact-form [aria-invalid='true'] {
+  border-color: var(--tape);
+  box-shadow: 0 1px 0 var(--tape);
+}
+.status {
+  min-height: 1.6em;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 500;
+}
+
+/* ---------- footer ---------- */
+.foot {
+  padding-block: 36px calc(40px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+}
+.foot .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+.foot p {
+  margin: 0;
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.foot-links {
+  display: flex;
+  gap: 22px;
+}
+.foot-links a {
+  color: var(--bone);
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 4px;
+}
+.foot-links a:hover {
+  text-decoration-color: var(--seam);
+}
+
+/* ---------- phone email pill ---------- */
+.mail-pill {
+  position: fixed;
+  z-index: 25;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: none;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 20px;
+  background: var(--seam);
+  color: var(--seam-ink);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(111, 243, 255, 0.35);
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0s;
+}
+.mail-pill.away {
+  transform: translateY(140%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0s 0.3s;
+}
+.mail-pill:focus-visible {
+  outline: 2px solid var(--bone);
+  outline-offset: 3px;
+}
+@media (max-width: 719px) {
+  .mail-pill {
+    display: inline-flex;
+  }
+  html:has(.mail-pill) {
+    scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ---------- films ---------- */
+/* Lazy films wait under a still or a title card and dissolve in on their first frame instead of cutting. */
+.film-dissolve {
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-out);
+}
+.film-dissolve[data-live] {
+  opacity: 1;
+}
+
+/* ---------- case study ---------- */
+.page {
+  padding-top: calc(var(--bar) + env(safe-area-inset-top, 0px));
+}
+/* Named lines, so every block can choose its width: text (a reading column on the left edge), wide (the full
+   wrap) or full (edge to edge). Measured from the container, not the viewport, so it also fits the admin preview. */
+.cs {
+  --cs-wide: 1248px;
+  --cs-text: 720px;
+  --cs-cols:
+    [full-start] minmax(max(var(--gutter), env(safe-area-inset-left, 0px)), 1fr)
+    [wide-start text-start] min(var(--cs-text), 100% - 2 * var(--gutter))
+    [text-end] minmax(0, calc(var(--cs-wide) - var(--cs-text)))
+    [wide-end] minmax(max(var(--gutter), env(safe-area-inset-right, 0px)), 1fr)
+    [full-end];
+  --accent: var(--seam);
+  position: relative;
+  isolation: isolate;
+  padding-bottom: clamp(72px, 9vw, 130px);
+  background: var(--void);
+  color: var(--bone);
+}
+/* Each case study is lit by its own project. */
+.cs::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: min(120vh, 1200px);
+  pointer-events: none;
+  background: radial-gradient(90% 70% at 50% 0%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 72%);
+}
+.cs-head,
+.cs-body,
+.cs-foot {
+  display: grid;
+  grid-template-columns: var(--cs-cols);
+}
+.cs-head > *,
+.cs-body > *,
+.cs-foot > * {
+  grid-column: text;
+  min-width: 0;
+}
+.cs-preview {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+  margin: 0;
+  padding: 10px max(var(--gutter), env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid var(--seam);
+  background: rgba(10, 17, 23, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.cs-preview strong {
+  color: var(--seam);
+}
+.cs-head {
+  row-gap: clamp(28px, 3.5vw, 44px);
+  padding-top: clamp(24px, 4vw, 48px);
+}
+.cs-head > .cs-cover,
+.cs-head > .cs-intro,
+.cs-head > .spec {
+  grid-column: wide;
+}
+.cs-cover {
+  filter: drop-shadow(0 0 1px color-mix(in srgb, var(--accent) 60%, transparent))
+    drop-shadow(0 0 48px color-mix(in srgb, var(--accent) 22%, transparent));
+}
+.cs-cover-clip {
+  --c: 34px;
+  overflow: hidden;
+  background: var(--deep);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+}
+.cs-cover-clip img,
+.cs-cover-clip video {
+  width: 100%;
+  max-height: 82svh;
+  object-fit: cover;
+}
+.cs-title {
+  margin: 0;
+  font: 400 clamp(2.1rem, 1rem + 4.4vw, 5rem) / 1.04 var(--f-title);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+.cs-summary {
+  max-width: 46ch;
+  margin: 18px 0 0;
+  font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.5rem);
+  font-weight: 300;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.cs-link {
+  margin-top: 26px;
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line-strong));
+}
+.spec {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 18px 28px;
+  margin: 0;
+}
+.spec div {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+}
+.spec dt {
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.spec dd {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+}
+@media (max-width: 559px) {
+  .spec {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+  }
+}
+.cs-body {
+  row-gap: clamp(48px, 6vw, 88px);
+  margin-top: clamp(56px, 7vw, 104px);
+}
+.cs-text h2 {
+  margin: 0 0 14px;
+  font-size: clamp(1.3rem, 1.1rem + 0.6vw, 1.65rem);
+  font-weight: 500;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.cs-text p {
+  max-width: 68ch;
+  margin: 0 0 1em;
+  text-wrap: pretty;
+}
+.cs-text p:last-child {
+  margin-bottom: 0;
+}
+.cs-body > .cs-figure {
+  margin: 0;
+}
+.cs-body > .size-full {
+  grid-column: full;
+}
+.cs-body > .size-wide,
+.cs-body > .cs-gallery {
+  grid-column: wide;
+}
+.cs-frame {
+  --c: 26px;
+  overflow: hidden;
+  background: var(--deep);
+  clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, 0 100%);
+}
+.size-full .cs-frame {
+  clip-path: none;
+}
+.cs-frame img,
+.cs-frame video {
+  width: 100%;
+}
+/* Films with controls take focus; inside a clipped frame the ring has to sit inside the edge to be seen. */
+:is(.cs-frame, .cs-cover-clip, .frame-clip) video:focus-visible {
+  outline-offset: -3px;
+}
+:is(.cs-figure, .cs-gallery, .cs-quote) figcaption {
+  max-width: 68ch;
+  margin-top: 12px;
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.size-full figcaption {
+  padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px));
+}
+.cs-gallery {
+  margin: 0;
+}
+.cs-gallery ul {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(12px, 1.6vw, 20px);
+  align-items: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cs-gallery .cs-frame {
+  --c: 18px;
+}
+@media (min-width: 720px) {
+  .cs-gallery ul {
+    grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  }
+}
+.cs-quote {
+  margin: 0;
+  padding-left: clamp(18px, 2.4vw, 28px);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 80%, #fff);
+}
+.cs-quote blockquote {
+  margin: 0;
+  font-size: clamp(1.45rem, 1.1rem + 1.3vw, 2.2rem);
+  font-weight: 300;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+.cs-quote blockquote p {
+  margin: 0 0 0.6em;
+}
+.cs-quote blockquote p:last-child {
+  margin-bottom: 0;
+}
+.cs-quote figcaption {
+  margin-top: 16px;
+}
+.cs-foot {
+  row-gap: 28px;
+  margin-top: clamp(80px, 10vw, 140px);
+}
+.cs-foot > .cs-next {
+  grid-column: wide;
+}
+.cs-foot > .btn {
+  justify-self: start;
+}
+.cs-next {
+  display: grid;
+  gap: 20px 32px;
+  align-items: end;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+.cs-next:focus-visible {
+  outline-offset: 8px;
+}
+@media (min-width: 720px) {
+  .cs-next {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+.cs-next-text {
+  display: grid;
+  gap: 6px;
+  align-content: end;
+}
+.cs-next-label,
+.cs-next-meta {
+  color: var(--mist);
+  font-size: 15px;
+  font-weight: 500;
+}
+.cs-next-title {
+  font: 400 clamp(1.6rem, 1rem + 2.4vw, 3rem) / 1.08 var(--f-title);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  transition: text-shadow 0.4s ease;
+}
+.cs-next .plate {
+  aspect-ratio: 16 / 9;
+}
+
+/* ---------- not found ---------- */
+.lost {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: 72svh;
+  padding-block: clamp(72px, 12vw, 160px);
+  isolation: isolate;
+  overflow: hidden;
+  overflow: clip;
+}
+.lost-mark {
+  position: absolute;
+  z-index: -1;
+  right: -8vw;
+  top: 50%;
+  width: min(72vw, 720px);
+  height: auto;
+  translate: 0 -50%;
+  fill: none;
+  stroke: var(--seam);
+  stroke-width: 0.6;
+  stroke-linecap: square;
+  opacity: 0.16;
+  filter: drop-shadow(0 0 18px var(--seam));
+}
+.lost-lead {
+  max-width: 40ch;
+  margin: 22px 0 0;
+  color: var(--mist);
+}
+
+/* ---------- motion switched off ---------- */
+/* The Motion switch in the bar marks the site root data-motion="on" or "off" once the page runs. Off holds what would
+   otherwise keep moving by itself: the tape stops where it stands (and carries on from there), the hero film stops
+   leaning back on scroll and the plates' seam light doesn't run. The name's strike and the copy's fade-in play once
+   on arrival, in under three seconds, so they are left to finish rather than cut or replayed. */
+.site[data-motion='off'] .tape-run {
+  animation-play-state: paused;
+}
+.site[data-motion='off'] .hero-film,
+.site[data-motion='off'] .plate.lit::before,
+.site[data-motion='off'] .plate.lit::after {
+  animation: none;
+}
+
+/* ---------- reduced motion ---------- */
+/* Everything lands in its final state: the name is lit, films hold their first frame, the tape stands still.
+   Hover glows stay, because they are state rather than motion. Turning Motion on in the bar (data-motion="on")
+   lets the site move again, all but the arrival, which has already happened. */
+@media (prefers-reduced-motion: reduce) {
+  .site:not([data-motion='on']) *,
+  .site:not([data-motion='on']) *::before,
+  .site:not([data-motion='on']) *::after,
+  .cs *,
+  .cs *::before,
+  .cs *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .name .l,
+  .lead,
+  .credit {
+    animation: none !important;
+  }
+}

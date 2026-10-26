@@ -1,0 +1,22 @@
+/** Whose site this is. The name is fixed identity, not CMS content. */
+export const OWNER_NAME = 'Nihaal Nazeer';
+
+/** The public origin used for canonical links, the sitemap and share images. */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://nihaalnazeer.com')
+).replace(/\/+$/, '');
+
+/** Resolves a site path ("/uploads/x.webp") or an already absolute URL (Supabase Storage) to an absolute URL. */
+export function absoluteUrl(pathOrUrl: string): string {
+  return new URL(pathOrUrl, `${SITE_URL}/`).toString();
+}
+
+export function isExternal(href: string): boolean {
+  return /^https?:\/\//i.test(href);
+}
+
+/** mailto: link with a friendly subject line. */
+export function mailto(email: string): string {
+  return `mailto:${email}?subject=${encodeURIComponent('Hello Nihaal')}`;
+}
