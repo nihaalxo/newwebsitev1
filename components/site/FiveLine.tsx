@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { LAIR_URL } from './config';
 import { InlineText } from './RichText';
 
-/** A link to the Lair, which always opens in a new tab. */
+/** A link to the Lair, which always opens in a new tab. On buttons the mockup's hidden note has no leading space. */
 export function LairLink({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <a className={className} href={LAIR_URL} target="_blank" rel="noopener">
@@ -10,7 +10,7 @@ export function LairLink({ children, className }: { children: ReactNode; classNa
       <svg className="icon" aria-hidden="true">
         <use href="#ext" />
       </svg>
-      <span className="vh"> (opens in a new tab)</span>
+      <span className="vh">{className?.includes('btn') ? '(opens in a new tab)' : ' (opens in a new tab)'}</span>
     </a>
   );
 }

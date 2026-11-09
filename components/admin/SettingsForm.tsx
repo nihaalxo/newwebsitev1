@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { saveSettings } from '@/app/admin/actions';
-import type { CvSection, Media } from '@/lib/cms/types';
+import { DEFAULT_SETTINGS } from '@/lib/cms/defaults';
+import { LABEL_GROUPS, labelLimit, type LabelGroup } from '@/lib/cms/labels';
+import { CATEGORIES, type Category, type CvSection, type Media, type StoryPrompts } from '@/lib/cms/types';
 import { PDF_ACCEPT, uploadErrorMessage, uploadFile } from '@/lib/upload-client';
 import { callServer } from './call-server';
 import { ChoiceField, FieldError, TextAreaField, TextField } from './fields';
@@ -25,12 +27,44 @@ import { useUnsavedWarning } from './useUnsavedWarning';
 
 type FilmTime = 'heroFilmLoopStart' | 'heroFilmLoopEnd' | 'contactFilmStart';
 
-/** Settings as the form edits them: education as one entry per line, the films' times as typed. */
-type SettingsDraft = Omit<SettingsInput, 'education' | FilmTime> & { education: string } & Record<FilmTime, string>;
+/**
+ * Settings as the form edits them: education as one entry per line, the films' times as typed, and each category's
+ * story prompts as "Heading: hint" lines.
+ */
+type SettingsDraft = Omit<SettingsInput, 'education' | 'storyPrompts' | FilmTime> & {
+  education: string;
+  storyPrompts: Record<Category, string>;
+} & Record<FilmTime, string>;
+
+function promptsToText(prompts: StoryPrompts): Record<Category, string> {
+  return Object.fromEntries(
+    CATEGORIES.map(({ id }) => [id, prompts[id].map((p) => (p.hint ? `${p.heading}: ${p.hint}` : p.heading)).join('\n')]),
+  ) as Record<Category, string>;
+}
+
+/** "The brief: Who it was for…" -> heading "The brief", hint "Who it was for…". A line with no colon is a heading alone. */
+function promptsFromText(text: Record<Category, string>): StoryPrompts {
+  return Object.fromEntries(
+    CATEGORIES.map(({ id }) => [
+      id,
+      text[id]
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const colon = line.indexOf(':');
+          return colon === -1
+            ? { heading: line, hint: '' }
+            : { heading: line.slice(0, colon).trim(), hint: line.slice(colon + 1).trim() };
+        }),
+    ]),
+  ) as StoryPrompts;
+}
 
 function toDraft(settings: SettingsInput): SettingsDraft {
   return {
     ...settings,
+    storyPrompts: promptsToText(settings.storyPrompts),
     education: settings.education.join('\n'),
     heroFilmLoopStart: String(settings.heroFilmLoopStart),
     heroFilmLoopEnd: String(settings.heroFilmLoopEnd),
@@ -49,6 +83,7 @@ function fromDraft(draft: SettingsDraft): SettingsInput {
     ...draft,
     // A bare @handle becomes the profile link here, so it's checked and sent as the URL the server would store.
     instagram: instagramUrl(draft.instagram),
+    storyPrompts: promptsFromText(draft.storyPrompts),
     education: draft.education
       .split('\n')
       .map((entry) => entry.trim())
@@ -72,7 +107,11 @@ const SECTIONS = [
   { id: 'about', label: 'About' },
   { id: 'cv', label: 'CV' },
   { id: 'contact', label: 'Contact' },
+  { id: 'labels', label: 'Buttons and small text' },
+  { id: 'case', label: 'Case files' },
 ];
+
+const CASE_LABELS = 'labels-case';
 
 export default function SettingsForm({ initial }: { initial: SettingsInput }) {
   const [draft, setDraft] = useState(() => toDraft(initial));
@@ -561,6 +600,48 @@ export default function SettingsForm({ initial }: { initial: SettingsInput }) {
                 error={errors.contactFilmStart}
               />
             </section>
+
+            <section className="adm-section" id="labels" aria-labelledby="labels-section-title">
+              <h2 className="adm-h2" id="labels-section-title">
+                Buttons and small text
+              </h2>
+              <p className="adm-section-intro">
+                The menu, buttons and messages around the site. An empty box goes back to the words shown in it in grey.
+              </p>
+              {LABEL_GROUPS.filter((group) => group.id !== CASE_LABELS).map((group) => (
+                <LabelFields key={group.id} group={group} labels={draft.labels} onChange={(labels) => set('labels', labels)} />
+              ))}
+            </section>
+
+            <section className="adm-section" id="case" aria-labelledby="case-section-title">
+              <h2 className="adm-h2" id="case-section-title">
+                Case files
+              </h2>
+              <p className="adm-section-intro">
+                The words every case file shares. A project&apos;s own words are in its editor, on the Projects page.
+              </p>
+              {LABEL_GROUPS.filter((group) => group.id === CASE_LABELS).map((group) => (
+                <LabelFields key={group.id} group={group} labels={draft.labels} onChange={(labels) => set('labels', labels)} />
+              ))}
+              <h3 className="adm-h3">What a strong case file covers</h3>
+              <p className="adm-help adm-help-flush">
+                A published case file with no text yet shows these as “To add” notes, and the project editor lists them above
+                the story. One per line: the heading, a colon, then the hint, like “The brief: Who it was for”. An empty box
+                goes back to the starting list.
+              </p>
+              {CATEGORIES.map(({ id, label }) => (
+                <TextAreaField
+                  key={id}
+                  id={fieldId(`storyPrompts.${id}`)}
+                  label={`${label} projects`}
+                  rows={5}
+                  value={draft.storyPrompts[id]}
+                  placeholder={promptsToText(DEFAULT_SETTINGS.storyPrompts)[id]}
+                  onChange={(text) => set('storyPrompts', { ...draft.storyPrompts, [id]: text })}
+                  error={errors[`storyPrompts.${id}`]}
+                />
+              ))}
+            </section>
           </div>
         </div>
 
@@ -576,6 +657,40 @@ export default function SettingsForm({ initial }: { initial: SettingsInput }) {
         </div>
       </div>
     </UploadTrackerProvider>
+  );
+}
+
+/** One group of labels, two to a row on wide screens. Each box shows its starting words in grey once emptied. */
+function LabelFields({
+  group,
+  labels,
+  onChange,
+}: {
+  group: LabelGroup;
+  labels: SettingsDraft['labels'];
+  onChange: (labels: SettingsDraft['labels']) => void;
+}) {
+  const defaults = DEFAULT_SETTINGS.labels;
+  return (
+    <>
+      <h3 className="adm-h3">{group.title}</h3>
+      <div className="adm-grid-2">
+        {group.fields.map((field) => {
+          const key = field.key as keyof typeof defaults;
+          const id = fieldId(`labels.${key}`);
+          const props = {
+            id,
+            label: field.label,
+            help: field.help,
+            maxLength: labelLimit(key),
+            value: labels[key],
+            placeholder: defaults[key],
+            onChange: (value: string) => onChange({ ...labels, [key]: value }),
+          };
+          return field.long ? <TextAreaField key={key} rows={2} {...props} /> : <TextField key={key} {...props} />;
+        })}
+      </div>
+    </>
   );
 }
 

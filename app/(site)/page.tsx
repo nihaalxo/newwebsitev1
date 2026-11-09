@@ -53,7 +53,12 @@ export default async function HomePage() {
         <Contact settings={settings} />
       </main>
       <WorkPeek />
-      <CaseDialog projects={projects.map(toCaseProject)} fiveLine={settings.fiveLine} />
+      <CaseDialog
+        projects={projects.map(toCaseProject)}
+        fiveLine={settings.fiveLine}
+        labels={settings.labels}
+        storyPrompts={settings.storyPrompts}
+      />
     </>
   );
 }

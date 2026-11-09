@@ -16,7 +16,7 @@ export default function Work({ settings, highlights, rest }: { settings: Setting
           <ul className="highs" id="highs">
             {highlights.map((item) => (
               <li key={item.id} className="card hi" style={{ '--span': 12 / highlights.length } as CSSProperties}>
-                <PlateCard item={item} priority />
+                <PlateCard item={item} />
               </li>
             ))}
           </ul>
@@ -35,7 +35,7 @@ export default function Work({ settings, highlights, rest }: { settings: Setting
         )}
         <p className="work-foot">
           <a className="btn btn-ghost" href="/work">
-            View all projects
+            {settings.labels.viewAll}
           </a>
         </p>
       </div>

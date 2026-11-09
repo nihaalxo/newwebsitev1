@@ -37,6 +37,7 @@ export const LIMITS = {
   controls: 12,
   cvSections: 12,
   cvEntries: 20,
+  storyPrompts: 8,
 } as const;
 
 /** How the site's text renderer (components/site/RichText) reads plain text. Shown under long text fields. */
@@ -257,6 +258,12 @@ export function validateSettings(settings: SettingsInput): FieldErrors {
   if (controls.length > LIMITS.controls) errors.lairControls = `List at most ${LIMITS.controls} controls, one per line.`;
   else if (controls.some((line) => !/^[^:]+:\s*\S/.test(line))) {
     errors.lairControls = 'Write each control as keys, a colon, then what they do, like "Shift: Run".';
+  }
+
+  for (const { id, label } of CATEGORIES) {
+    if (settings.storyPrompts[id].length > LIMITS.storyPrompts) {
+      errors[`storyPrompts.${id}`] = `List at most ${LIMITS.storyPrompts} parts for ${label.toLowerCase()} projects.`;
+    }
   }
 
   if (settings.cvSections.length > LIMITS.cvSections) {

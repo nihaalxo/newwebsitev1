@@ -6,6 +6,7 @@ import 'server-only';
 // rules.ts. Lists are passed through whole, so one that's too long is refused there rather than cut short here;
 // the server action body limit (1 MB) bounds them.
 
+import { LABEL_KEYS, labelLimit, type Labels } from '@/lib/cms/labels';
 import {
   CATEGORIES,
   PROJECT_TYPES,
@@ -15,6 +16,7 @@ import {
   type Media,
   type ProjectInput,
   type ProjectType,
+  type StoryPrompts,
 } from '@/lib/cms/types';
 import {
   LIMITS,
@@ -220,6 +222,26 @@ function controls(value: unknown): string {
     .join('\n');
 }
 
+/** Every known label as one line; unknown keys are dropped. An empty one is stored empty and shows its starting words. */
+function labels(value: unknown): Labels {
+  const source = isData(value) ? value : {};
+  return Object.fromEntries(LABEL_KEYS.map((key) => [key, line(source[key], labelLimit(key))])) as Labels;
+}
+
+/** Each category's prompts, a heading and a hint each; prompts without a heading are dropped. */
+function storyPrompts(value: unknown): StoryPrompts {
+  const source = isData(value) ? value : {};
+  return Object.fromEntries(
+    CATEGORIES.map(({ id }) => [
+      id,
+      (Array.isArray(source[id]) ? source[id] : [])
+        .filter(isData)
+        .map((prompt) => ({ heading: line(prompt.heading, LIMITS.heading), hint: line(prompt.hint, LIMITS.caption) }))
+        .filter((prompt) => prompt.heading),
+    ]),
+  ) as StoryPrompts;
+}
+
 export function sanitizeSettings(value: unknown): SettingsInput | null {
   if (!isData(value)) return null;
   const education = Array.isArray(value.education) ? value.education : [];
@@ -262,6 +284,8 @@ export function sanitizeSettings(value: unknown): SettingsInput | null {
     instagram: instagramUrl(line(value.instagram, LIMITS.url)),
     contactFilm: optionalMedia(value.contactFilm, 'video'),
     contactFilmStart: seconds(value.contactFilmStart),
+    labels: labels(value.labels),
+    storyPrompts: storyPrompts(value.storyPrompts),
   };
 }
 

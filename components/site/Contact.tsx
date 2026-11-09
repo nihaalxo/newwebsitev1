@@ -5,7 +5,7 @@ import ContactForm from './ContactForm';
 import CopyButton from './CopyButton';
 
 export default function Contact({ settings }: { settings: Settings }) {
-  const { email, linkedin, contactFilm } = settings;
+  const { email, linkedin, contactFilm, labels } = settings;
   return (
     <section className="contact" id="contact" aria-labelledby="contact-title">
       <div className="film">
@@ -28,10 +28,19 @@ export default function Contact({ settings }: { settings: Settings }) {
             </a>
           )}
           <div className="actions">
-            {email && <CopyButton className="btn btn-ghost" text={email} label="Copy email" selectId="email" />}
+            {email && (
+              <CopyButton
+                className="btn btn-ghost"
+                text={email}
+                label={labels.copyEmail}
+                copied={labels.copied}
+                selected={labels.copySelected}
+                selectId="email"
+              />
+            )}
             {linkedin && (
               <a className="btn btn-ghost" href={linkedin} target="_blank" rel="noopener">
-                LinkedIn
+                {labels.linkedin}
                 <svg className="icon" aria-hidden="true">
                   <use href="#ext" />
                 </svg>
@@ -40,7 +49,7 @@ export default function Contact({ settings }: { settings: Settings }) {
             )}
           </div>
         </div>
-        <ContactForm email={email} />
+        <ContactForm email={email} labels={labels} />
       </div>
     </section>
   );

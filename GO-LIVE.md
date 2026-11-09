@@ -154,7 +154,7 @@ request. If pages fail with error 1102 ("Worker exceeded resource limits"), the 
 ## 11. Check the live site
 
 - **The intro:** `https://nihaalnazeer.com` plays the intro on a first visit, and a reload skips it.
-  `https://nihaalnazeer.com/?from=lair` skips it too, and the address loses `?from=lair`.
+  `https://nihaalnazeer.com/?from=lair` skips it too. The address keeps `?from=lair`, as the mockup does.
 - **The Lair links:** every Lair link opens `https://interactive.nihaalnazeer.com/?film=on` in a new tab.
 - **The work:** `/work` opens with its filters working. A project opens in its case file, and
   `/work/my-chaii-london` opens on that project.
@@ -164,7 +164,9 @@ request. If pages fail with error 1102 ("Worker exceeded resource limits"), the 
   curl -sI -H "Range: bytes=0-1" https://nihaalnazeer.com/films/lair-ship.mp4
   ```
 - **The admin:** sign in at `/admin` with the email and password from step 5.
-  1. Change a heading in **Site settings**, save, and check it on the home page. Then change it back.
+  1. Change a heading in **Site settings**, save, and check it on the home page. Then change it back. The menu,
+     buttons, form messages and the words every case file shares are in the same page, under **Buttons and small
+     text** and **Case files**. Emptying one of those boxes puts its starting words back.
   2. Upload an image, for example the portrait. Save, and check it appears on the page at an address starting with
      `/cms/`.
 

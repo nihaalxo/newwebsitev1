@@ -25,10 +25,10 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
           <path d="M13 8H3M7 4 3 8l4 4" fill="none" stroke="currentColor" strokeWidth="1.6" />
         </symbol>
       </svg>
-      <SiteHeader />
+      <SiteHeader labels={settings.labels} />
       {children}
       <SiteFooter settings={settings} />
-      {settings.email && <MailPill email={settings.email} />}
+      {settings.email && <MailPill email={settings.email} label={settings.labels.mailPill} />}
       <p className="vh" id="sr-status" role="status" aria-live="polite"></p>
       <SeamLap />
     </>

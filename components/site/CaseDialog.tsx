@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
+import type { Labels, StoryPrompts } from '@/lib/cms/types';
 import type { CaseProject } from './case-project';
 import CaseView from './CaseView';
+import FiveLine from './FiveLine';
 import { getActiveFilter } from './filter-store';
 import { reducedMotion } from './films';
 import { isSoundOn } from './sound';
@@ -13,6 +15,8 @@ interface CaseDialogProps {
   /** Every published project, in order: the case file steps through them (or the filtered ones) with Previous and Next. */
   projects: CaseProject[];
   fiveLine: string;
+  labels: Labels;
+  storyPrompts: StoryPrompts;
   /** Open on this project from the start: the page at /work/<slug>. */
   initialSlug?: string;
   /** Over All projects, Back to all work just closes the case file. */
@@ -26,7 +30,7 @@ type View = { seq: string[]; idx: number; announce: boolean };
  * only, so a link opened in a new tab still goes to /work/<slug>). Its address is #case-<slug>, so Back closes it and
  * a link with that hash opens it.
  */
-export default function CaseDialog({ projects, fiveLine, initialSlug, overAllWork = false }: CaseDialogProps) {
+export default function CaseDialog({ projects, fiveLine, labels, storyPrompts, initialSlug, overAllWork = false }: CaseDialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
   // Set when a project opens: the Close button is focused once it has rendered.
@@ -178,6 +182,8 @@ export default function CaseDialog({ projects, fiveLine, initialSlug, overAllWor
         <CaseView
           project={project}
           fiveLine={fiveLine}
+          labels={labels}
+          storyPrompts={storyPrompts}
           prevTitle={neighbour(-1)}
           nextTitle={neighbour(1)}
           announcement={view?.announce ? `${project.title}, ${view.idx + 1} of ${n}` : ''}
@@ -194,12 +200,41 @@ export default function CaseDialog({ projects, fiveLine, initialSlug, overAllWor
           }
         />
       ) : (
-        <div className="case-bar">
-          <span id="case-kicker">Case file</span>
-          <button className="x-btn" type="button" id="case-close" onClick={api.closeCase}>
-            Close
-          </button>
-        </div>
+        // Before any project opens: the mockup's empty case file, filled in when one does.
+        <>
+          <div className="case-bar">
+            <span id="case-kicker">Case file</span>
+            <button className="x-btn" type="button" id="case-close" onClick={api.closeCase}>
+              {labels.caseClose}
+            </button>
+          </div>
+          <div className="case-in">
+            <div id="case-media"></div>
+            <div>
+              <h2 className="case-title" id="case-title"></h2>
+              <p className="case-line" id="case-line"></p>
+            </div>
+            <dl className="spec" id="case-spec"></dl>
+            <div className="secs" id="case-secs"></div>
+            <FiveLine text={fiveLine} />
+            <p>
+              <a className="ext" id="case-all" href="/work">
+                {labels.caseAllWork}
+              </a>
+            </p>
+            <div className="case-foot">
+              <button type="button" id="case-prev">
+                <small>{labels.casePrev}</small>
+                <strong id="case-prev-t"></strong>
+              </button>
+              <button type="button" id="case-next">
+                <small>{labels.caseNext}</small>
+                <strong id="case-next-t"></strong>
+              </button>
+            </div>
+            <p className="vh" id="case-live" aria-live="polite"></p>
+          </div>
+        </>
       )}
     </dialog>
   );

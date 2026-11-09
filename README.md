@@ -50,7 +50,7 @@ Other commands:
 | Command | What it does |
 | --- | --- |
 | `npm run typecheck`, `npm run lint` | Check the code |
-| `npm run build` | The plain Next.js production build |
+| `npm run build`, then `npm start` | The plain Next.js production build, served at http://localhost:3000 from `.cms/content.json`, read-only. Editing needs `npm run dev` |
 | `npm run cf:build`, then `npm run preview` | The Cloudflare build, run locally with a local database and bucket (GO-LIVE.md shows the full list) |
 
 ## Add a project
@@ -74,7 +74,7 @@ Other commands:
 
 - Everything edited under `npm run dev` is written to `.cms/content.json`, and uploads go to `public/uploads/`.
   - Both are committed to git: they are the content that `npm run cms:to-cloudflare` copies to the live site.
-  - Editing only works under `npm run dev`.
+  - Editing only works under `npm run dev`. `npm start` shows the same content but can't change it.
 - The starting content comes from two places:
   - `scripts/catalogue.json`: all 21 projects, their summaries and image descriptions.
   - The project images in `public/`.

@@ -48,10 +48,10 @@ export default function Lair({ settings, storySlug }: { settings: Settings; stor
           )}
           <Prose text={settings.lairNudge} />
           <div className="actions">
-            <LairLink className="btn btn-seam">Enter the Lair</LairLink>
+            <LairLink className="btn btn-seam">{settings.labels.enterLair}</LairLink>
             {storySlug && (
               <button className="btn btn-ghost" type="button" data-open={storySlug}>
-                How I built it
+                {settings.labels.howBuilt}
               </button>
             )}
           </div>

@@ -17,17 +17,25 @@ export default async function AllProjects({ openSlug }: { openSlug?: string }) {
               <svg className="icon" aria-hidden="true">
                 <use href="#back" />
               </svg>
-              Back<span className="vh"> to the home page</span>
+              {settings.labels.back}
+              <span className="vh"> to the home page</span>
             </a>
             <h1 className="title-xl" id="all-title">
               {settings.allProjectsTitle}
             </h1>
             <FiveLine text={settings.fiveLine} />
-            <AllWork items={projects.map(toWorkItem)} />
+            <AllWork items={projects.map(toWorkItem)} labels={settings.labels} />
           </div>
         </section>
       </main>
-      <CaseDialog projects={projects.map(toCaseProject)} fiveLine={settings.fiveLine} initialSlug={openSlug} overAllWork />
+      <CaseDialog
+        projects={projects.map(toCaseProject)}
+        fiveLine={settings.fiveLine}
+        labels={settings.labels}
+        storyPrompts={settings.storyPrompts}
+        initialSlug={openSlug}
+        overAllWork
+      />
     </>
   );
 }

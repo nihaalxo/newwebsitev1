@@ -1,6 +1,5 @@
 import type { CSSProperties, MouseEvent, ReactNode } from 'react';
-import { STORY_PROMPTS } from '@/lib/cms/story-prompts';
-import { PROJECT_TYPES, type Block, type Media } from '@/lib/cms/types';
+import { PROJECT_TYPES, type Block, type Labels, type Media, type StoryPrompts } from '@/lib/cms/types';
 import type { CaseProject } from './case-project';
 import FiveLine from './FiveLine';
 import { imageSources } from './media';
@@ -101,6 +100,8 @@ function StoryBlock({ block }: { block: Block }) {
 export interface CaseViewProps {
   project: CaseProject;
   fiveLine: string;
+  labels: Labels;
+  storyPrompts: StoryPrompts;
   /** Titles of the neighbours; both null hides Previous and Next. */
   prevTitle: string | null;
   nextTitle: string | null;
@@ -117,6 +118,8 @@ export interface CaseViewProps {
 export default function CaseView({
   project: p,
   fiveLine,
+  labels,
+  storyPrompts,
   prevTitle,
   nextTitle,
   announcement = '',
@@ -131,13 +134,13 @@ export default function CaseView({
   const capture = p.category === 'spatial' && !film && !p.stillOnly;
   const type = PROJECT_TYPES.find((t) => t.id === p.projectType)?.label;
   const spec: [string, ReactNode][] = [
-    ['Year', p.year],
-    ['Discipline', p.discipline || <Fill>What kind of work it is</Fill>],
-    ...(p.shown ? ([['In the images', p.shown]] as [string, ReactNode][]) : []),
-    ['Role', p.role || <Fill>Solo, or your part in a team</Fill>],
-    ['Type', type || <Fill>Client, UAL brief or self-initiated</Fill>],
-    [p.category === 'spatial' ? 'Built with' : 'Tools', p.tools || <Fill>What it was made with</Fill>],
-    ...(p.deliverables ? ([['Deliverables', p.deliverables]] as [string, ReactNode][]) : []),
+    [labels.specYear, p.year],
+    [labels.specDiscipline, p.discipline || <Fill>{labels.fillDiscipline}</Fill>],
+    ...(p.shown ? ([[labels.specShown, p.shown]] as [string, ReactNode][]) : []),
+    [labels.specRole, p.role || <Fill>{labels.fillRole}</Fill>],
+    [labels.specType, type || <Fill>{labels.fillType}</Fill>],
+    [p.category === 'spatial' ? labels.specBuiltWith : labels.specTools, p.tools || <Fill>{labels.fillTools}</Fill>],
+    ...(p.deliverables ? ([[labels.specDeliverables, p.deliverables]] as [string, ReactNode][]) : []),
   ];
   // The cover already leads the case file, so an image block of the same file isn't shown twice.
   const story = p.blocks.filter(
@@ -156,7 +159,7 @@ export default function CaseView({
           </a>
         ) : (
           <button className="x-btn" type="button" id="case-close" onClick={onClose}>
-            Close
+            {labels.caseClose}
           </button>
         )}
       </div>
@@ -174,7 +177,7 @@ export default function CaseView({
                 aria-label={film.media.alt || cover?.alt || p.title}
               />
             ) : cover ? (
-              <img src={cover.src} width={cover.width} height={cover.height} alt={cover.alt} />
+              <img src={cover.src} alt={cover.alt} />
             ) : null}
           </div>
           {capture && (
@@ -183,7 +186,7 @@ export default function CaseView({
                 <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M16 13l12 7-12 7z" fill="currentColor" />
               </svg>
-              <span className="fill">A 10-second capture from the headset or the visionOS simulator</span>
+              <span className="fill">{labels.fillCapture}</span>
             </div>
           )}
         </div>
@@ -196,15 +199,15 @@ export default function CaseView({
           </p>
         </div>
         <dl className="spec" id="case-spec">
-          {spec.map(([term, value]) => (
-            <div key={term}>
+          {spec.map(([term, value], i) => (
+            <div key={i}>
               <dt>{term}</dt>
               <dd>{value}</dd>
             </div>
           ))}
           {p.link && (
             <div>
-              <dt>Link</dt>
+              <dt>{labels.specLink}</dt>
               <dd>
                 <a className="ext" href={p.link} target="_blank" rel="noopener">
                   {new URL(p.link).host.replace(/^www\./, '')}
@@ -219,10 +222,10 @@ export default function CaseView({
         </dl>
         <div className="secs" id="case-secs">
           {!hasText &&
-            STORY_PROMPTS[p.category].map(({ heading, hint }) => (
-              <section key={heading}>
+            storyPrompts[p.category].map(({ heading, hint }, i) => (
+              <section key={i}>
                 <h3>{heading}</h3>
-                <p className="fill">{hint}</p>
+                {hint && <p className="fill">{hint}</p>}
               </section>
             ))}
           {story.map((block) => (
@@ -232,16 +235,16 @@ export default function CaseView({
         <FiveLine text={fiveLine} />
         <p>
           <a className="ext" id="case-all" href="/work" onClick={onAllWork}>
-            Back to all work
+            {labels.caseAllWork}
           </a>
         </p>
         <div className="case-foot">
           <button type="button" id="case-prev" hidden={!multi} onClick={onPrev}>
-            <small>Previous project</small>
+            <small>{labels.casePrev}</small>
             <strong id="case-prev-t">{prevTitle}</strong>
           </button>
           <button type="button" id="case-next" hidden={!multi} onClick={onNext}>
-            <small>Next project</small>
+            <small>{labels.caseNext}</small>
             <strong id="case-next-t">{nextTitle}</strong>
           </button>
         </div>

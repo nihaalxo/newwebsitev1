@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function EditProjectPage({ params }: { params: Params }) {
   const { id } = await params;
   const { store } = await requireAdmin(editPath(id));
-  const [project, all] = await Promise.all([loadProject(id), store.listAll()]);
+  const [project, all, settings] = await Promise.all([loadProject(id), store.listAll(), store.getSettings()]);
   if (!project) notFound();
 
   return (
@@ -34,6 +34,7 @@ export default async function EditProjectPage({ params }: { params: Params }) {
       saved={{ status: project.status, slug: project.slug, publishedAt: project.publishedAt, updatedAt: project.updatedAt }}
       takenSlugs={all.filter((p) => p.id !== project.id).map((p) => p.slug)}
       siteHost={new URL(SITE_URL).host}
+      storyPrompts={settings.storyPrompts}
     />
   );
 }

@@ -1,15 +1,15 @@
 import { Fragment, type ReactNode } from 'react';
-import type { Settings } from '@/lib/cms/types';
+import type { Labels, Settings } from '@/lib/cms/types';
 import LazyFilm from './LazyFilm';
 import { Prose } from './RichText';
 
 /** The "classified" doors over the photo, opened by hovering or focusing it. Pure decoration. */
-function Dossier() {
+function Dossier({ labels }: { labels: Labels }) {
   const face = (
     <span className="face">
-      <span className="file-no">File 07 · N. Nazeer</span>
-      <span className="stamp">Classified</span>
-      <span className="hint">Hover to reveal</span>
+      <span className="file-no">{labels.dossierFile}</span>
+      <span className="stamp">{labels.dossierStamp}</span>
+      <span className="hint">{labels.dossierHint}</span>
     </span>
   );
   return (
@@ -24,11 +24,11 @@ function Dossier() {
 }
 
 export default function About({ settings }: { settings: Settings }) {
-  const { portrait, education, tools, basedIn, availability } = settings;
+  const { portrait, education, tools, basedIn, availability, labels } = settings;
   const facts: [string, ReactNode][] = [];
   if (education.length > 0) {
     facts.push([
-      'Studied',
+      labels.factStudied,
       education.map((entry, i) => (
         <Fragment key={i}>
           {i > 0 && <br />}
@@ -37,9 +37,9 @@ export default function About({ settings }: { settings: Settings }) {
       )),
     ]);
   }
-  if (tools) facts.push(['Tools', tools]);
-  if (basedIn) facts.push(['Based in', basedIn]);
-  if (availability) facts.push(['Available for', availability]);
+  if (tools) facts.push([labels.factTools, tools]);
+  if (basedIn) facts.push([labels.factBasedIn, basedIn]);
+  if (availability) facts.push([labels.factAvailable, availability]);
 
   return (
     <section className="about" id="about" aria-labelledby="about-title">
@@ -51,8 +51,8 @@ export default function About({ settings }: { settings: Settings }) {
           <Prose text={settings.aboutStatement} className="statement" />
           {facts.length > 0 && (
             <dl className="facts">
-              {facts.map(([term, value]) => (
-                <div key={term}>
+              {facts.map(([term, value], i) => (
+                <div key={i}>
                   <dt>{term}</dt>
                   <dd>{value}</dd>
                 </div>
@@ -65,7 +65,7 @@ export default function About({ settings }: { settings: Settings }) {
             <span className="halo">
               <span className="plate identity-frame" tabIndex={0}>
                 <img src={portrait.src} width={portrait.width} height={portrait.height} loading="lazy" alt={portrait.alt} />
-                <Dossier />
+                <Dossier labels={labels} />
                 <span className="seam-run" aria-hidden="true"></span>
               </span>
             </span>

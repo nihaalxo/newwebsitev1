@@ -8,7 +8,7 @@ import { mailto } from './config';
  * The phone-only "Email me" pill. On the home page it shows between the hero and the contact section; elsewhere it
  * steps aside for the footer, which has its own link.
  */
-export default function MailPill({ email }: { email: string }) {
+export default function MailPill({ email, label }: { email: string; label: string }) {
   const pathname = usePathname();
   const [away, setAway] = useState(true);
 
@@ -32,7 +32,7 @@ export default function MailPill({ email }: { email: string }) {
 
   return (
     <a className={away ? 'mail-pill away' : 'mail-pill'} id="mail-pill" href={mailto(email)}>
-      Email me
+      {label}
     </a>
   );
 }

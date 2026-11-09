@@ -1,5 +1,6 @@
 import defaultSettings from './default-settings.json';
-import type { ProjectInput, Settings } from './types';
+import { LABEL_KEYS, type Labels } from './labels';
+import { CATEGORIES, type ProjectInput, type Settings, type StoryPrompt, type StoryPrompts } from './types';
 
 // Safe to import from client components: no server-only code lives here.
 
@@ -11,6 +12,37 @@ export const DEFAULT_SETTINGS: Settings = {
   ...(defaultSettings as unknown as Omit<Settings, 'updatedAt'>),
   updatedAt: '',
 };
+
+// Typed copies: these fail to compile if default-settings.json lacks a label or a category.
+const DEFAULT_LABELS: Labels = defaultSettings.labels;
+const DEFAULT_STORY_PROMPTS: StoryPrompts = defaultSettings.storyPrompts;
+
+/** Every label, with an empty or missing one back to its starting words. */
+function withLabelDefaults(stored: unknown): Labels {
+  const source = stored && typeof stored === 'object' ? (stored as Partial<Record<string, unknown>>) : {};
+  const labels = { ...DEFAULT_LABELS };
+  for (const key of LABEL_KEYS) {
+    const value = source[key];
+    if (typeof value === 'string' && value.trim()) labels[key] = value;
+  }
+  return labels;
+}
+
+function isPrompt(value: unknown): value is StoryPrompt {
+  const prompt = value as Partial<StoryPrompt> | null;
+  return typeof prompt?.heading === 'string' && prompt.heading.trim() !== '' && typeof prompt.hint === 'string';
+}
+
+/** Every category's prompts, with a missing or empty list back to the starting ones. */
+function withStoryPromptDefaults(stored: unknown): StoryPrompts {
+  const source = stored && typeof stored === 'object' ? (stored as Partial<Record<string, unknown>>) : {};
+  const prompts = { ...DEFAULT_STORY_PROMPTS };
+  for (const { id } of CATEGORIES) {
+    const list = source[id];
+    if (Array.isArray(list) && list.length > 0 && list.every(isPrompt)) prompts[id] = list;
+  }
+  return prompts;
+}
 
 /** The starting point for "New project" in the admin. */
 export function emptyProject(): ProjectInput {
@@ -39,7 +71,8 @@ export function emptyProject(): ProjectInput {
 
 /**
  * Fills in any setting a stored record lacks (for example one added after it was saved) and drops unknown keys.
- * A key that is present wins even when it is null, so clearing the portrait does not bring the default back.
+ * A key that is present wins even when it is null, so clearing the portrait does not bring the default back. Labels
+ * are the exception: an empty one shows its starting words, because a button can't be blank.
  */
 export function withSettingsDefaults(stored: Partial<Settings> | null | undefined): Settings {
   const source: Partial<Settings> = stored ?? {};
@@ -47,6 +80,9 @@ export function withSettingsDefaults(stored: Partial<Settings> | null | undefine
   for (const key of Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[]) {
     if (source[key] !== undefined) (merged as Record<keyof Settings, unknown>)[key] = source[key];
   }
+  // Labels and prompts are filled in one by one, so a label added later, or one left empty, shows its starting words.
+  merged.labels = withLabelDefaults(source.labels);
+  merged.storyPrompts = withStoryPromptDefaults(source.storyPrompts);
   return merged;
 }
 

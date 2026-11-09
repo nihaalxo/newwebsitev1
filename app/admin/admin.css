@@ -1432,3 +1432,15 @@ html:has(.adm-bar) {
   height: 100%;
   object-fit: cover;
 }
+
+/* A group of fields inside a section, e.g. the menu's labels in Buttons and small text. */
+.adm-h3 {
+  margin-top: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.adm-help-flush {
+  margin-top: -16px;
+  max-width: 64ch;
+}

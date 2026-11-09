@@ -78,6 +78,8 @@ export default async function PreviewPage({ params }: { params: Params }) {
           <CaseView
             project={toCaseProject(previewable(project))}
             fiveLine={settings.fiveLine}
+            labels={settings.labels}
+            storyPrompts={settings.storyPrompts}
             prevTitle={null}
             nextTitle={null}
             closeHref={editPath(project.id)}

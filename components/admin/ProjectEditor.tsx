@@ -3,7 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteProject, saveProject } from '@/app/admin/actions';
-import { CATEGORIES, MAX_HIGHLIGHTS, PROJECT_TYPES, type Block, type Project, type ProjectInput, type ProjectType } from '@/lib/cms/types';
+import {
+  CATEGORIES,
+  MAX_HIGHLIGHTS,
+  PROJECT_TYPES,
+  type Block,
+  type Project,
+  type ProjectInput,
+  type ProjectType,
+  type StoryPrompts,
+} from '@/lib/cms/types';
 import AccentField from './AccentField';
 import BlockEditor from './BlockEditor';
 import { callServer } from './call-server';
@@ -47,6 +56,8 @@ interface ProjectEditorProps {
   takenSlugs: string[];
   /** e.g. "nihaalnazeer.com", for showing the case study's address. */
   siteHost: string;
+  /** What a strong case file covers, as set in Site settings > Case files. */
+  storyPrompts?: StoryPrompts;
 }
 
 type Intent = 'draft' | 'publish' | 'unpublish';
@@ -69,7 +80,13 @@ function slugFollowsTitle(project: ProjectInput, saved: SavedState | null): bool
   return project.slug === '' || project.slug === slugify(project.title);
 }
 
-export default function ProjectEditor({ initial, saved: initiallySaved, takenSlugs, siteHost }: ProjectEditorProps) {
+export default function ProjectEditor({
+  initial,
+  saved: initiallySaved,
+  takenSlugs,
+  siteHost,
+  storyPrompts = STORY_PROMPTS,
+}: ProjectEditorProps) {
   const router = useRouter();
   const [draft, setDraft] = useState<ProjectInput>(initial);
   const [savedJson, setSavedJson] = useState(() => JSON.stringify(initial));
@@ -483,9 +500,10 @@ export default function ProjectEditor({ initial, saved: initiallySaved, takenSlu
               <div className="adm-prompts">
                 <p>A strong {categoryLabel(draft.category).toLowerCase()} case study covers:</p>
                 <ul>
-                  {STORY_PROMPTS[draft.category].map((prompt) => (
+                  {storyPrompts[draft.category].map((prompt) => (
                     <li key={prompt.heading}>
-                      <strong>{prompt.heading}</strong>: {prompt.hint}
+                      <strong>{prompt.heading}</strong>
+                      {prompt.hint && `: ${prompt.hint}`}
                     </li>
                   ))}
                 </ul>

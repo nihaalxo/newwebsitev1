@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, type CSSProperties } from 'react';
-import { CATEGORIES } from '@/lib/cms/types';
+import { CATEGORIES, type Category, type Labels } from '@/lib/cms/types';
 import { setActiveFilter, type Filter } from './filter-store';
 import PlateCard from './PlateCard';
 import { say } from './say';
@@ -28,23 +28,38 @@ function spans(count: number): number[] {
 
 const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export default function AllWork({ items }: { items: WorkItem[] }) {
+/** The filter's name for each category, as set in Site settings. */
+const CATEGORY_LABEL: Record<Category, keyof Labels> = {
+  brand: 'catBrand',
+  spatial: 'catSpatial',
+  interface: 'catInterface',
+  print: 'catPrint',
+};
+
+export default function AllWork({ items, labels }: { items: WorkItem[]; labels: Labels }) {
   const [active, setActive] = useState<Filter>('all');
+  // The grid gets its plate count only once a filter has been used, as in the mockup.
+  const [filtered, setFiltered] = useState(false);
   const bar = useRef<HTMLDivElement>(null);
   const grid = useRef<HTMLUListElement>(null);
   const layout = spans(items.length);
   const counts = new Map(CATEGORIES.map((c) => [c.id, items.filter((i) => i.category === c.id).length]));
   const tabs: { id: Filter; label: string; count: number }[] = [
-    { id: 'all', label: 'All', count: items.length },
-    ...CATEGORIES.filter((c) => (counts.get(c.id) ?? 0) > 0).map((c) => ({ id: c.id, label: c.label, count: counts.get(c.id) ?? 0 })),
+    { id: 'all', label: labels.filterAll, count: items.length },
+    ...CATEGORIES.filter((c) => (counts.get(c.id) ?? 0) > 0).map((c) => ({
+      id: c.id,
+      label: labels[CATEGORY_LABEL[c.id]],
+      count: counts.get(c.id) ?? 0,
+    })),
   ];
   const showing = active === 'all' ? items.length : (counts.get(active) ?? 0);
 
   function choose(filter: Filter) {
     setActive(filter);
+    setFiltered(true);
     setActiveFilter(filter);
     const count = filter === 'all' ? items.length : (counts.get(filter) ?? 0);
-    const label = CATEGORIES.find((c) => c.id === filter)?.label.toLowerCase();
+    const label = filter === 'all' ? '' : labels[CATEGORY_LABEL[filter]].toLowerCase();
     say(filter === 'all' ? `Showing all ${count} projects` : `Showing ${count} ${label} projects`);
     // Keep the top of the grid just under the sticky filters, so the change is visible.
     if (bar.current && grid.current) {
@@ -68,7 +83,7 @@ export default function AllWork({ items }: { items: WorkItem[] }) {
         className={active === 'all' ? 'grid' : 'grid is-filtered'}
         id="grid"
         ref={grid}
-        style={{ '--n': Math.min(showing, 3) } as CSSProperties}
+        style={filtered ? ({ '--n': Math.min(showing, 3) } as CSSProperties) : undefined}
       >
         {items.map((item, i) => (
           <li

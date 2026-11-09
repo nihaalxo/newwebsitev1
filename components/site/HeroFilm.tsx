@@ -25,14 +25,6 @@ function introAlreadySeen(): boolean {
   return seen;
 }
 
-/** Takes ?from=lair out of the address once it has been read, so a reload or a shared link doesn't carry it. */
-function forgetLairReturn(): void {
-  const url = new URL(location.href);
-  if (url.searchParams.get('from') !== 'lair') return;
-  url.searchParams.delete('from');
-  history.replaceState(history.state, '', url.pathname + url.search + url.hash);
-}
-
 interface HeroFilmProps {
   src: string;
   poster?: string;
@@ -51,10 +43,7 @@ export default function HeroFilm({ src, poster, loopStart, loopEnd }: HeroFilmPr
     const hero = ref.current;
     if (!hero) return;
     const reduce = reducedMotion();
-    if (skipIntro.current === null) {
-      skipIntro.current = introAlreadySeen() || reduce;
-      forgetLairReturn();
-    }
+    if (skipIntro.current === null) skipIntro.current = introAlreadySeen() || reduce;
     const skip = skipIntro.current;
 
     if (skip && poster) hero.poster = poster;

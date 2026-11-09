@@ -1,15 +1,30 @@
-import { Fragment } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import type { CvSection, Settings } from '@/lib/cms/types';
+
+/** The parts with " | " between them, adjacent words joined into one text, as the mockup writes "London | <a>". */
+function joined(parts: ReactNode[]): ReactNode[] {
+  const out: ReactNode[] = [];
+  const push = (node: ReactNode) => {
+    const last = out.length - 1;
+    if (typeof node === 'string' && typeof out[last] === 'string') out[last] = `${out[last]}${node}`;
+    else out.push(node);
+  };
+  parts.forEach((part, i) => {
+    if (i > 0) push(' | ');
+    push(part);
+  });
+  return out;
+}
 
 /** Positions and dates only: the PDF, one click away, has the full details. */
 export default function Cv({ settings }: { settings: Settings }) {
-  const { cvTitle, cvHeadline, cvPlace, cvUrl, cvSections, email, linkedin } = settings;
+  const { cvTitle, cvHeadline, cvPlace, cvUrl, cvSections, email, linkedin, labels } = settings;
   const headline = cvHeadline
     .split('|')
     .map((part) => part.trim())
     .filter(Boolean);
   const contact = [
-    cvPlace && <Fragment key="place">{cvPlace}</Fragment>,
+    cvPlace,
     email && (
       <a key="email" href={`mailto:${email}`}>
         {email}
@@ -17,7 +32,8 @@ export default function Cv({ settings }: { settings: Settings }) {
     ),
     linkedin && (
       <a key="linkedin" href={linkedin} target="_blank" rel="noopener">
-        LinkedIn<span className="vh"> (opens in a new tab)</span>
+        {labels.linkedin}
+        <span className="vh"> (opens in a new tab)</span>
       </a>
     ),
   ].filter(Boolean);
@@ -42,19 +58,12 @@ export default function Cv({ settings }: { settings: Settings }) {
               </p>
             )}
             {contact.length > 0 && (
-              <p className="cv-contact">
-                {contact.map((item, i) => (
-                  <Fragment key={i}>
-                    {i > 0 && ' | '}
-                    {item}
-                  </Fragment>
-                ))}
-              </p>
+              <p className="cv-contact">{joined(contact)}</p>
             )}
           </div>
           {cvUrl && (
             <a className="btn btn-seam" href={cvUrl} download>
-              Download CV PDF
+              {labels.cvDownload}
               <svg className="icon" aria-hidden="true">
                 <use href="#dl" />
               </svg>

@@ -11,9 +11,9 @@ import { STALE_PROJECT_MESSAGE, type Project, type Settings } from './types';
 
 /**
  * Local mode: content lives in .cms/content.json and uploads in public/uploads, both committed to git.
- * It only ever runs under `npm run dev`: lib/cms/index.ts imports this module inside a development-only branch, so
- * node:fs never reaches a production build (the Cloudflare Worker has no filesystem). To publish what is here, run
- * `npm run cms:to-cloudflare`.
+ * It edits under `npm run dev`, and a plain Node production server (`npm run build`, then `npm start`) shows it
+ * read-only. lib/cms/index.ts imports this module only in branches the Cloudflare build drops, so node:fs never
+ * reaches the Worker (which has no filesystem). To publish what is here, run `npm run cms:to-cloudflare`.
  */
 
 interface Store {

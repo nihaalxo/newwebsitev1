@@ -1,5 +1,9 @@
 // Shared content model. Every storage mode (local file, Cloudflare D1 + R2, Supabase) reads and writes exactly these shapes.
 
+import type { Labels } from './labels';
+
+export type { LabelKey, Labels } from './labels';
+
 export type Category = 'brand' | 'spatial' | 'interface' | 'print';
 
 export const CATEGORIES: { id: Category; label: string }[] = [
@@ -115,6 +119,15 @@ export interface CvSection {
   entries: CvEntry[];
 }
 
+/** One part of a strong case file, e.g. "The brief": "Who it was for and what had to change…". */
+export interface StoryPrompt {
+  heading: string;
+  hint: string;
+}
+
+/** What a strong case file covers, by category. */
+export type StoryPrompts = Record<Category, StoryPrompt[]>;
+
 /**
  * Every word on the public site that isn't a project. Lines marked "inline" accept **bold**; lines marked "five" put
  * the words in [square brackets] on the link to the Lair. Empty optional strings are hidden on the public site.
@@ -178,6 +191,13 @@ export interface Settings {
   contactFilm: Media | null;
   /** Seconds into the contact film to start from. */
   contactFilmStart: number;
+  /** The short words: the menu, buttons, the contact form's messages, the case file's labels (lib/cms/labels.ts). */
+  labels: Labels;
+  /**
+   * Shown as "To add" notes in a published case file that has no text yet, and above the story in the project
+   * editor.
+   */
+  storyPrompts: StoryPrompts;
   updatedAt: string;
 }
 
