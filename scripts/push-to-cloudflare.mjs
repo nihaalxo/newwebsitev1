@@ -67,7 +67,7 @@ async function readBindings() {
   const bucket = config.r2_buckets?.find((b) => b.binding === 'CMS_UPLOADS');
   if (!db || !bucket) fail('wrangler.jsonc must declare the CMS_DB database and the CMS_UPLOADS bucket.');
   if (remote && /^0{8}-/.test(db.database_id)) {
-    fail('wrangler.jsonc still has the placeholder database_id. Put in the id from `npx wrangler d1 create` (GO-LIVE.md, step 3).');
+    fail('wrangler.jsonc still has the placeholder database_id. Put in the id from `npx wrangler d1 create` (GO-LIVE.md, step 2).');
   }
   return { bucket: bucket.bucket_name };
 }

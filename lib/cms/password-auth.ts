@@ -5,8 +5,8 @@ import type { AuthResult } from './types';
 
 /*
  * One admin, signed in with an email and password held in the environment (ADMIN_EMAIL, ADMIN_PASSWORD) and kept
- * signed in by an HMAC-signed cookie (LOCAL_SESSION_SECRET). Local mode reads them from .env.local; on Cloudflare
- * they are Worker secrets, or .dev.vars in the local preview.
+ * signed in by an HMAC-signed cookie (LOCAL_SESSION_SECRET). On this computer they are in .dev.vars (`npm run dev` and
+ * the Cloudflare preview both read it); on Cloudflare they are Worker secrets.
  */
 
 type EnvSource = Record<string, string | undefined>;

@@ -3,13 +3,20 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nihaalnazeer",
-  "main": ".open-next/worker.js",
+  // cloudflare/worker.mjs hands every request to the site OpenNext builds into .open-next/worker.js, and serves the
+  // films in public/ with byte ranges, which Safari needs to play them.
+  "main": "cloudflare/worker.mjs",
   "compatibility_date": "2026-11-04",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  // Everything in public/ plus Next's static files, served before the Worker runs.
+  // Everything in public/ plus Next's static files, served before the Worker runs. Films go to the Worker first, so
+  // a Range request gets 206 and the requested bytes (static assets alone answer 200 with the whole file).
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "run_worker_first": ["/*.mp4", "/*.webm", "/*.mov", "/*.m4v"],
+    // Files only at their exact path, as Next serves public/ (OpenNext requires this with run_worker_first).
+    "html_handling": "none",
+    "not_found_handling": "none"
   },
   // Lets the Worker call itself (OpenNext uses it for revalidation).
   "services": [
@@ -37,6 +44,6 @@
   "observability": {
     "enabled": true
   }
-  // The custom domain is attached in step 9 of GO-LIVE.md; ADMIN_EMAIL, ADMIN_PASSWORD and LOCAL_SESSION_SECRET are
-  // secrets (`npx wrangler secret put NAME`), never vars in this file.
+  // The custom domain is attached in step 10 of GO-LIVE.md. ADMIN_EMAIL, ADMIN_PASSWORD and LOCAL_SESSION_SECRET are
+  // secrets (`npx wrangler secret put NAME`, step 5), never vars in this file; the local preview reads them from .dev.vars.
 }

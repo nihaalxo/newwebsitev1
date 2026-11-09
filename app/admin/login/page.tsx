@@ -28,7 +28,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </div>
         <LoginForm next={destination} />
         {store.mode === 'local' && (
-          <p className="adm-help">Local mode: the email and password are ADMIN_EMAIL and ADMIN_PASSWORD in .env.local.</p>
+          <p className="adm-help">Local mode: the email and password are ADMIN_EMAIL and ADMIN_PASSWORD in .dev.vars.</p>
         )}
         {store.mode === 'cloudflare' && (
           <p className="adm-help">The email and password are the Worker secrets ADMIN_EMAIL and ADMIN_PASSWORD.</p>

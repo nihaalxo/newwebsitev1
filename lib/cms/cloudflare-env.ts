@@ -59,9 +59,8 @@ export interface CmsCloudflareEnv {
   LOCAL_SESSION_SECRET?: string;
 }
 
-/** Uploads live in R2 under this prefix and are served by app/cms/[...path]/route.ts at /cms/<path>. */
-export const R2_PREFIX = 'cms/';
-export const R2_PUBLIC_PREFIX = '/cms/';
+/** Uploads live in R2 under this prefix and are served at /cms/<path> (lib/cms/r2-files.ts). */
+export { R2_PREFIX, R2_PUBLIC_PREFIX } from './r2-files';
 
 /**
  * The Worker's bindings when this request is running on Cloudflare (deployed, or the OpenNext preview) with the CMS

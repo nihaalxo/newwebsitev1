@@ -25,10 +25,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files: they hold your admin password and Supabase keys
+# local env files: local addresses and keys, never committed
 .env*.local
 
-# Cloudflare: local secrets for the preview, wrangler's local D1/R2 state and the OpenNext build
+# The admin's email, password and session secret (read by `npm run dev` and `npm run preview`), wrangler's local
+# D1/R2 state, and the OpenNext build
 .dev.vars
 .dev.vars.*
 /.wrangler/

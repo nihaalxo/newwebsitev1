@@ -110,7 +110,7 @@ function byPosition(a: Project, b: Project): number {
 const auth = passwordAuth({
   env: () => process.env,
   secure: isProduction,
-  setupHint: '.env.local and restart the dev server',
+  setupHint: '.dev.vars and restart the dev server',
 });
 const requireAdmin = auth.requireAdmin;
 

@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -11,9 +11,9 @@
     "cms:seed": "node scripts/seed-local.mjs",
     "cms:push": "node scripts/push-to-supabase.mjs",
     "cms:to-cloudflare": "node scripts/push-to-cloudflare.mjs",
-    "cf:build": "opennextjs-cloudflare build",
+    "cf:build": "node scripts/check-deploy-env.mjs && opennextjs-cloudflare build && node scripts/film-sizes.mjs",
     "preview": "opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "npm run cf:build && opennextjs-cloudflare deploy",
     "db:migrate:local": "wrangler d1 migrations apply CMS_DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply CMS_DB --remote",
     "cf-typegen": "wrangler types"

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Copies the local-mode content (.cms/content.json and the files it points at) into your Supabase project.
 //
-//   npm run cms:push                  # or: node --env-file=.env.local scripts/push-to-supabase.mjs
+//   npm run cms:push                  # or: node --env-file=.dev.vars scripts/push-to-supabase.mjs
 //   npm run cms:push -- --dry-run     # shows what would happen, without connecting to Supabase
 //
 // 1. Uploads every local file the content references (anything under /uploads/ and the films at the root of
@@ -49,17 +49,22 @@ const formatSize = (bytes) =>
 
 // ---- Environment
 
-/** `npm run cms:push` doesn't pass --env-file, so fall back to reading .env.local directly. */
+/**
+ * `npm run cms:push` doesn't pass --env-file, so read .dev.vars (where secrets live: nothing is built from it), then
+ * .env.development.local and .env.local, directly. A variable already set is never overwritten.
+ */
 function loadEnv() {
-  const envFile = path.join(ROOT, '.env.local');
   const needed = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'];
-  if (needed.some((name) => !process.env[name]) && existsSync(envFile) && typeof process.loadEnvFile === 'function') {
-    process.loadEnvFile(envFile);
+  for (const name of ['.dev.vars', '.env.development.local', '.env.local']) {
+    const envFile = path.join(ROOT, name);
+    if (needed.some((n) => !process.env[n]) && existsSync(envFile) && typeof process.loadEnvFile === 'function') {
+      process.loadEnvFile(envFile);
+    }
   }
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/+$/, '');
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  if (!url) fail('NEXT_PUBLIC_SUPABASE_URL is not set. Add it to .env.local (Supabase > Project Settings > API).');
-  if (!dryRun && !serviceKey) fail('SUPABASE_SERVICE_ROLE_KEY is not set. Add it to .env.local (Supabase > Project Settings > API).');
+  if (!url) fail('NEXT_PUBLIC_SUPABASE_URL is not set. Add it to .env.development.local (Supabase > Project Settings > API).');
+  if (!dryRun && !serviceKey) fail('SUPABASE_SERVICE_ROLE_KEY is not set. Add it to .dev.vars (Supabase > Project Settings > API).');
   if (serviceKey && looksLikePublicKey(serviceKey)) {
     fail('SUPABASE_SERVICE_ROLE_KEY holds the public anon key. Use the service_role (secret) key instead.');
   }
