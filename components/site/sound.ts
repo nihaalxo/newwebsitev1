@@ -12,6 +12,8 @@ export function setSoundOn(next: boolean): void {
   soundOn = next;
   document.querySelectorAll('video').forEach((video) => {
     video.muted = !next;
+    // A film that is playing carries on with its soundtrack (the browser allows it: this runs from a click).
+    if (next && !video.paused) video.play().catch(() => undefined);
   });
   listeners.forEach((listener) => listener());
 }

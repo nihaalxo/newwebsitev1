@@ -1,45 +1,37 @@
-'use client';
-
-import Link from 'next/link';
-import type { CSSProperties } from 'react';
-import Picture from './Picture';
+import { thumbnail } from './media';
 import type { WorkItem } from './work-item';
 
-/** Light the seam around a plate. The class stays until the run finishes, so a brushing pointer never cuts it short. */
-function lightSeam(link: HTMLElement) {
-  link.querySelector('.plate')?.classList.add('lit');
-}
-
-/** A project as a large plate with its caption, on the home page's highlights and on All projects. */
-export default function PlateCard({ item, sizes, priority = false }: { item: WorkItem; sizes: string; priority?: boolean }) {
-  const meta = [item.discipline, item.year].filter(Boolean).join(', ');
+/**
+ * A project as a plate with the full glimmer hover: a halo, a lap of light around the whole outline (SeamLap) and a
+ * slow zoom. A real link to the project's page, which the case file intercepts to open in place (CaseDialog).
+ */
+export default function PlateCard({ item, priority = false }: { item: WorkItem; priority?: boolean }) {
+  const src = thumbnail(item.cover);
   return (
-    <Link
-      className="card-link"
-      href={`/work/${item.slug}`}
-      onPointerEnter={(event) => {
-        if (event.pointerType === 'mouse') lightSeam(event.currentTarget);
-      }}
-      onFocus={(event) => {
-        if (event.currentTarget.matches(':focus-visible')) lightSeam(event.currentTarget);
-      }}
-    >
+    <a className="card-link" href={`/work/${item.slug}`} data-open={item.slug}>
       <span className="halo">
-        <span
-          className="plate"
-          style={{ '--accent': item.accent } as CSSProperties}
-          onAnimationEnd={(event) => {
-            if (event.pseudoElement === '::before') event.currentTarget.classList.remove('lit');
-          }}
-        >
-          {item.cover && <Picture media={item.cover} sizes={sizes} priority={priority} />}
+        <span className="plate">
+          {src && (
+            <img
+              src={src}
+              width={item.cover?.width}
+              height={item.cover?.height}
+              alt={item.cover?.alt ?? ''}
+              loading={priority ? undefined : 'lazy'}
+              fetchPriority={priority ? 'high' : undefined}
+            />
+          )}
+          <span className="seam-run" aria-hidden="true"></span>
         </span>
       </span>
       <span className="cap">
         <span className="card-title">{item.title}</span>
-        {meta && <span className="card-meta">{meta}</span>}
+        <span className="card-meta">
+          {item.discipline ? `${item.discipline}, ` : ''}
+          {item.year}
+        </span>
         {item.summary && <span className="card-line">{item.summary}</span>}
       </span>
-    </Link>
+    </a>
   );
 }

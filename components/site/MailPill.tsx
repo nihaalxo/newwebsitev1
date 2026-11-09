@@ -1,31 +1,37 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { mailto } from './config';
 
-/** Phones only: a floating "Email me" between the hero and Contact, out of the way while either is on screen. */
+/**
+ * The phone-only "Email me" pill. On the home page it shows between the hero and the contact section; elsewhere it
+ * steps aside for the footer, which has its own link.
+ */
 export default function MailPill({ email }: { email: string }) {
+  const pathname = usePathname();
   const [away, setAway] = useState(true);
 
   useEffect(() => {
-    const ends = ['hero', 'contact'].map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
-    if (ends.length === 0 || !('IntersectionObserver' in window)) return;
-
-    const visible = new Map<Element, boolean>();
+    if (!('IntersectionObserver' in window)) return;
+    const hero = document.querySelector('.hero');
+    const watched = (hero ? [hero, document.getElementById('contact')] : [document.querySelector('.foot')]).filter(
+      (el): el is Element => el !== null,
+    );
+    const seen = new Map<Element, boolean>();
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => visible.set(entry.target, entry.isIntersecting));
-        setAway([...visible.values()].some(Boolean));
+        entries.forEach((entry) => seen.set(entry.target, entry.isIntersecting));
+        setAway([...seen.values()].some(Boolean));
       },
       { threshold: 0.2 },
     );
-    ends.forEach((el) => observer.observe(el));
+    watched.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return (
-    // While away it is visibility: hidden, which also takes it out of the tab order.
-    <a className={away ? 'mail-pill away' : 'mail-pill'} href={mailto(email)}>
+    <a className={away ? 'mail-pill away' : 'mail-pill'} id="mail-pill" href={mailto(email)}>
       Email me
     </a>
   );

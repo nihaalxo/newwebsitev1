@@ -73,6 +73,11 @@ export function Inline({ text }: { text: string }) {
   return <>{renderInline(text.trim())}</>;
 }
 
+/** Like Inline, but keeps the spaces at either end, for a run that sits next to other inline content. */
+export function InlineText({ text }: { text: string }) {
+  return <>{renderInline(text)}</>;
+}
+
 /** Paragraphs of prose. Renders nothing for empty text. */
 export function Prose({ text, className }: { text: string; className?: string }) {
   const paragraphs = splitParagraphs(text);

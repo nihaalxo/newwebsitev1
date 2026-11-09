@@ -381,7 +381,7 @@ export default function ProjectEditor({ initial, saved: initiallySaved, takenSlu
                 id={fieldId('summary')}
                 label="Summary"
                 required
-                help="One sentence, shown under the card title and at the top of the case study."
+                help="One sentence, shown under the card title and at the top of the case file."
                 rows={3}
                 target={SUMMARY_TARGET}
                 maxLength={LIMITS.summary}
@@ -416,7 +416,18 @@ export default function ProjectEditor({ initial, saved: initiallySaved, takenSlu
               <h2 className="adm-h2" id="details-title">
                 Details
               </h2>
-              <p className="adm-section-intro">Shown in a row of facts under the summary. Anything left empty is hidden.</p>
+              <p className="adm-section-intro">
+                Shown in a row of facts under the summary. Role, type and tools show a “To add” prompt until they are filled
+                in; the rest is hidden when empty.
+              </p>
+              <TextField
+                id={fieldId('shown')}
+                label="In the images"
+                help="What the cover and images show, like “Bags, cups, sachets, an enamel mug”."
+                value={draft.shown}
+                maxLength={LIMITS.summary}
+                onChange={(shown) => set('shown', shown)}
+              />
               <div className="adm-grid-2">
                 <TextField
                   id={fieldId('role')}
@@ -473,11 +484,27 @@ export default function ProjectEditor({ initial, saved: initiallySaved, takenSlu
                 <p>A strong {categoryLabel(draft.category).toLowerCase()} case study covers:</p>
                 <ul>
                   {STORY_PROMPTS[draft.category].map((prompt) => (
-                    <li key={prompt}>{prompt}</li>
+                    <li key={prompt.heading}>
+                      <strong>{prompt.heading}</strong>: {prompt.hint}
+                    </li>
                   ))}
                 </ul>
               </div>
+              <p className="adm-help">
+                Text blocks with a heading show side by side in the case file; images, galleries, videos and quotes run the
+                full width. Until there is any text, the case file shows these prompts as “To add” notes. The first video
+                replaces the cover at the top of the case file.
+              </p>
               <BlockEditor blocks={draft.blocks} onChange={changeBlocks} errors={errors} folderHint={folder} />
+              {draft.category === 'spatial' && (
+                <SwitchField
+                  id={fieldId('stillOnly')}
+                  label="Stills only, no capture to come"
+                  help="Spatial projects without a video ask for a short capture from the headset or the visionOS simulator. Turn this on when the project is shown by stills alone."
+                  checked={draft.stillOnly}
+                  onChange={(stillOnly) => set('stillOnly', stillOnly)}
+                />
+              )}
             </section>
 
             <section className="adm-section" id="home" aria-labelledby="home-title">

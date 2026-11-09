@@ -186,7 +186,8 @@ export interface Settings {
  * writes to R2), or to a Supabase signed URL.
  */
 export type UploadTicket =
-  | { mode: 'local' | 'cloudflare'; url: string; publicUrl: string }
+  | { mode: 'local'; url: string; publicUrl: string }
+  | { mode: 'cloudflare'; url: string; publicUrl: string }
   | { mode: 'supabase'; bucket: string; path: string; token: string; publicUrl: string };
 
 export type AuthResult = { ok: true } | { ok: false; error: string };

@@ -1,32 +1,29 @@
 import type { Metadata } from 'next';
-import AllWork from '@/components/site/AllWork';
+import AllProjects from '@/components/site/AllProjects';
 import { absoluteUrl, OWNER_NAME } from '@/components/site/config';
-import { listPublished } from '@/components/site/data';
-import { toWorkItem } from '@/components/site/work-item';
+import { getSettings } from '@/components/site/data';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
-const TITLE = 'All projects';
-const DESCRIPTION = 'Every project: brand identities, spatial experiences, interfaces, print and motion.';
+const DESCRIPTION = `Every project by ${OWNER_NAME}: brand identities, spatial experiences, app interfaces, print and motion.`;
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: '/work' },
-  openGraph: { type: 'website', url: absoluteUrl('/work'), siteName: OWNER_NAME, title: TITLE, description: DESCRIPTION },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  const title = settings.allProjectsTitle || 'All projects';
+  return {
+    title,
+    description: DESCRIPTION,
+    alternates: { canonical: '/work' },
+    openGraph: {
+      type: 'website',
+      url: absoluteUrl('/work'),
+      siteName: OWNER_NAME,
+      title: `${title} | ${OWNER_NAME}`,
+      description: settings.heroLead || DESCRIPTION,
+    },
+  };
+}
 
-export default async function AllProjectsPage() {
-  const projects = await listPublished();
-
-  return (
-    <main id="main" className="page">
-      <div className="wrap all-head">
-        <h1 className="title-l" id="all-title">
-          {TITLE}
-        </h1>
-      </div>
-      <AllWork items={projects.map(toWorkItem)} labelledBy="all-title" />
-    </main>
-  );
+export default function AllProjectsPage() {
+  return <AllProjects />;
 }

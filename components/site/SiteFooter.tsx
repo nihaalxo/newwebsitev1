@@ -1,34 +1,21 @@
-import Link from 'next/link';
 import type { Settings } from '@/lib/cms/types';
-import { mailto, OWNER_NAME } from './config';
-import XMark from './XMark';
+import BrandLink from './BrandLink';
+import { mailto } from './config';
+import FiveLine from './FiveLine';
 
-export default function SiteFooter({ settings, showLair }: { settings: Settings; showLair: boolean }) {
-  const { email, linkedin, instagram } = settings;
-
+export default function SiteFooter({ settings }: { settings: Settings }) {
+  const { email, linkedin, fiveFooter } = settings;
   return (
     <footer className="foot">
       <div className="wrap">
-        <Link className="brand" href="/#top" aria-label={`${OWNER_NAME}, home`}>
-          <XMark />
-          <span>{OWNER_NAME}</span>
-        </Link>
-        {showLair && (
-          <p>
-            There&apos;s also a world you can walk around in. <Link href="/#lair">Enter the Lair</Link>
-          </p>
-        )}
-        {(email || linkedin || instagram) && (
+        <BrandLink />
+        <FiveLine text={fiveFooter} className="" />
+        {(email || linkedin) && (
           <p className="foot-links">
             {email && <a href={mailto(email)}>Email</a>}
             {linkedin && (
               <a href={linkedin} target="_blank" rel="noopener">
                 LinkedIn<span className="vh"> (opens in a new tab)</span>
-              </a>
-            )}
-            {instagram && (
-              <a href={instagram} target="_blank" rel="noopener">
-                Instagram<span className="vh"> (opens in a new tab)</span>
               </a>
             )}
           </p>

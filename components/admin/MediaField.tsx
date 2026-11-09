@@ -32,6 +32,8 @@ export interface MediaFieldProps {
   altError?: string;
   /** Videos: seconds to cue the preview to, so "Use the frame on screen" starts on that frame. */
   previewStart?: number;
+  /** Videos: offer a second, portrait cut that plays instead on screens taller than they are wide. */
+  tallCut?: boolean;
 }
 
 type Busy = { label: string; progress: number | null };
@@ -53,11 +55,13 @@ export default function MediaField({
   error,
   altError,
   previewStart,
+  tallCut,
 }: MediaFieldProps) {
   const track = useUploadTracker();
   const root = useRef<HTMLDivElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const posterInput = useRef<HTMLInputElement>(null);
+  const tallInput = useRef<HTMLInputElement>(null);
   const previewVideo = useRef<HTMLVideoElement>(null);
   // Uploads finish after a delay; merge into whatever the value is by then, not what it was when they started.
   const latest = useRef(value);
@@ -108,7 +112,8 @@ export default function MediaField({
       const active = document.activeElement;
       const focusHere = active === document.body || Boolean(root.current?.contains(active));
       if (!latest.current && focusHere) setPendingFocus(kind === 'image' ? `${id}-alt` : id);
-      // Keep the description when replacing a file; a new film needs a new poster, which `uploaded` doesn't carry.
+      // Keep the description when replacing a file; a new film needs a new poster and tall cut, which `uploaded`
+      // doesn't carry.
       onChange({ ...uploaded, alt: latest.current?.alt ?? '' });
     });
   }
@@ -130,6 +135,21 @@ export default function MediaField({
       const poster = await uploadStill(file, `${folderHint}-poster`, onProgress);
       if (latest.current) onChange({ ...latest.current, poster });
     });
+  }
+
+  function uploadTall(file: File) {
+    if (busy) return;
+    void run(`Uploading ${file.name}`, 'Tall cut uploaded.', async (onProgress) => {
+      const tall = await uploadVideo(file, `${folderHint}-tall`, onProgress);
+      if (latest.current) onChange({ ...latest.current, srcTall: tall.src });
+    });
+  }
+
+  function removeTall() {
+    if (!value) return;
+    const { srcTall: _removed, ...rest } = value;
+    onChange(rest);
+    setPendingFocus(`${id}-tall-upload`);
   }
 
   function remove() {
@@ -303,6 +323,38 @@ export default function MediaField({
         </div>
       )}
 
+      {value && kind === 'video' && tallCut && (
+        <div className="adm-poster">
+          <div className="adm-poster-thumb">
+            {value.srcTall ? <video src={value.srcTall} muted playsInline preload="metadata" /> : <span>No tall cut</span>}
+          </div>
+          <div className="adm-poster-body">
+            <p className="adm-label">Tall cut (portrait screens)</p>
+            <p className="adm-help">
+              Optional. A portrait version of the same film, played instead on phones held upright and other screens
+              taller than they are wide.
+            </p>
+            <div className="adm-media-actions">
+              <button
+                id={`${id}-tall-upload`}
+                type="button"
+                className="adm-btn adm-btn-small"
+                onClick={() => !busy && tallInput.current?.click()}
+                aria-disabled={busy ? true : undefined}
+              >
+                {value.srcTall ? 'Replace the tall cut' : 'Upload a tall cut'}
+                <span className="adm-vh"> for {label}</span>
+              </button>
+              {value.srcTall && (
+                <button type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={removeTall}>
+                  Remove the tall cut<span className="adm-vh"> from {label}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <input
         ref={fileInput}
         type="file"
@@ -326,6 +378,20 @@ export default function MediaField({
             const file = event.target.files?.[0];
             event.target.value = '';
             if (file) uploadPoster(file);
+          }}
+        />
+      )}
+      {kind === 'video' && tallCut && (
+        <input
+          ref={tallInput}
+          type="file"
+          accept={VIDEO_ACCEPT}
+          hidden
+          tabIndex={-1}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = '';
+            if (file) uploadTall(file);
           }}
         />
       )}

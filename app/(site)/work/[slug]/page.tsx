@@ -1,20 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import CaseStudy from '@/components/site/CaseStudy';
+import AllProjects from '@/components/site/AllProjects';
 import { absoluteUrl, OWNER_NAME } from '@/components/site/config';
-import { getPublishedProject, listPublished, nextProject } from '@/components/site/data';
+import { getPublishedProject } from '@/components/site/data';
 import { still } from '@/components/site/media';
 
-export const revalidate = 300;
-// Projects published after the last build render on first request, then join the cache.
-export const dynamicParams = true;
+// A project's own address: All projects, with that project's case file open over it.
+export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ slug: string }>;
-
-export async function generateStaticParams() {
-  const projects = await listPublished();
-  return projects.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
@@ -48,12 +42,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function WorkPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const [project, all] = await Promise.all([getPublishedProject(slug), listPublished()]);
+  const project = await getPublishedProject(slug);
   if (!project) notFound();
 
-  return (
-    <main id="main" className="page">
-      <CaseStudy project={project} next={nextProject(all, project)} />
-    </main>
-  );
+  return <AllProjects openSlug={project.slug} />;
 }

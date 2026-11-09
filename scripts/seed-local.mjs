@@ -5,7 +5,8 @@
 //   node scripts/seed-local.mjs --force   # rebuilds it (and the images) from scratch
 //
 // For each project it writes public/uploads/seed/<slug>.webp (original size) and <slug>-sm.webp (960px wide at most),
-// then writes .cms/content.json with every project published and the default site settings.
+// then writes .cms/content.json with every project published and the default site settings
+// (lib/cms/default-settings.json).
 
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
@@ -25,52 +26,20 @@ const SMALL_WIDTH = 960;
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CATEGORIES = ['brand', 'spatial', 'interface', 'print'];
 
-// An exact copy of DEFAULT_SETTINGS in lib/cms/defaults.ts (without updatedAt). Change both together.
-const DEFAULT_SETTINGS = {
-  heroLead: 'Product | UI/UX | Multidisciplinary',
-  aboutStatement:
-    "I'm Nihaal, a multidisciplinary designer trained in Graphic and Media Design at UAL in London. I work in three places: on the shelf, with identities like My Chaii London and RGFC; on screen, with apps like Green Print; and in space, with Apple Vision Pro concepts reimagining Netflix and live football.",
-  basedIn: '',
-  availability: '',
-  cvUrl: '',
-  avatar: {
-    kind: 'image',
-    src: '/uploads/seed/avatar.jpg',
-    alt: "Nihaal's 3D avatar in a black suit with glowing cyan seams and an X across the chest",
-    width: 800,
-    height: 600,
-  },
-  portrait: null,
-  email: 'nihaalnazeerxo@gmail.com',
-  linkedin: 'https://www.linkedin.com/in/nihaal-nazeer-b6187117a/',
-  instagram: '',
-  tools: 'Blender, After Effects, Premiere Pro, Illustrator, Photoshop, InDesign, Lightroom, Audition and XD',
-  education: ['BA (Hons) Graphic and Media Design, UAL', 'CertHE Design, Screen and Media, UAL'],
-  lairUrl: 'https://interactive.nihaalnazeer.com/',
-  lairBlurb:
-    'I rebuilt my portfolio as a world you can walk through: a hall of light, a shooting range and a wall of screens. Bring a keyboard and a mouse.',
-  lairBuiltWith: '',
-  heroFilm: { kind: 'video', src: '/finalheroshot.compressed.mp4', poster: '/uploads/seed/hero-poster.jpg', alt: '' },
-  heroFilmStart: 9,
-  heroFilmLoopStart: 1.2,
-  heroFilmLoopEnd: 24.5,
-  lairFilm: {
-    kind: 'video',
-    src: '/tutorialfullanimation0000-3500_2.compressed.mp4',
-    poster: '/uploads/seed/immersive-portfolio-website.webp',
-    alt: 'Walkthrough: a desk with a curved monitor showing the Lair, with the controls lit on the keyboard',
-  },
-  contactFilm: { kind: 'video', src: '/comp_1.compressed.mp4', alt: '' },
-};
+/** The site settings to seed: the same file lib/cms/defaults.ts builds DEFAULT_SETTINGS from. */
+const DEFAULT_SETTINGS_FILE = path.join(ROOT, 'lib', 'cms', 'default-settings.json');
 
-/** Files the settings point at that this script doesn't generate. */
-const SETTINGS_FILES = [
-  'uploads/seed/avatar.jpg',
-  'uploads/seed/hero-poster.jpg',
-  'finalheroshot.compressed.mp4',
-  'tutorialfullanimation0000-3500_2.compressed.mp4',
-  'comp_1.compressed.mp4',
-];
+/** Files under /public that the settings point at, so a missing one is reported (they are committed, not generated). */
+function settingsFiles(settings) {
+  const files = [];
+  const visit = (value) => {
+    if (typeof value === 'string' && value.startsWith('/') && /\.[a-z0-9]+$/i.test(value)) files.push(value.slice(1));
+    else if (Array.isArray(value)) value.forEach(visit);
+    else if (value && typeof value === 'object') Object.values(value).forEach(visit);
+  };
+  visit(settings);
+  return files;
+}
 
 /**
  * A UUID derived from a name (RFC 4122 version 5, URL namespace), so re-seeding gives every project the same id
@@ -157,6 +126,8 @@ function toProject(entry, cover, now) {
     year: entry.year,
     discipline: entry.discipline,
     summary: entry.summary,
+    shown: entry.shown ?? '',
+    stillOnly: entry.stillOnly === true,
     cover,
     accent: entry.accent,
     role: '',
@@ -184,7 +155,8 @@ async function main() {
   const { projects: entries } = JSON.parse(await readFile(CATALOGUE_FILE, 'utf8'));
   validateCatalogue(entries);
 
-  const missing = SETTINGS_FILES.filter((file) => !existsSync(path.join(PUBLIC_DIR, file)));
+  const DEFAULT_SETTINGS = JSON.parse(await readFile(DEFAULT_SETTINGS_FILE, 'utf8'));
+  const missing = settingsFiles(DEFAULT_SETTINGS).filter((file) => !existsSync(path.join(PUBLIC_DIR, file)));
   if (missing.length > 0) console.warn(`seed-local: the default settings point at files that are missing:\n  public/${missing.join('\n  public/')}`);
 
   await mkdir(SEED_DIR, { recursive: true });

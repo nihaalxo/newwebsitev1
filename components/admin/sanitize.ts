@@ -11,6 +11,7 @@ import {
   PROJECT_TYPES,
   type Block,
   type Category,
+  type CvSection,
   type Media,
   type ProjectInput,
   type ProjectType,
@@ -78,6 +79,8 @@ function media(value: unknown, kind: Media['kind']): Media {
   const width = dimension(data.width);
   const height = dimension(data.height);
   if (kind === 'image' && small) result.srcSmall = small;
+  const tall = mediaSource(data.srcTall);
+  if (kind === 'video' && tall) result.srcTall = tall;
   if (kind === 'video' && poster) result.poster = poster;
   if (width && height) {
     result.width = width;
@@ -158,6 +161,8 @@ export function sanitizeProject(value: unknown): { input: ProjectInput; problems
     year: Number.isInteger(Number(value.year)) ? Number(value.year) : Number.NaN,
     discipline: line(value.discipline, LIMITS.discipline),
     summary: line(value.summary, LIMITS.summary),
+    shown: line(value.shown, LIMITS.summary),
+    stillOnly: value.stillOnly === true,
     cover: optionalMedia(value.cover, 'image'),
     accent: HEX_PATTERN.test(accent) ? accent.toUpperCase() : accent,
     role: line(value.role, LIMITS.role),
@@ -179,32 +184,84 @@ export function sanitizeProject(value: unknown): { input: ProjectInput; problems
   return { input, problems };
 }
 
+/** Lowercase words joined by hyphens, for a CV section's anchor. */
+function sectionId(value: unknown, title: string, taken: Set<string>): string {
+  const base = slugify(line(value, 40)) || slugify(title) || 'section';
+  let id = base;
+  for (let n = 2; taken.has(id); n++) id = `${base}-${n}`;
+  taken.add(id);
+  return id;
+}
+
+function cvSections(value: unknown): CvSection[] {
+  const taken = new Set<string>();
+  return (Array.isArray(value) ? value : []).filter(isData).map((section) => {
+    const title = line(section.title);
+    const entries = Array.isArray(section.entries) ? section.entries : [];
+    return {
+      id: sectionId(section.id, title, taken),
+      title,
+      column: section.column === 2 ? 2 : 1,
+      entries: entries.filter(isData).map((entry) => ({
+        role: line(entry.role),
+        when: line(entry.when, 80),
+        at: line(entry.at),
+      })),
+    };
+  });
+}
+
+/** One control per line, "keys: what they do", with the spacing around the colon tidied. */
+function controls(value: unknown): string {
+  return prose(value, LIMITS.paragraph)
+    .split('\n')
+    .map((entry) => entry.replace(/\s+/g, ' ').trim().replace(/\s*:\s*/, ': '))
+    .filter(Boolean)
+    .join('\n');
+}
+
 export function sanitizeSettings(value: unknown): SettingsInput | null {
   if (!isData(value)) return null;
   const education = Array.isArray(value.education) ? value.education : [];
 
   return {
+    siteDescription: line(value.siteDescription, LIMITS.description),
     heroLead: line(value.heroLead, LIMITS.line),
+    heroFilm: optionalMedia(value.heroFilm, 'video'),
+    heroFilmLoopStart: seconds(value.heroFilmLoopStart),
+    heroFilmLoopEnd: seconds(value.heroFilmLoopEnd),
+    fiveLine: line(value.fiveLine),
+    fiveFooter: line(value.fiveFooter),
+    workTitle: line(value.workTitle, 60),
+    allProjectsTitle: line(value.allProjectsTitle, 60),
+    lairTitle: line(value.lairTitle, 60),
+    lairBlurb: prose(value.lairBlurb, LIMITS.paragraph),
+    lairControls: controls(value.lairControls),
+    lairNudge: prose(value.lairNudge, LIMITS.paragraph),
+    lairTouch: line(value.lairTouch, LIMITS.paragraph),
+    lairFilm: optionalMedia(value.lairFilm, 'video'),
+    aboutTitle: line(value.aboutTitle, 60),
     aboutStatement: prose(value.aboutStatement, LIMITS.paragraph),
+    education: education.map((entry) => line(entry)).filter(Boolean),
+    tools: line(value.tools, LIMITS.tools),
     basedIn: line(value.basedIn),
     availability: line(value.availability),
-    cvUrl: line(value.cvUrl, LIMITS.url),
-    avatar: optionalMedia(value.avatar, 'image'),
     portrait: optionalMedia(value.portrait, 'image'),
+    aboutPhotoCaption: line(value.aboutPhotoCaption, 80),
+    aboutFilm: optionalMedia(value.aboutFilm, 'video'),
+    cvTitle: line(value.cvTitle, 60),
+    cvHeadline: line(value.cvHeadline),
+    cvPlace: line(value.cvPlace, 80),
+    cvUrl: line(value.cvUrl, LIMITS.url),
+    cvSections: cvSections(value.cvSections),
+    contactTitle: line(value.contactTitle),
+    contactFallback: line(value.contactFallback),
+    contactLead: line(value.contactLead, LIMITS.paragraph),
     email: line(value.email).replace(/^mailto:/i, ''),
     linkedin: line(value.linkedin, LIMITS.url),
     instagram: instagramUrl(line(value.instagram, LIMITS.url)),
-    tools: line(value.tools, LIMITS.tools),
-    education: education.map((entry) => line(entry)).filter(Boolean),
-    lairUrl: line(value.lairUrl, LIMITS.url),
-    lairBlurb: prose(value.lairBlurb, LIMITS.paragraph),
-    lairBuiltWith: line(value.lairBuiltWith),
-    heroFilm: optionalMedia(value.heroFilm, 'video'),
-    heroFilmStart: seconds(value.heroFilmStart),
-    heroFilmLoopStart: seconds(value.heroFilmLoopStart),
-    heroFilmLoopEnd: seconds(value.heroFilmLoopEnd),
-    lairFilm: optionalMedia(value.lairFilm, 'video'),
     contactFilm: optionalMedia(value.contactFilm, 'video'),
+    contactFilmStart: seconds(value.contactFilmStart),
   };
 }
 

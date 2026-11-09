@@ -1,27 +1,23 @@
 import type { Metadata, Viewport } from 'next';
-import localFont from 'next/font/local';
+import { Michroma, Urbanist } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { OWNER_NAME, SITE_URL } from '@/components/site/config';
 import './globals.css';
 
-// The owner's own typefaces. Nasalization sets title cards, the name and signage; Gilmer sets everything people read.
-const titleFont = localFont({
-  src: '../public/nasalization-rg.otf',
+// Michroma sets the name, titles and small signage; Urbanist sets everything people read. next/font downloads both
+// at build time and serves them from the site itself, so no request goes to Google when a page loads.
+const titleFont = Michroma({
   weight: '400',
-  style: 'normal',
+  subsets: ['latin'],
   display: 'swap',
-  variable: '--f-title',
-  fallback: ['Eurostile', 'Arial', 'sans-serif'],
+  variable: '--font-michroma',
 });
 
-const textFont = localFont({
-  src: [
-    { path: '../public/GilmerLight.otf', weight: '300', style: 'normal' },
-    { path: '../public/GilmerMedium.otf', weight: '500', style: 'normal' },
-  ],
+const textFont = Urbanist({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
   display: 'swap',
-  variable: '--f-text',
-  fallback: ['Avenir Next', 'system-ui', 'sans-serif'],
+  variable: '--font-urbanist',
 });
 
 export const metadata: Metadata = {

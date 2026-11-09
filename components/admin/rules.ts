@@ -33,6 +33,10 @@ export const LIMITS = {
   line: 200,
   paragraph: 2000,
   educationEntries: 12,
+  description: 300,
+  controls: 12,
+  cvSections: 12,
+  cvEntries: 20,
 } as const;
 
 /** How the site's text renderer (components/site/RichText) reads plain text. Shown under long text fields. */
@@ -114,23 +118,10 @@ export function categoryLabel(id: Category): string {
 }
 
 /** What a strong case study contains, per category. Shown under the Story heading. */
-export const STORY_PROMPTS: Record<Category, string[]> = {
-  brand: [
-    'The brief',
-    'Three decisions that shaped the identity (mark, type, pattern)',
-    'The system (construction, type, palette, a page of guidelines)',
-    'The identity in use',
-  ],
-  spatial: [
-    'The brief',
-    'The interaction model (windows or volumes, gaze and pinch, the first ten seconds)',
-    'A capture from the headset or the visionOS simulator',
-    'The toolchain',
-    "What you'd do next",
-  ],
-  interface: ['The brief', 'Key flows', 'Final screens at device size', "What you'd change"],
-  print: ['The brief', 'Process and dropped routes', 'The finished piece', 'Credits and tools'],
-};
+export { STORY_PROMPTS } from '@/lib/cms/story-prompts';
+
+/** "[walk through my spaceship]": the words in square brackets become the link to the Lair. */
+export const FIVE_LINK_PATTERN = /\[([^\]\n]+)\]/;
 
 const COUNT_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
 
@@ -227,7 +218,6 @@ export function validateSettings(settings: SettingsInput): FieldErrors {
   const links: [keyof SettingsInput, string][] = [
     ['linkedin', 'LinkedIn'],
     ['instagram', 'Instagram'],
-    ['lairUrl', 'The Lair'],
   ];
   for (const [key, name] of links) {
     const value = settings[key];
@@ -245,20 +235,46 @@ export function validateSettings(settings: SettingsInput): FieldErrors {
   }
 
   const validSeconds = (value: number) => Number.isFinite(value) && value >= 0 && value <= HERO_START_MAX;
-  if (!validSeconds(settings.heroFilmStart)) {
-    errors.heroFilmStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 9.`;
-  }
   if (!validSeconds(settings.heroFilmLoopStart)) {
-    errors.heroFilmLoopStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 1.2.`;
+    errors.heroFilmLoopStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 4.5.`;
   }
   if (!validSeconds(settings.heroFilmLoopEnd)) {
     errors.heroFilmLoopEnd = `Enter a number of seconds between 0 and ${HERO_START_MAX}, or 0 to play the whole film.`;
   } else if (settings.heroFilmLoopEnd > 0 && settings.heroFilmLoopEnd <= settings.heroFilmLoopStart) {
     errors.heroFilmLoopEnd = 'Make this later than Loop from, or enter 0 to play the whole film.';
   }
+  if (!validSeconds(settings.contactFilmStart)) {
+    errors.contactFilmStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 0.8.`;
+  }
 
-  if (settings.avatar?.src && !settings.avatar.alt.trim()) errors['avatar.alt'] = 'Describe the avatar still.';
-  if (settings.portrait?.src && !settings.portrait.alt.trim()) errors['portrait.alt'] = 'Describe the portrait.';
+  for (const key of ['fiveLine', 'fiveFooter'] as const) {
+    if (settings[key] && !FIVE_LINK_PATTERN.test(settings[key])) {
+      errors[key] = 'Put the words that link to the Lair in [square brackets].';
+    }
+  }
+
+  const controls = settings.lairControls.split('\n').filter((line) => line.trim());
+  if (controls.length > LIMITS.controls) errors.lairControls = `List at most ${LIMITS.controls} controls, one per line.`;
+  else if (controls.some((line) => !/^[^:]+:\s*\S/.test(line))) {
+    errors.lairControls = 'Write each control as keys, a colon, then what they do, like "Shift: Run".';
+  }
+
+  if (settings.cvSections.length > LIMITS.cvSections) {
+    errors.cvSections = `The CV can have at most ${LIMITS.cvSections} sections.`;
+  }
+  settings.cvSections.forEach((section, index) => {
+    const key = `cvSections.${index}`;
+    if (!section.title.trim()) errors[`${key}.title`] = 'Give this section a title, or remove it.';
+    if (section.entries.length > LIMITS.cvEntries) {
+      errors[`${key}.entries`] = `A section can list at most ${LIMITS.cvEntries} lines.`;
+    }
+    section.entries.forEach((entry, line) => {
+      if (!entry.role.trim()) errors[`${key}.entries.${line}.role`] = 'Write the position, or remove this line.';
+    });
+  });
+
+  if (settings.portrait?.src && !settings.portrait.alt.trim()) errors['portrait.alt'] = 'Describe the photo.';
+  if (settings.lairFilm?.src && !settings.lairFilm.alt.trim()) errors['lairFilm.alt'] = 'Describe what the film shows.';
 
   return errors;
 }

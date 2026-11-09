@@ -1,52 +1,44 @@
-import { preload } from 'react-dom';
 import type { Settings } from '@/lib/cms/types';
 import { OWNER_NAME } from './config';
-import Film from './Film';
-import { imageSources } from './media';
-import NeonName from './NeonName';
+import FiveLine from './FiveLine';
+import HeroFilm from './HeroFilm';
 import { Inline } from './RichText';
 
-/** The opening shot: the hero film full bleed, the name set over it as a title card, the arrow pointing to the work. */
-export default function Hero({ settings, showCue }: { settings: Settings; showCue: boolean }) {
-  const film = settings.heroFilm;
-  const still = film?.kind === 'video' ? film.poster : film?.src;
-  // The poster is the first thing anyone sees, so fetch it ahead of the stylesheet-discovered assets.
-  if (still) preload(still, { as: 'image', fetchPriority: 'high' });
-
+/** Exactly one screen: the film full-bleed, the name set like a title card, and the way down. */
+export default function Hero({ settings }: { settings: Settings }) {
+  const { heroFilm, heroLead, fiveLine } = settings;
+  const [first, ...rest] = OWNER_NAME.split(' ');
   return (
-    <section className="hero" id="hero" aria-labelledby="hero-name">
-      {film?.kind === 'video' && (
-        <Film
-          media={film}
-          className="hero-film"
-          ambient
-          startAt={settings.heroFilmStart}
+    <section className="hero" aria-labelledby="name">
+      {heroFilm && (
+        <HeroFilm
+          src={heroFilm.src}
+          poster={heroFilm.poster}
           loopStart={settings.heroFilmLoopStart}
           loopEnd={settings.heroFilmLoopEnd}
-          decorative
         />
       )}
-      {film?.kind === 'image' && (
-        <img className="hero-film" {...imageSources(film)} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
-      )}
-      <div className="hero-shade" aria-hidden="true" />
+      <div className="hero-shade" aria-hidden="true"></div>
       <div className="wrap hero-inner">
         <div className="hero-foot">
-          <h1 className="name" id="hero-name">
-            <NeonName text={OWNER_NAME} />
-          </h1>
-          {settings.heroLead && (
-            <p className="lead">
-              <Inline text={settings.heroLead} />
-            </p>
-          )}
-          {showCue && (
-            <a className="scroll-cue" href="#work" aria-label="Scroll down to the work">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M12 3v17M5.5 13.5 12 20l6.5-6.5" />
-              </svg>
-            </a>
-          )}
+          <div>
+            <h1 className="name" id="name">
+              {first}
+              <br />
+              {rest.join(' ')}
+            </h1>
+            {heroLead && (
+              <p className="lead">
+                <Inline text={heroLead} />
+              </p>
+            )}
+            <FiveLine text={fiveLine} />
+          </div>
+          <a className="scroll-cue" href="#work" aria-label="Scroll down to the work">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v17M5.5 13.5 12 20l6.5-6.5" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>

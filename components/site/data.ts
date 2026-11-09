@@ -22,16 +22,3 @@ export function splitHighlights(projects: Project[]): { highlights: Project[]; r
   const highlights = projects.filter((p) => p.featured).slice(0, MAX_HIGHLIGHTS);
   return { highlights, rest: projects.filter((p) => !highlights.includes(p)) };
 }
-
-/** The project after `current` in the published order, wrapping to the first; null when there is no other. */
-export function nextProject(all: Project[], current: Project): Project | null {
-  const others = all.filter((p) => p.id !== current.id);
-  if (others.length === 0) return null;
-  const index = all.findIndex((p) => p.id === current.id);
-  return index === -1 ? others[0] : all[(index + 1) % all.length];
-}
-
-/** The Lair band renders only when there is something to show in it. */
-export function hasLair(settings: Settings): boolean {
-  return Boolean(settings.lairUrl || settings.lairFilm || settings.lairBlurb);
-}

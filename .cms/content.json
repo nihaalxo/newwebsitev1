@@ -8,6 +8,8 @@
       "year": 2024,
       "discipline": "Brand identity",
       "summary": "A rebrand shown across takeaway bags, cups, sachets and an enamel mug.",
+      "shown": "Bags, cups, sachets, an enamel mug, teapot mark",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/my-chaii-london.webp",
@@ -40,9 +42,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "dff127c7-7b1a-5f72-8bc2-abfc1001c31d",
@@ -52,6 +54,8 @@
       "year": 2025,
       "discipline": "Vision Pro concept",
       "summary": "A match as a window in your living room, with player tags and a 90-minute momentum ribbon.",
+      "shown": "Match window, player tags, minimap, momentum ribbon",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/football-on-the-vision-pro.webp",
@@ -84,9 +88,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "8bb3aa48-1a82-5896-accf-418d472eee39",
@@ -96,6 +100,8 @@
       "year": 2024,
       "discipline": "Vision Pro concept",
       "summary": "Browsing and watching when the room becomes the screen.",
+      "shown": "Immersive environment, player window, playback controls",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/immersive-netflix-for-vision-pro.webp",
@@ -128,9 +134,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "c8631655-8d1c-5f72-a5a9-1cac70e2e15f",
@@ -140,6 +146,8 @@
       "year": 2024,
       "discipline": "Brand identity, kit",
       "summary": "A club crest and a black-and-gold kit, plus a personal N monogram.",
+      "shown": "Club crest, personal monogram, black-and-gold kit",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/rgfc-branding-and-jersey.webp",
@@ -172,9 +180,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "b37af488-6a3b-578f-b879-8d27842f9154",
@@ -184,6 +192,8 @@
       "year": 2024,
       "discipline": "Brand identity",
       "summary": "A butterfly mark built from leaves, shown on shopfront glass.",
+      "shown": "Butterfly mark on shopfront glass",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/silklon-and-serione.webp",
@@ -216,9 +226,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "98f15500-0fc7-5ae6-af47-7efda1ea0d46",
@@ -228,6 +238,8 @@
       "year": 2024,
       "discipline": "App design",
       "summary": "A carbon-footprint app where a caped hero coaches you to cut emissions.",
+      "shown": "Onboarding, statistics, profile, item logging",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/green-print.webp",
@@ -260,9 +272,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "2d8c3200-caa1-5861-9afd-d7522040e966",
@@ -272,6 +284,8 @@
       "year": 2024,
       "discipline": "UI and animation",
       "summary": "A UI and motion study built around a glowing chrysalis.",
+      "shown": "UI design and animation",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/butterfly-garden.webp",
@@ -304,9 +318,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "4298ab0a-d819-58c8-b9af-afe810acdc70",
@@ -316,6 +330,8 @@
       "year": 2024,
       "discipline": "Posters",
       "summary": "Two posters on the type designers Hermann Zapf and Frederic Goudy.",
+      "shown": "Two posters",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/typographic-posters.webp",
@@ -348,9 +364,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "6b7d6cf4-f2bf-5e9a-b2fe-5ebfb2ba198d",
@@ -360,6 +376,8 @@
       "year": 2024,
       "discipline": "3D animation",
       "summary": "A Blender animation set in a retro kitchen lined with family photos.",
+      "shown": "Blender animation",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/memory-palace.webp",
@@ -392,9 +410,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "b2f3f3cd-38ee-5821-8498-db1a3e9ce573",
@@ -404,6 +422,8 @@
       "year": 2025,
       "discipline": "3D web experience",
       "summary": "This portfolio as a world you walk through, with a keyboard and mouse.",
+      "shown": "Hall, shooting range, screens, glowing hands",
+      "stillOnly": true,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/immersive-portfolio-website.webp",
@@ -436,9 +456,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "5c52d39f-f5c7-5b59-bf5c-e9c1181e1abe",
@@ -448,6 +468,8 @@
       "year": 2023,
       "discipline": "Vision Pro concept",
       "summary": "A spatial redesign of the Instagram app for Apple Vision Pro.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/instagram-for-apple-vision-pro.webp",
@@ -480,9 +502,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "0d4200bf-df6f-50ea-bec0-bb975ce12d5e",
@@ -492,6 +514,8 @@
       "year": 2024,
       "discipline": "Brand identity",
       "summary": "A twisting ribbon form in green, blue and red halftone, on black.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/original-machines.webp",
@@ -524,9 +548,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "4f6a77be-5f19-5fde-bcb8-e9d56cf9ee22",
@@ -536,6 +560,8 @@
       "year": 2023,
       "discipline": "Game design",
       "summary": "A phone game with a keypad, a keyboard and a level called The Mad Doctor.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/escape-room.webp",
@@ -568,17 +594,20 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
+      "id": "dcfb2888-387d-51b4-ba99-4faa18258f33",
       "slug": "lean",
       "title": "Lean",
       "category": "interface",
       "year": 2023,
       "discipline": "Website design",
       "summary": "A website for Lean, with the tagline Whey Too Tasty and a menu of its dishes.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/lean.webp",
@@ -611,10 +640,9 @@
           "size": "wide"
         }
       ],
-      "id": "dcfb2888-387d-51b4-ba99-4faa18258f33",
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T13:01:15.365Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "7d220bfd-2fdb-527a-b1b4-d38582c131b2",
@@ -624,6 +652,8 @@
       "year": 2024,
       "discipline": "App redesign",
       "summary": "A redesign of the Ehteraz Covid-19 app, from the health-status QR code to vaccination records and helplines.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/ehteraz-covid-app.webp",
@@ -656,9 +686,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "32947c3a-05eb-5042-babd-8d9f47671054",
@@ -668,6 +698,8 @@
       "year": 2024,
       "discipline": "Interactive pamphlet",
       "summary": "A folded black pamphlet printed with concentric rings of type.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/fortune-teller.webp",
@@ -700,9 +732,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "23e2a480-628c-5541-a1b1-cd6dfa475e70",
@@ -712,6 +744,8 @@
       "year": 2024,
       "discipline": "Publication design",
       "summary": "A book design for Percival Everett's Telephone, with crackled covers in black and white and a yellow title.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/telephone.webp",
@@ -744,9 +778,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "49673e79-9e17-5b34-8f61-83cebe416238",
@@ -756,6 +790,8 @@
       "year": 2024,
       "discipline": "Animation",
       "summary": "A black-and-white animation. In this frame, parallel lines bend around a glowing disc.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/static-action.webp",
@@ -788,9 +824,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "8539d841-cdd8-538a-896e-0754dac929e1",
@@ -800,6 +836,8 @@
       "year": 2024,
       "discipline": "Animation",
       "summary": "An animation, shown here by a frame of glowing cream particles.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/light-and-dark.webp",
@@ -832,9 +870,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "ed2fb1e5-8869-5c43-93da-f73475b868a8",
@@ -844,6 +882,8 @@
       "year": 2024,
       "discipline": "Campaign",
       "summary": "A pink pin badge that reads Take Your Mind's Medicine, around a pill patterned like a brain.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/mental-health-advocate.webp",
@@ -876,9 +916,9 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     },
     {
       "id": "49273259-f670-574c-aabe-ba7682254b8f",
@@ -888,6 +928,8 @@
       "year": 2024,
       "discipline": "Short film",
       "summary": "A short film, shown here by a frame of a glowing ring in a field of stars.",
+      "shown": "",
+      "stillOnly": false,
       "cover": {
         "kind": "image",
         "src": "/uploads/seed/mind-of-a-designer.webp",
@@ -920,56 +962,162 @@
           "size": "wide"
         }
       ],
-      "createdAt": "2026-10-26T12:33:45.624Z",
-      "updatedAt": "2026-10-26T12:33:45.624Z",
-      "publishedAt": "2026-10-26T12:33:45.624Z"
+      "createdAt": "2026-11-09T21:10:43.416Z",
+      "updatedAt": "2026-11-09T21:10:43.416Z",
+      "publishedAt": "2026-11-09T21:10:43.416Z"
     }
   ],
   "settings": {
+    "siteDescription": "Nihaal Nazeer designs brand identities, app interfaces and spatial experiences for Apple Vision Pro. {count} projects, plus a 3D portfolio you can walk through.",
     "heroLead": "Product | UI/UX | Multidisciplinary",
-    "aboutStatement": "I'm Nihaal, a multidisciplinary designer trained in Graphic and Media Design at UAL in London. I work in three places: on the shelf, with identities like My Chaii London and RGFC; on screen, with apps like Green Print; and in space, with Apple Vision Pro concepts reimagining Netflix and live football.",
-    "basedIn": "",
-    "availability": "",
-    "cvUrl": "",
-    "avatar": {
-      "kind": "image",
-      "src": "/uploads/seed/avatar.jpg",
-      "alt": "Nihaal's 3D avatar in a black suit with glowing cyan seams and an X across the chest",
-      "width": 800,
-      "height": 600
-    },
-    "portrait": null,
-    "email": "nihaalnazeerxo@gmail.com",
-    "linkedin": "https://www.linkedin.com/in/nihaal-nazeer-b6187117a/",
-    "instagram": "",
-    "tools": "Blender, After Effects, Premiere Pro, Illustrator, Photoshop, InDesign, Lightroom, Audition and XD",
-    "education": [
-      "BA (Hons) Graphic and Media Design, UAL",
-      "CertHE Design, Screen and Media, UAL"
-    ],
-    "lairUrl": "https://interactive.nihaalnazeer.com/",
-    "lairBlurb": "I rebuilt my portfolio as a world you can walk through: a hall of light, a shooting range and a wall of screens. Bring a keyboard and a mouse.",
-    "lairBuiltWith": "",
     "heroFilm": {
       "kind": "video",
       "src": "/finalheroshot.compressed.mp4",
       "poster": "/uploads/seed/hero-poster.jpg",
       "alt": ""
     },
-    "heroFilmStart": 9,
-    "heroFilmLoopStart": 1.2,
-    "heroFilmLoopEnd": 24.5,
+    "heroFilmLoopStart": 4.5,
+    "heroFilmLoopEnd": 22.3,
+    "fiveLine": "If you have 5 minutes, [walk through my spaceship]. It will be worth it.",
+    "fiveFooter": "If you have 5 minutes, [enter the Lair]. It will be worth it.",
+    "workTitle": "Work",
+    "allProjectsTitle": "All projects",
+    "lairTitle": "The Lair",
+    "lairBlurb": "I rebuilt my portfolio as **a spaceship you can walk through**, in orbit above Earth, with a gallery of my work, a shooting range, a disco button and a robot that won't stop talking.",
+    "lairControls": "W A S D: Move\nShift: Run\nSpace: Jump\nE: Interact\nClick: Fire lightning",
+    "lairNudge": "**If you have 5 minutes, go in.** It will be worth it.",
+    "lairTouch": "On a phone? Your left thumb walks, your right thumb looks, and a tap fires lightning.",
     "lairFilm": {
       "kind": "video",
-      "src": "/tutorialfullanimation0000-3500_2.compressed.mp4",
-      "poster": "/uploads/seed/immersive-portfolio-website.webp",
-      "alt": "Walkthrough: a desk with a curved monitor showing the Lair, with the controls lit on the keyboard"
+      "src": "/films/lair-ship.mp4",
+      "srcTall": "/films/lair-ship-tall.mp4",
+      "poster": "/films/lair-ship-poster.jpg",
+      "alt": "Film: Earth at night, me flying past it trailing lightning, and the ship in orbit lighting up as I reach it"
     },
+    "aboutTitle": "About",
+    "aboutStatement": "I'm Nihaal, an AI-integrated product designer based in London. My work is multidisciplinary: UI/UX, graphic design, branding, motion and 3D, from research and wireframes through to working prototypes and the visual story that launches them. I use AI to prototype faster, and design it into products where it genuinely helps the people using them.",
+    "education": [
+      "BA (Hons) Graphic and Media Design, UAL",
+      "CertHE Design, Screen and Media, UAL"
+    ],
+    "tools": "Figma, Adobe Creative Suite, Blender, TouchDesigner, Claude Code, Codex and Cursor",
+    "basedIn": "London. Open to relocation within the UK or internationally",
+    "availability": "Full-time roles",
+    "portrait": {
+      "kind": "image",
+      "src": "/uploads/seed/secret-identity.webp",
+      "alt": "Nihaal in a brown double-breasted suit and open black shirt, smiling, hands in his pockets, leaning on a marble bar at night",
+      "width": 853,
+      "height": 1066
+    },
+    "aboutPhotoCaption": "Secret identity",
+    "aboutFilm": {
+      "kind": "video",
+      "src": "/rotatingpowers0001-0180_(1).mp4",
+      "poster": "/uploads/seed/about-poster.jpg",
+      "alt": ""
+    },
+    "cvTitle": "CV",
+    "cvHeadline": "AI-Integrated Product Designer | Creative Technology",
+    "cvPlace": "London",
+    "cvUrl": "/uploads/seed/Nihaal-Nazeer-CV-2026.pdf",
+    "cvSections": [
+      {
+        "id": "experience",
+        "title": "Experience",
+        "column": 1,
+        "entries": [
+          {
+            "role": "AI Product Designer, Tech & AI, Experience Design Studio",
+            "when": "Apr 2026 – Present",
+            "at": "Trivandi, London"
+          },
+          {
+            "role": "Design Intern, Marketing",
+            "when": "Aug 2025 – Apr 2026",
+            "at": "Trivandi, London"
+          }
+        ]
+      },
+      {
+        "id": "additional",
+        "title": "Additional experience",
+        "column": 1,
+        "entries": [
+          {
+            "role": "Founder & Creative Director",
+            "when": "Jan 2026 – Present",
+            "at": "Stack Design Studio, London"
+          },
+          {
+            "role": "AI Model Evaluator, Contractor",
+            "when": "Dec 2025 – Present",
+            "at": "Stealth AI startup, Remote"
+          },
+          {
+            "role": "Creative Technologist Intern",
+            "when": "Sep 2025 – Nov 2025",
+            "at": "Inoasis, London"
+          }
+        ]
+      },
+      {
+        "id": "earlier",
+        "title": "Selected earlier experience",
+        "column": 2,
+        "entries": [
+          {
+            "role": "Brand Designer",
+            "when": "2025",
+            "at": "My Chaii London, Charity Project"
+          },
+          {
+            "role": "Video Editor",
+            "when": "Sep 2024 – Sep 2025",
+            "at": "BeKnown Ltd, London"
+          },
+          {
+            "role": "Exhibition Co-Lead",
+            "when": "Sep 2024",
+            "at": "UAL Student Showcase, London"
+          },
+          {
+            "role": "UI / Graphic Designer",
+            "when": "Aug 2023 – Sep 2024",
+            "at": "Sesameed Education, Remote"
+          }
+        ]
+      },
+      {
+        "id": "education",
+        "title": "Education",
+        "column": 2,
+        "entries": [
+          {
+            "role": "BA (Hons) Graphic and Media Design",
+            "when": "2022 – 2025",
+            "at": "University of the Arts London"
+          },
+          {
+            "role": "Certificate in Higher Education, Design, Screen and Media",
+            "when": "2021 – 2022",
+            "at": "University of the Arts London"
+          }
+        ]
+      }
+    ],
+    "contactTitle": "Everybody needs some help at times. Who better to ask, but a superhero?",
+    "contactFallback": "Everybody needs some help at times.",
+    "contactLead": "Tell me what you're working on: a brand, an interface or a whole world.",
+    "email": "nihaalnazeerxo@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/nihaal-nazeer-b6187117a/",
+    "instagram": "",
     "contactFilm": {
       "kind": "video",
       "src": "/comp_1.compressed.mp4",
       "alt": ""
     },
-    "updatedAt": "2026-10-26T12:33:45.624Z"
+    "contactFilmStart": 0.8,
+    "updatedAt": "2026-11-09T21:10:43.416Z"
   }
 }

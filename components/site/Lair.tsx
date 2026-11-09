@@ -1,100 +1,64 @@
-import Link from 'next/link';
-import type { Media, Settings } from '@/lib/cms/types';
-import CopyButton from './CopyButton';
-import Film from './Film';
-import LairKeys from './LairKeys';
-import Picture from './Picture';
+import { Fragment } from 'react';
+import type { Settings } from '@/lib/cms/types';
+import { LairLink } from './FiveLine';
+import LazyFilm from './LazyFilm';
 import { Prose } from './RichText';
 
-const TAPE_TEXT = 'Keyboard and mouse required';
-
-/** What is known for sure: the owner's own line if there is one, otherwise where the world runs. */
-function specLine(settings: Settings): string {
-  if (settings.lairBuiltWith) return settings.lairBuiltWith;
-  try {
-    return `Runs in the browser at ${new URL(settings.lairUrl).host}.`;
-  } catch {
-    return '';
-  }
+/** "W A S D: Move" -> keys ["W", "A", "S", "D"], action "Move". */
+function parseControls(text: string): { keys: string[]; action: string }[] {
+  return text
+    .split('\n')
+    .map((line) => {
+      const colon = line.indexOf(':');
+      if (colon === -1) return null;
+      const keys = line.slice(0, colon).trim().split(/\s+/).filter(Boolean);
+      const action = line.slice(colon + 1).trim();
+      return keys.length > 0 && action ? { keys, action } : null;
+    })
+    .filter((control): control is { keys: string[]; action: string } => control !== null);
 }
 
-/** Caution tape that crawls along its own length; two identical halves make the loop seamless. */
-function HazardTape() {
-  return (
-    <div className="tape" aria-hidden="true">
-      <span className="tape-run">
-        {Array.from({ length: 4 }, (_, i) => (
-          <span key={i}>
-            {TAPE_TEXT}
-            <b />
-          </span>
-        ))}
-      </span>
-    </div>
-  );
-}
-
-function LairFilm({ media }: { media: Media }) {
-  if (media.kind === 'image') {
-    return <Picture media={media} sizes="(max-width: 959px) 100vw, 58vw" />;
-  }
-  // The poster sits underneath and the film dissolves in over it once its first frame is ready.
-  return (
-    <>
-      {media.poster && <img src={media.poster} alt="" width={media.width} height={media.height} loading="lazy" decoding="async" />}
-      <Film media={media} ambient lazy dissolve showPoster={false} />
-    </>
-  );
-}
-
-export default function Lair({ settings, buildStoryHref }: { settings: Settings; buildStoryHref: string | null }) {
-  const spec = specLine(settings);
-  const film = settings.lairFilm;
-
+/**
+ * The band for the walk-through 3D portfolio. `storySlug` is the published case file that tells how it was built;
+ * without one, How I built it is left out.
+ */
+export default function Lair({ settings, storySlug }: { settings: Settings; storySlug: string | null }) {
+  const controls = parseControls(settings.lairControls);
   return (
     <section className="lair" id="lair" aria-labelledby="lair-title">
-      <div className="wrap lair-grid">
+      <div className="wrap lair-in">
         <div className="lair-copy">
           <h2 className="title-l" id="lair-title">
-            The Lair
+            {settings.lairTitle}
           </h2>
           <Prose text={settings.lairBlurb} />
-          <LairKeys />
-          {spec && <p className="lair-spec">{spec}</p>}
-          {(settings.lairUrl || buildStoryHref) && (
-            <div className="actions">
-              {settings.lairUrl && (
-                <span className="lit">
-                  <a className="btn btn-seam" href={settings.lairUrl} target="_blank" rel="noopener">
-                    Enter the Lair<span className="vh"> (opens in a new tab)</span>
-                  </a>
-                </span>
-              )}
-              {buildStoryHref && (
-                <Link className="btn btn-ghost" href={buildStoryHref}>
-                  Read how I built it
-                </Link>
-              )}
-            </div>
+          {controls.length > 0 && (
+            <ul className="keys" aria-label="Controls">
+              {controls.map(({ keys, action }) => (
+                <li key={`${keys.join('-')}-${action}`}>
+                  {keys.map((key, i) => (
+                    <Fragment key={i}>
+                      <kbd>{key}</kbd>
+                    </Fragment>
+                  ))}
+                  <span>{action}</span>
+                </li>
+              ))}
+            </ul>
           )}
-          {settings.lairUrl && (
-            <p className="on-touch">
-              On a phone? <CopyButton className="linkish" text={settings.lairUrl} label="Copy the link" /> and open it on a
-              laptop later.
-            </p>
-          )}
-        </div>
-        {film && (
-          <div className="lair-frame">
-            <HazardTape />
-            <div className="frame-halo">
-              <div className="frame-clip">
-                <LairFilm media={film} />
-              </div>
-            </div>
+          <Prose text={settings.lairNudge} />
+          <div className="actions">
+            <LairLink className="btn btn-seam">Enter the Lair</LairLink>
+            {storySlug && (
+              <button className="btn btn-ghost" type="button" data-open={storySlug}>
+                How I built it
+              </button>
+            )}
           </div>
-        )}
+          {settings.lairTouch && <p className="on-touch">{settings.lairTouch}</p>}
+        </div>
       </div>
+      {settings.lairFilm && <LazyFilm film={settings.lairFilm} className="lair-film lazy-film" label={settings.lairFilm.alt} />}
     </section>
   );
 }

@@ -4,12 +4,15 @@ import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { requireAdmin } from '@/components/admin/auth';
 import { editPath, previewPath } from '@/components/admin/paths';
-import CaseStudy from '@/components/site/CaseStudy';
-import { nextProject } from '@/components/site/data';
+import type { CSSProperties } from 'react';
+import { toCaseProject } from '@/components/site/case-project';
+import CaseView from '@/components/site/CaseView';
+import { getSettings } from '@/components/site/data';
 import { cms } from '@/lib/cms';
 import type { Block, Project } from '@/lib/cms/types';
 
-// Outside the (protected) group on purpose: no admin chrome, so the case study looks exactly as it will on the site.
+// Outside the (protected) group on purpose: no admin chrome, so the case file looks exactly as it will on the site,
+// shown open in the page rather than as a dialog over it.
 
 type Params = Promise<{ id: string }>;
 
@@ -48,25 +51,38 @@ function previewable(project: Project): Project {
 
 export default async function PreviewPage({ params }: { params: Params }) {
   const { id } = await params;
-  const { store } = await requireAdmin(previewPath(id));
-  const [project, all] = await Promise.all([loadProject(id), store.listAll()]);
+  await requireAdmin(previewPath(id));
+  const [project, settings] = await Promise.all([loadProject(id), getSettings()]);
   if (!project) notFound();
-
-  // The footer's next project is the one that would follow on the site: the next published project in order.
-  const sequence = [...all]
-    .sort((a, b) => a.position - b.position)
-    .filter((p) => p.status === 'published' || p.id === project.id);
 
   return (
     <>
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+        <symbol id="ext" viewBox="0 0 16 16">
+          <path d="M6 3h7v7M13 3 4 12" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        </symbol>
+      </svg>
       <div className="adm-preview-bar" role="region" aria-label="Preview">
         <p>
           Previewing <strong>{project.title || 'Untitled project'}</strong>
         </p>
         <a href={editPath(project.id)}>Back to the editor</a>
       </div>
-      <main id="main" className="page">
-        <CaseStudy project={previewable(project)} next={nextProject(sequence, project)} preview />
+      <main id="main">
+        <dialog
+          className="case is-preview"
+          open
+          aria-labelledby="case-title"
+          style={{ '--amb': project.accent || '#6FF3FF' } as CSSProperties}
+        >
+          <CaseView
+            project={toCaseProject(previewable(project))}
+            fiveLine={settings.fiveLine}
+            prevTitle={null}
+            nextTitle={null}
+            closeHref={editPath(project.id)}
+          />
+        </dialog>
       </main>
     </>
   );

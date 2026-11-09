@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { absoluteUrl } from '@/components/site/config';
 import { getSettings, listPublished } from '@/components/site/data';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [projects, settings] = await Promise.all([listPublished(), getSettings()]);

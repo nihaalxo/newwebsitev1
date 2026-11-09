@@ -2,7 +2,7 @@
    Utilitarian on purpose: the public site's palette, type and cut-corner device, none of its cinema.
    Every rule is scoped to .adm (the admin shell and the sign-in page) or to an adm-* class, so nothing here reaches
    the public site or the case study inside the preview, which loads components/site/site.css alongside this file.
-   Gilmer has only two weights: 300 for reading, 500 for labels, controls and headings. */
+   Type: Urbanist, at 300 for reading and 500 for labels, controls and headings. */
 
 .adm,
 .adm-preview-bar {
@@ -1410,4 +1410,25 @@ html:has(.adm-bar) {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* ---------- CV lines and tall cuts (site settings) ---------- */
+.adm-cv-line {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 14px 0 0;
+  border: 0;
+  border-top: 1px solid var(--a-line);
+}
+.adm-cv-line legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 4px;
+  padding: 0;
+}
+.adm-poster-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

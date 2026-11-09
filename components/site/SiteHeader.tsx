@@ -1,63 +1,79 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { OWNER_NAME } from './config';
-import MotionToggle from './MotionToggle';
-import SoundToggle from './SoundToggle';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+import BrandLink from './BrandLink';
+import { say } from './say';
+import { isSoundOn, setSoundOn, soundOffOnServer, subscribeToSound } from './sound';
 
-/** Share of the hero scrolled away before the bar frosts over. */
-const HERO_SETTLE = 0.18;
+/** Where "Skip to the work" goes on each page. */
+function skipTarget(pathname: string): string {
+  if (pathname === '/') return '#work';
+  if (/^\/work(\/[^/]+)?\/?$/.test(pathname)) return '#grid';
+  return '#main';
+}
 
-export default function SiteHeader({ showLair }: { showLair: boolean }) {
+/**
+ * The fixed bar. On the home page it is clear over the hero and turns solid once the hero scrolls away; everywhere
+ * else it is solid from the start. Sound is off on every visit, with one button to turn it on (the films carry their
+ * own soundtracks).
+ */
+export default function SiteHeader() {
   const pathname = usePathname();
-  const [solid, setSolid] = useState(false);
+  const home = pathname === '/';
+  const [heroInView, setHeroInView] = useState(true);
+  const sound = useSyncExternalStore(subscribeToSound, isSoundOn, soundOffOnServer);
 
-  // Clear over the hero film; frosted once the page moves under it. Re-measured on every route.
   useEffect(() => {
-    const update = () => {
-      const hero = document.getElementById('hero');
-      const threshold = hero ? hero.offsetHeight * HERO_SETTLE : 8;
-      setSolid(window.scrollY > threshold);
-    };
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    return () => {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-    };
-  }, [pathname]);
+    if (!home) return;
+    const hero = document.querySelector('.hero');
+    if (!hero || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(([entry]) => setHeroInView(entry.intersectionRatio >= 0.82), {
+      threshold: [0, 0.82, 1],
+    });
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, [home]);
 
-  // All projects has no film behind the bar, and its title and tabs scroll under it from the first pixel.
-  const frosted = solid || pathname === '/work';
+  const at = home ? '' : '/';
+  const toggleSound = () => {
+    setSoundOn(!sound);
+    say(sound ? 'Sound off' : 'Sound on');
+  };
 
   return (
-    <header className={frosted ? 'bar solid' : 'bar'}>
-      <div className="wrap">
-        <Link className="brand" href="/#top" aria-label={`${OWNER_NAME}, home`}>
-          <span>{OWNER_NAME}</span>
-        </Link>
-        <div className="bar-end">
-          <nav className="nav" aria-label="Primary">
-            <Link href="/#work">Work</Link>
-            {showLair && (
-              <Link href="/#lair">
+    <>
+      <a className="skip" href={skipTarget(pathname)}>
+        Skip to the work
+      </a>
+      <header className={home && heroInView ? 'bar' : 'bar solid'} id="bar">
+        <div className="wrap">
+          <BrandLink />
+          <div className="bar-end">
+            <nav className="nav" aria-label="Primary">
+              <a href={`${at}#work`}>Work</a>
+              <a href={`${at}#lair`}>
                 <span className="the">The </span>Lair
-              </Link>
-            )}
-            <Link href="/#about" className="wide">
-              About
-            </Link>
-            <Link href="/#contact">Contact</Link>
-          </nav>
-          <div className="bar-toggles">
-            <MotionToggle />
-            <SoundToggle />
+              </a>
+              <a href={`${at}#about`} className="wide">
+                About
+              </a>
+              <a href={`${at}#cv`} className="wide">
+                CV
+              </a>
+              <a href={`${at}#contact`}>Contact</a>
+            </nav>
+            <button className="sound" id="sound" type="button" aria-pressed={sound} onClick={toggleSound}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none" />
+                <path className="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
+                <path className="mute" d="M16 9.5l5 5M21 9.5l-5 5" />
+              </svg>
+              <span className="sound-l">Sound</span>
+            </button>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
