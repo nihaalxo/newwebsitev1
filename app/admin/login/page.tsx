@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { safeAdminPath } from '@/components/admin/auth';
 import { XMark } from '@/components/admin/icons';
 import LoginForm from '@/components/admin/LoginForm';
-import { cms, cmsMode } from '@/lib/cms';
+import { cms } from '@/lib/cms';
 
 export const metadata: Metadata = { title: 'Sign in' };
 export const dynamic = 'force-dynamic';
@@ -11,7 +11,8 @@ export const dynamic = 'force-dynamic';
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string | string[] }> }) {
   const { next } = await searchParams;
   const destination = safeAdminPath(Array.isArray(next) ? next[0] : next);
-  if (await (await cms()).currentAdmin()) redirect(destination);
+  const store = await cms();
+  if (await store.currentAdmin()) redirect(destination);
 
   return (
     <div className="adm adm-login">
@@ -26,8 +27,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <p className="adm-lede">To edit your projects and site settings.</p>
         </div>
         <LoginForm next={destination} />
-        {cmsMode === 'local' && (
+        {store.mode === 'local' && (
           <p className="adm-help">Local mode: the email and password are ADMIN_EMAIL and ADMIN_PASSWORD in .env.local.</p>
+        )}
+        {store.mode === 'cloudflare' && (
+          <p className="adm-help">The email and password are the Worker secrets ADMIN_EMAIL and ADMIN_PASSWORD.</p>
         )}
       </main>
     </div>

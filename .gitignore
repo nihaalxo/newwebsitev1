@@ -28,8 +28,11 @@ yarn-error.log*
 # local env files: they hold your admin password and Supabase keys
 .env*.local
 
-# vercel
-.vercel
+# Cloudflare: local secrets for the preview, wrangler's local D1/R2 state and the OpenNext build
+.dev.vars
+.dev.vars.*
+/.wrangler/
+/.open-next/
 
 # typescript
 *.tsbuildinfo

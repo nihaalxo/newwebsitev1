@@ -7,7 +7,7 @@ import type { Media, Project, Settings } from './types';
 
 function mediaUrls(media: Media | null | undefined): string[] {
   if (!media) return [];
-  return [media.src, media.srcSmall, media.poster].filter((url): url is string => Boolean(url));
+  return [media.src, media.srcSmall, media.srcTall, media.poster].filter((url): url is string => Boolean(url));
 }
 
 /** Every file a project uses: cover, block images and videos, gallery items and posters. */
@@ -21,7 +21,7 @@ export function projectMediaUrls(project: Pick<Project, 'cover' | 'blocks'>): st
 }
 
 export function settingsMediaUrls(settings: Settings): string[] {
-  const urls = [settings.avatar, settings.portrait, settings.heroFilm, settings.lairFilm, settings.contactFilm].flatMap(mediaUrls);
+  const urls = [settings.portrait, settings.heroFilm, settings.lairFilm, settings.aboutFilm, settings.contactFilm].flatMap(mediaUrls);
   if (settings.cvUrl) urls.push(settings.cvUrl);
   return urls;
 }

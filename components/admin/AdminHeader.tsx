@@ -1,12 +1,14 @@
+import type { CmsMode } from '@/lib/cms/adapter';
 import AdminNav from './AdminNav';
 import { XMark } from './icons';
 
 const MODE_TEXT = {
   local: 'Local mode: saving to .cms/content.json',
+  cloudflare: 'Saving to Cloudflare',
   supabase: 'Saving to Supabase',
 } as const;
 
-export default function AdminHeader({ email, mode }: { email: string; mode: 'local' | 'supabase' }) {
+export default function AdminHeader({ email, mode }: { email: string; mode: CmsMode }) {
   return (
     <header className="adm-top">
       <div className="adm-top-in">

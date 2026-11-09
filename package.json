@@ -9,22 +9,31 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "cms:seed": "node scripts/seed-local.mjs",
-    "cms:push": "node scripts/push-to-supabase.mjs"
+    "cms:push": "node scripts/push-to-supabase.mjs",
+    "cms:to-cloudflare": "node scripts/push-to-cloudflare.mjs",
+    "cf:build": "opennextjs-cloudflare build",
+    "preview": "opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "db:migrate:local": "wrangler d1 migrations apply CMS_DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply CMS_DB --remote",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@emailjs/browser": "4.4.1",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",
-    "next": "15.5.28",
+    "next": "15.5.29",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.16",
     "@types/node": "20.19.0",
     "@types/react": "19.1.10",
     "@types/react-dom": "19.1.7",
     "sharp": "0.34.3",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "wrangler": "4.158.0"
   }
 }

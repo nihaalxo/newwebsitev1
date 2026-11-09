@@ -1,0 +1,42 @@
+// The Cloudflare Worker that serves the site, built by OpenNext (`npm run cf:build`, `npm run deploy`).
+// GO-LIVE.md walks through creating the database and bucket, the secrets and the custom domain.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nihaalnazeer",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-04",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Everything in public/ plus Next's static files, served before the Worker runs.
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Lets the Worker call itself (OpenNext uses it for revalidation).
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "nihaalnazeer"
+    }
+  ],
+  // Projects and site settings. Replace database_id with the id `npx wrangler d1 create nihaalnazeer-cms` prints.
+  "d1_databases": [
+    {
+      "binding": "CMS_DB",
+      "database_name": "nihaalnazeer-cms",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "d1/migrations"
+    }
+  ],
+  // Images, films and the CV uploaded in the admin, served at /cms/...
+  "r2_buckets": [
+    {
+      "binding": "CMS_UPLOADS",
+      "bucket_name": "nihaalnazeer-uploads"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+  // The custom domain is attached in step 9 of GO-LIVE.md; ADMIN_EMAIL, ADMIN_PASSWORD and LOCAL_SESSION_SECRET are
+  // secrets (`npx wrangler secret put NAME`), never vars in this file.
+}

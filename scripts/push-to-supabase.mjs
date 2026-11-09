@@ -125,6 +125,8 @@ function projectRow(project) {
     year: project.year,
     discipline: project.discipline,
     summary: project.summary,
+    shown: project.shown ?? '',
+    still_only: project.stillOnly === true,
     cover: project.cover,
     accent: project.accent,
     role: project.role,

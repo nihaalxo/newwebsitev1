@@ -135,7 +135,8 @@ async function uploadBlob(blob: Blob, hint: string, contentType: string, onProgr
 }
 
 async function send(ticket: UploadTicket, blob: Blob, contentType: string, onProgress?: ProgressHandler) {
-  if (ticket.mode === 'local') {
+  // Local mode writes to public/uploads, Cloudflare to R2; both through a route on this site that reports progress.
+  if (ticket.mode === 'local' || ticket.mode === 'cloudflare') {
     await putWithProgress(ticket.url, blob, contentType, onProgress);
     return;
   }

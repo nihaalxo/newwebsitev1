@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/components/admin/auth';
 import ProjectList, { type ProjectRow } from '@/components/admin/ProjectList';
-import { cmsMode } from '@/lib/cms';
 import { MAX_HIGHLIGHTS, type Project } from '@/lib/cms/types';
 
 export const metadata: Metadata = { title: 'Projects' };
@@ -43,7 +42,7 @@ export default async function ProjectsPage() {
       </div>
 
       {projects.length === 0 ? (
-        <EmptyState />
+        <EmptyState local={store.mode === 'local'} />
       ) : (
         <>
           <p className="adm-list-help">
@@ -58,7 +57,7 @@ export default async function ProjectsPage() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ local }: { local: boolean }) {
   return (
     <div className="adm-empty">
       <h2 className="adm-h2">No projects yet</h2>
@@ -69,7 +68,7 @@ function EmptyState() {
         <li>Tell the story with text, images, galleries, videos and quotes.</li>
         <li>Save it as a draft while you work, preview it, and publish when it&apos;s ready.</li>
       </ol>
-      {cmsMode === 'local' && (
+      {local && (
         <p className="adm-help">
           Running locally and expected to see the existing projects? Run npm run cms:seed in the project folder, then reload.
         </p>

@@ -1,0 +1,101 @@
+{
+  "siteDescription": "Nihaal Nazeer designs brand identities, app interfaces and spatial experiences for Apple Vision Pro. {count} projects, plus a 3D portfolio you can walk through.",
+  "heroLead": "Product | UI/UX | Multidisciplinary",
+  "heroFilm": {
+    "kind": "video",
+    "src": "/finalheroshot.compressed.mp4",
+    "poster": "/uploads/seed/hero-poster.jpg",
+    "alt": ""
+  },
+  "heroFilmLoopStart": 4.5,
+  "heroFilmLoopEnd": 22.3,
+  "fiveLine": "If you have 5 minutes, [walk through my spaceship]. It will be worth it.",
+  "fiveFooter": "If you have 5 minutes, [enter the Lair]. It will be worth it.",
+  "workTitle": "Work",
+  "allProjectsTitle": "All projects",
+  "lairTitle": "The Lair",
+  "lairBlurb": "I rebuilt my portfolio as **a spaceship you can walk through**, in orbit above Earth, with a gallery of my work, a shooting range, a disco button and a robot that won't stop talking.",
+  "lairControls": "W A S D: Move\nShift: Run\nSpace: Jump\nE: Interact\nClick: Fire lightning",
+  "lairNudge": "**If you have 5 minutes, go in.** It will be worth it.",
+  "lairTouch": "On a phone? Your left thumb walks, your right thumb looks, and a tap fires lightning.",
+  "lairFilm": {
+    "kind": "video",
+    "src": "/films/lair-ship.mp4",
+    "srcTall": "/films/lair-ship-tall.mp4",
+    "poster": "/films/lair-ship-poster.jpg",
+    "alt": "Film: Earth at night, me flying past it trailing lightning, and the ship in orbit lighting up as I reach it"
+  },
+  "aboutTitle": "About",
+  "aboutStatement": "I'm Nihaal, an AI-integrated product designer based in London. My work is multidisciplinary: UI/UX, graphic design, branding, motion and 3D, from research and wireframes through to working prototypes and the visual story that launches them. I use AI to prototype faster, and design it into products where it genuinely helps the people using them.",
+  "education": ["BA (Hons) Graphic and Media Design, UAL", "CertHE Design, Screen and Media, UAL"],
+  "tools": "Figma, Adobe Creative Suite, Blender, TouchDesigner, Claude Code, Codex and Cursor",
+  "basedIn": "London. Open to relocation within the UK or internationally",
+  "availability": "Full-time roles",
+  "portrait": {
+    "kind": "image",
+    "src": "/uploads/seed/secret-identity.webp",
+    "alt": "Nihaal in a brown double-breasted suit and open black shirt, smiling, hands in his pockets, leaning on a marble bar at night",
+    "width": 853,
+    "height": 1066
+  },
+  "aboutPhotoCaption": "Secret identity",
+  "aboutFilm": {
+    "kind": "video",
+    "src": "/rotatingpowers0001-0180_(1).mp4",
+    "poster": "/uploads/seed/about-poster.jpg",
+    "alt": ""
+  },
+  "cvTitle": "CV",
+  "cvHeadline": "AI-Integrated Product Designer | Creative Technology",
+  "cvPlace": "London",
+  "cvUrl": "/uploads/seed/Nihaal-Nazeer-CV-2026.pdf",
+  "cvSections": [
+    {
+      "id": "experience",
+      "title": "Experience",
+      "column": 1,
+      "entries": [
+        { "role": "AI Product Designer, Tech & AI, Experience Design Studio", "when": "Apr 2026 – Present", "at": "Trivandi, London" },
+        { "role": "Design Intern, Marketing", "when": "Aug 2025 – Apr 2026", "at": "Trivandi, London" }
+      ]
+    },
+    {
+      "id": "additional",
+      "title": "Additional experience",
+      "column": 1,
+      "entries": [
+        { "role": "Founder & Creative Director", "when": "Jan 2026 – Present", "at": "Stack Design Studio, London" },
+        { "role": "AI Model Evaluator, Contractor", "when": "Dec 2025 – Present", "at": "Stealth AI startup, Remote" },
+        { "role": "Creative Technologist Intern", "when": "Sep 2025 – Nov 2025", "at": "Inoasis, London" }
+      ]
+    },
+    {
+      "id": "earlier",
+      "title": "Selected earlier experience",
+      "column": 2,
+      "entries": [
+        { "role": "Brand Designer", "when": "2025", "at": "My Chaii London, Charity Project" },
+        { "role": "Video Editor", "when": "Sep 2024 – Sep 2025", "at": "BeKnown Ltd, London" },
+        { "role": "Exhibition Co-Lead", "when": "Sep 2024", "at": "UAL Student Showcase, London" },
+        { "role": "UI / Graphic Designer", "when": "Aug 2023 – Sep 2024", "at": "Sesameed Education, Remote" }
+      ]
+    },
+    {
+      "id": "education",
+      "title": "Education",
+      "column": 2,
+      "entries": [
+        { "role": "BA (Hons) Graphic and Media Design", "when": "2022 – 2025", "at": "University of the Arts London" },
+        { "role": "Certificate in Higher Education, Design, Screen and Media", "when": "2021 – 2022", "at": "University of the Arts London" }
+      ]
+    }
+  ],
+  "contactTitle": "Everybody needs some help at times. Who better to ask, but a superhero?",
+  "contactFallback": "Everybody needs some help at times.",
+  "contactLead": "Tell me what you're working on: a brand, an interface or a whole world.",
+  "email": "nihaalnazeerxo@gmail.com",
+  "linkedin": "https://www.linkedin.com/in/nihaal-nazeer-b6187117a/",
+  "instagram": "",
+  "contactFilm": { "kind": "video", "src": "/comp_1.compressed.mp4", "alt": "" },
+  "contactFilmStart": 0.8
+}

@@ -20,6 +20,8 @@ export function projectFields(input: ProjectInput): ProjectFields {
     year: input.year,
     discipline: input.discipline,
     summary: input.summary,
+    shown: input.shown ?? '',
+    stillOnly: input.stillOnly === true,
     cover: input.cover,
     accent: input.accent,
     role: input.role,
@@ -59,6 +61,9 @@ export interface ProjectRow {
   year: number;
   discipline: string;
   summary: string;
+  /** Added in migration 0002; older rows read as ''/false. */
+  shown?: string | null;
+  still_only?: boolean | null;
   cover: Media | null;
   accent: string;
   role: string;
@@ -87,6 +92,8 @@ export function projectFromRow(row: ProjectRow): Project {
     year: row.year,
     discipline: row.discipline,
     summary: row.summary,
+    shown: row.shown ?? '',
+    stillOnly: row.still_only === true,
     cover: row.cover,
     accent: row.accent,
     role: row.role,
@@ -112,6 +119,8 @@ export function projectToRow(fields: ProjectFields): ProjectRowWrite {
     year: fields.year,
     discipline: fields.discipline,
     summary: fields.summary,
+    shown: fields.shown,
+    still_only: fields.stillOnly,
     cover: fields.cover,
     accent: fields.accent,
     role: fields.role,

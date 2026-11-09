@@ -1,46 +1,14 @@
+import defaultSettings from './default-settings.json';
 import type { ProjectInput, Settings } from './types';
 
 // Safe to import from client components: no server-only code lives here.
 
 /**
- * What the site shows before anything has been saved in Site settings.
- * scripts/seed-local.mjs keeps an identical copy for .cms/content.json; change both together.
+ * What the site shows before anything has been saved in Site settings. The values live in default-settings.json so
+ * scripts/seed-local.mjs and scripts/push-to-cloudflare.mjs seed exactly the same words.
  */
 export const DEFAULT_SETTINGS: Settings = {
-  heroLead: 'Product | UI/UX | Multidisciplinary',
-  aboutStatement:
-    "I'm Nihaal, a multidisciplinary designer trained in Graphic and Media Design at UAL in London. I work in three places: on the shelf, with identities like My Chaii London and RGFC; on screen, with apps like Green Print; and in space, with Apple Vision Pro concepts reimagining Netflix and live football.",
-  basedIn: '',
-  availability: '',
-  cvUrl: '',
-  avatar: {
-    kind: 'image',
-    src: '/uploads/seed/avatar.jpg',
-    alt: "Nihaal's 3D avatar in a black suit with glowing cyan seams and an X across the chest",
-    width: 800,
-    height: 600,
-  },
-  portrait: null,
-  email: 'nihaalnazeerxo@gmail.com',
-  linkedin: 'https://www.linkedin.com/in/nihaal-nazeer-b6187117a/',
-  instagram: '',
-  tools: 'Blender, After Effects, Premiere Pro, Illustrator, Photoshop, InDesign, Lightroom, Audition and XD',
-  education: ['BA (Hons) Graphic and Media Design, UAL', 'CertHE Design, Screen and Media, UAL'],
-  lairUrl: 'https://interactive.nihaalnazeer.com/',
-  lairBlurb:
-    'I rebuilt my portfolio as a world you can walk through: a hall of light, a shooting range and a wall of screens. Bring a keyboard and a mouse.',
-  lairBuiltWith: '',
-  heroFilm: { kind: 'video', src: '/finalheroshot.compressed.mp4', poster: '/uploads/seed/hero-poster.jpg', alt: '' },
-  heroFilmStart: 9,
-  heroFilmLoopStart: 1.2,
-  heroFilmLoopEnd: 24.5,
-  lairFilm: {
-    kind: 'video',
-    src: '/tutorialfullanimation0000-3500_2.compressed.mp4',
-    poster: '/uploads/seed/immersive-portfolio-website.webp',
-    alt: 'Walkthrough: a desk with a curved monitor showing the Lair, with the controls lit on the keyboard',
-  },
-  contactFilm: { kind: 'video', src: '/comp_1.compressed.mp4', alt: '' },
+  ...(defaultSettings as unknown as Omit<Settings, 'updatedAt'>),
   updatedAt: '',
 };
 
@@ -53,6 +21,8 @@ export function emptyProject(): ProjectInput {
     year: new Date().getFullYear(),
     discipline: '',
     summary: '',
+    shown: '',
+    stillOnly: false,
     cover: null,
     accent: '#6FF3FF',
     role: '',
@@ -69,7 +39,7 @@ export function emptyProject(): ProjectInput {
 
 /**
  * Fills in any setting a stored record lacks (for example one added after it was saved) and drops unknown keys.
- * A key that is present wins even when it is null, so clearing the avatar does not bring the default back.
+ * A key that is present wins even when it is null, so clearing the portrait does not bring the default back.
  */
 export function withSettingsDefaults(stored: Partial<Settings> | null | undefined): Settings {
   const source: Partial<Settings> = stored ?? {};
@@ -87,6 +57,9 @@ export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** Mirrors the 'media' bucket's file size limit. */
 export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
+
+/** A CV is a few pages of text; anything bigger is almost certainly the wrong file. */
+export const MAX_PDF_BYTES = 20 * 1024 * 1024;
 
 /** Mirrors the 'media' bucket's allowed MIME types. SVG is left out on purpose: it can carry script. */
 export const ALLOWED_UPLOAD_TYPES: readonly string[] = [

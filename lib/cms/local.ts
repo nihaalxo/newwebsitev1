@@ -2,18 +2,18 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { cookies } from 'next/headers';
 import type { CmsAdapter } from './adapter';
 import { isAllowedUploadPath, isAllowedUploadType, uploadPathMatchesType, withSettingsDefaults } from './defaults';
 import { orphanedUrls, projectMediaUrls, settingsMediaUrls, uploadPathFromUrl } from './media-refs';
 import { projectFields } from './rows';
-import { SESSION_COOKIE, SESSION_MAX_AGE_SECONDS, safeEqual, signSession, verifySession } from './session';
+import { passwordAuth } from './password-auth';
 import { STALE_PROJECT_MESSAGE, type Project, type Settings } from './types';
 
 /**
  * Local mode: content lives in .cms/content.json and uploads in public/uploads, both committed to git.
- * Reads work everywhere, so a deployment without Supabase still shows the seeded site; writes only work under
- * `npm run dev`, because a deployed filesystem is read-only and would forget every change anyway.
+ * It only ever runs under `npm run dev`: lib/cms/index.ts imports this module inside a development-only branch, so
+ * node:fs never reaches a production build (the Cloudflare Worker has no filesystem). To publish what is here, run
+ * `npm run cms:to-cloudflare`.
  */
 
 interface Store {
@@ -22,7 +22,7 @@ interface Store {
 }
 
 const CONTENT_FILE = path.join(process.cwd(), '.cms', 'content.json');
-const READ_ONLY_MESSAGE = 'Local mode is read-only in production. Connect Supabase to edit.';
+const READ_ONLY_MESSAGE = 'Local mode only saves under npm run dev.';
 const isProduction = process.env.NODE_ENV === 'production';
 
 // ---- Reading and writing the file
@@ -107,45 +107,12 @@ function byPosition(a: Project, b: Project): number {
 
 // ---- Auth
 
-interface LocalCredentials {
-  email: string;
-  password: string;
-  secret: string;
-}
-
-/** The three variables local sign-in needs, or the names of the ones that are missing. */
-function readCredentials(): { ok: true; value: LocalCredentials } | { ok: false; missing: string[] } {
-  const env = {
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL?.trim() ?? '',
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? '',
-    LOCAL_SESSION_SECRET: process.env.LOCAL_SESSION_SECRET ?? '',
-  };
-  const missing = Object.entries(env)
-    .filter(([, value]) => !value)
-    .map(([name]) => name);
-  if (missing.length > 0) return { ok: false, missing };
-  return {
-    ok: true,
-    value: { email: env.ADMIN_EMAIL.toLowerCase(), password: env.ADMIN_PASSWORD, secret: env.LOCAL_SESSION_SECRET },
-  };
-}
-
-async function sessionEmail(): Promise<string | null> {
-  const credentials = readCredentials();
-  if (!credentials.ok) return null;
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  if (!token) return null;
-  const session = verifySession(token, credentials.value.secret);
-  // A session only counts for the admin email currently configured, so changing ADMIN_EMAIL signs everyone out.
-  if (!session || !safeEqual(session.email, credentials.value.email)) return null;
-  return session.email;
-}
-
-async function requireAdmin(): Promise<void> {
-  if (!(await sessionEmail())) throw new Error('UNAUTHORIZED');
-}
-
-// ---- The adapter
+const auth = passwordAuth({
+  env: () => process.env,
+  secure: isProduction,
+  setupHint: '.env.local and restart the dev server',
+});
+const requireAdmin = auth.requireAdmin;
 
 export function createLocalAdapter(): CmsAdapter {
   return {
@@ -267,36 +234,8 @@ export function createLocalAdapter(): CmsAdapter {
       };
     },
 
-    async signIn(email, password) {
-      const credentials = readCredentials();
-      if (!credentials.ok) {
-        return {
-          ok: false,
-          error: `Local sign-in isn't set up: add ${credentials.missing.join(', ')} to .env.local and restart the dev server.`,
-        };
-      }
-      // Both comparisons always run, so the response time doesn't reveal which one failed.
-      const emailMatches = safeEqual(email.trim().toLowerCase(), credentials.value.email);
-      const passwordMatches = safeEqual(password, credentials.value.password);
-      if (!(emailMatches && passwordMatches)) return { ok: false, error: "That email and password don't match." };
-
-      (await cookies()).set(SESSION_COOKIE, signSession(credentials.value.email, credentials.value.secret), {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: isProduction,
-        path: '/',
-        maxAge: SESSION_MAX_AGE_SECONDS,
-      });
-      return { ok: true };
-    },
-
-    async signOut() {
-      (await cookies()).delete(SESSION_COOKIE);
-    },
-
-    async currentAdmin() {
-      const email = await sessionEmail();
-      return email ? { email } : null;
-    },
+    signIn: auth.signIn,
+    signOut: auth.signOut,
+    currentAdmin: auth.currentAdmin,
   };
 }

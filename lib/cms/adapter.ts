@@ -1,14 +1,17 @@
 import type { AuthResult, Project, ProjectInput, Settings, UploadTicket } from './types';
 
+export type CmsMode = 'local' | 'cloudflare' | 'supabase';
+
 /**
  * One storage backend. `local` keeps content in .cms/content.json and files in public/uploads (development only);
- * `supabase` uses Postgres + Storage + Auth and is what runs in production.
+ * `cloudflare` keeps content in D1 and files in R2 and is what runs in production; `supabase` (Postgres + Storage +
+ * Auth) is kept as an alternative and is used only when it is configured and the Cloudflare bindings are absent.
  *
  * Public reads never require a session. Every admin method must verify the session itself
  * (in Supabase mode Row Level Security enforces it as well) and throw `new Error('UNAUTHORIZED')` when there is none.
  */
 export interface CmsAdapter {
-  readonly mode: 'local' | 'supabase';
+  readonly mode: CmsMode;
 
   // Public reads: published content only.
   listPublished(): Promise<Project[]>;
