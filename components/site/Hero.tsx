@@ -6,8 +6,8 @@ import { imageSources } from './media';
 import NeonName from './NeonName';
 import { Inline } from './RichText';
 
-/** The opening shot: the hero film full bleed, the name set over it as a title card. */
-export default function Hero({ settings }: { settings: Settings }) {
+/** The opening shot: the hero film full bleed, the name set over it as a title card, the arrow pointing to the work. */
+export default function Hero({ settings, showCue }: { settings: Settings; showCue: boolean }) {
   const film = settings.heroFilm;
   const still = film?.kind === 'video' ? film.poster : film?.src;
   // The poster is the first thing anyone sees, so fetch it ahead of the stylesheet-discovered assets.
@@ -16,7 +16,15 @@ export default function Hero({ settings }: { settings: Settings }) {
   return (
     <section className="hero" id="hero" aria-labelledby="hero-name">
       {film?.kind === 'video' && (
-        <Film media={film} className="hero-film" ambient startAt={settings.heroFilmStart} decorative />
+        <Film
+          media={film}
+          className="hero-film"
+          ambient
+          startAt={settings.heroFilmStart}
+          loopStart={settings.heroFilmLoopStart}
+          loopEnd={settings.heroFilmLoopEnd}
+          decorative
+        />
       )}
       {film?.kind === 'image' && (
         <img className="hero-film" {...imageSources(film)} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
@@ -32,10 +40,12 @@ export default function Hero({ settings }: { settings: Settings }) {
               <Inline text={settings.heroLead} />
             </p>
           )}
-          {settings.heroCredit && (
-            <p className="credit">
-              <Inline text={settings.heroCredit} />
-            </p>
+          {showCue && (
+            <a className="scroll-cue" href="#work" aria-label="Scroll down to the work">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 3v17M5.5 13.5 12 20l6.5-6.5" />
+              </svg>
+            </a>
           )}
         </div>
       </div>

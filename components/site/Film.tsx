@@ -14,6 +14,9 @@ interface FilmProps {
   lazy?: boolean;
   /** Seconds into the file to start from. */
   startAt?: number;
+  /** The loop's window, in seconds: reaching loopEnd jumps back to loopStart. A loopEnd of 0 keeps the whole film. */
+  loopStart?: number;
+  loopEnd?: number;
   controls?: boolean;
   /** Hide from assistive tech when the film only sets a mood and the words around it carry the meaning. */
   decorative?: boolean;
@@ -48,6 +51,8 @@ export default function Film({
   ambient = false,
   lazy = false,
   startAt = 0,
+  loopStart = 0,
+  loopEnd = 0,
   controls = false,
   decorative = false,
   showPoster = true,
@@ -147,6 +152,30 @@ export default function Film({
       cleanUpListeners();
     };
   }, [src, lazy, ambient]);
+
+  // timeupdate fires only about four times a second, late enough to show a blink of the black the window is there to
+  // skip, so a playing film also checks on every frame it presents.
+  useEffect(() => {
+    const video = ref.current;
+    if (!video || loopEnd <= loopStart) return;
+
+    const rewind = () => {
+      // A window running past the end of the file closes just before it, so the browser's own loop never starts over from 0.
+      if (video.currentTime >= Math.min(loopEnd, (video.duration || Infinity) - 0.1)) video.currentTime = loopStart;
+    };
+    let frame = 0;
+    const onFrame = () => {
+      rewind();
+      frame = video.requestVideoFrameCallback(onFrame);
+    };
+    if ('requestVideoFrameCallback' in video) frame = video.requestVideoFrameCallback(onFrame);
+    video.addEventListener('timeupdate', rewind);
+
+    return () => {
+      video.removeEventListener('timeupdate', rewind);
+      if (frame) video.cancelVideoFrameCallback(frame);
+    };
+  }, [loopStart, loopEnd]);
 
   const classes = [className, dissolve ? 'film-dissolve' : null].filter(Boolean).join(' ') || undefined;
 

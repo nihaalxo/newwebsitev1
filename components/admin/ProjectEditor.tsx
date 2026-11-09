@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteProject, saveProject } from '@/app/admin/actions';
-import { CATEGORIES, PROJECT_TYPES, type Block, type Project, type ProjectInput, type ProjectType } from '@/lib/cms/types';
+import { CATEGORIES, MAX_HIGHLIGHTS, PROJECT_TYPES, type Block, type Project, type ProjectInput, type ProjectType } from '@/lib/cms/types';
 import AccentField from './AccentField';
 import BlockEditor from './BlockEditor';
 import { callServer } from './call-server';
@@ -106,6 +106,8 @@ export default function ProjectEditor({ initial, saved: initiallySaved, takenSlu
     setErrors((current) => {
       if (errorCount(current) === 0) return current;
       const now = findErrors(draft, checkedForPublishing);
+      // Only the server knows the highlight limit: its refusal stands until the switch is off or the next save asks again.
+      if (draft.featured && current.featured) now.featured = current.featured;
       const still = Object.keys(current).filter((key) => key in now);
       if (still.length === errorCount(current) && still.every((key) => now[key] === current[key])) return current;
       return Object.fromEntries(still.map((key) => [key, now[key]]));
@@ -484,8 +486,9 @@ export default function ProjectEditor({ initial, saved: initiallySaved, takenSlu
               </h2>
               <SwitchField
                 id={fieldId('featured')}
-                label="Show as a large image on the home page"
-                help="When off, it's listed under More work instead. Set the order on the Projects page."
+                label="Highlight on the home page"
+                help={`Shows it large on the home page, with up to ${MAX_HIGHLIGHTS} highlighted at a time. Otherwise it's in the list under the highlights. Set the order on the Projects page.`}
+                error={errors.featured}
                 checked={draft.featured}
                 onChange={(featured) => set('featured', featured)}
               />

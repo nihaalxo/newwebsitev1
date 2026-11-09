@@ -22,15 +22,28 @@ import {
 import { UploadTrackerProvider, useUploadCount, useUploadTracker } from './upload-tracker';
 import { useUnsavedWarning } from './useUnsavedWarning';
 
-/** Settings as the form edits them: education as one entry per line, the start time as typed. */
-type SettingsDraft = Omit<SettingsInput, 'education' | 'heroFilmStart'> & { education: string; heroFilmStart: string };
+type FilmTime = 'heroFilmStart' | 'heroFilmLoopStart' | 'heroFilmLoopEnd';
+
+/** Settings as the form edits them: education as one entry per line, the film's times as typed. */
+type SettingsDraft = Omit<SettingsInput, 'education' | FilmTime> & { education: string } & Record<FilmTime, string>;
 
 function toDraft(settings: SettingsInput): SettingsDraft {
-  return { ...settings, education: settings.education.join('\n'), heroFilmStart: String(settings.heroFilmStart) };
+  return {
+    ...settings,
+    education: settings.education.join('\n'),
+    heroFilmStart: String(settings.heroFilmStart),
+    heroFilmLoopStart: String(settings.heroFilmLoopStart),
+    heroFilmLoopEnd: String(settings.heroFilmLoopEnd),
+  };
+}
+
+/** A time as typed: a decimal comma is fine, and an empty box means 0. */
+function seconds(typed: string): number {
+  const value = typed.trim().replace(',', '.');
+  return value === '' ? 0 : Number(value);
 }
 
 function fromDraft(draft: SettingsDraft): SettingsInput {
-  const start = draft.heroFilmStart.trim().replace(',', '.');
   return {
     ...draft,
     // A bare @handle becomes the profile link here, so it's checked and sent as the URL the server would store.
@@ -39,7 +52,9 @@ function fromDraft(draft: SettingsDraft): SettingsInput {
       .split('\n')
       .map((entry) => entry.trim())
       .filter(Boolean),
-    heroFilmStart: start === '' ? 0 : Number(start),
+    heroFilmStart: seconds(draft.heroFilmStart),
+    heroFilmLoopStart: seconds(draft.heroFilmLoopStart),
+    heroFilmLoopEnd: seconds(draft.heroFilmLoopEnd),
   };
 }
 
@@ -55,6 +70,7 @@ const SECTIONS = [
 export default function SettingsForm({ initial }: { initial: SettingsInput }) {
   const [draft, setDraft] = useState(() => toDraft(initial));
   const [savedJson, setSavedJson] = useState(() => JSON.stringify(toDraft(initial)));
+  const [savedFilm, setSavedFilm] = useState(initial.heroFilm?.src);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -86,8 +102,18 @@ export default function SettingsForm({ initial }: { initial: SettingsInput }) {
     setNotice((n) => (n?.tone === 'saved' ? null : n));
   }
 
-  function setMedia(key: 'avatar' | 'portrait' | 'heroFilm' | 'lairFilm' | 'contactFilm') {
+  function setMedia(key: 'avatar' | 'portrait' | 'lairFilm' | 'contactFilm') {
     return (media: Media | null) => set(key, media);
+  }
+
+  /** Loop times belong to one film, so a different file, or none, starts them over. A new poster or description keeps them. */
+  function changeHeroFilm(media: Media | null) {
+    setDraft((current) =>
+      media?.src === current.heroFilm?.src
+        ? { ...current, heroFilm: media }
+        : { ...current, heroFilm: media, heroFilmLoopStart: '0', heroFilmLoopEnd: '0' },
+    );
+    setNotice((n) => (n?.tone === 'saved' ? null : n));
   }
 
   async function save() {
@@ -123,14 +149,17 @@ export default function SettingsForm({ initial }: { initial: SettingsInput }) {
     const storedDraft = toDraft(stored);
     setDraft((current) => (current === before ? storedDraft : current));
     setSavedJson(JSON.stringify(storedDraft));
+    setSavedFilm(stored.heroFilm?.src);
     setNotice({ tone: 'saved', text: 'Saved. The site now shows these changes.' });
   }
 
+  const loopWasReset = draft.heroFilm?.src !== savedFilm && seconds(draft.heroFilmLoopEnd) === 0;
+  const unsaved = loopWasReset ? 'Unsaved changes. The hero film changed, so its loop times went back to 0.' : 'Unsaved changes';
   const status = busy
     ? { tone: 'busy', text: 'Saving…' }
     : uploads > 0
       ? { tone: 'busy', text: 'Uploading. Save when it finishes.' }
-      : (notice ?? (dirty ? { tone: 'dirty', text: 'Unsaved changes' } : { tone: 'saved', text: 'No unsaved changes' }));
+      : (notice ?? (dirty ? { tone: 'dirty', text: unsaved } : { tone: 'saved', text: 'No unsaved changes' }));
 
   return (
     <UploadTrackerProvider value={track}>
@@ -164,19 +193,11 @@ export default function SettingsForm({ initial }: { initial: SettingsInput }) {
               <TextAreaField
                 id={fieldId('heroLead')}
                 label="Line under your name"
-                help="The first sentence people read, over the hero film."
+                help="Shown under your name, over the hero film. Keep it short enough to fit one line on a phone."
                 rows={2}
                 maxLength={LIMITS.line}
                 value={draft.heroLead}
                 onChange={(heroLead) => set('heroLead', heroLead)}
-              />
-              <TextField
-                id={fieldId('heroCredit')}
-                label="Note beside the hero"
-                help="A small line shown on wide screens, like a note about the avatar."
-                maxLength={LIMITS.line}
-                value={draft.heroCredit}
-                onChange={(heroCredit) => set('heroCredit', heroCredit)}
               />
               <MediaField
                 id={fieldId('heroFilm')}
@@ -184,7 +205,7 @@ export default function SettingsForm({ initial }: { initial: SettingsInput }) {
                 help="Plays full-bleed behind your name. A small file, under about 10 MB, keeps the page quick to open."
                 kind="video"
                 value={draft.heroFilm}
-                onChange={setMedia('heroFilm')}
+                onChange={changeHeroFilm}
                 folderHint="site/hero-film"
                 previewStart={fromDraft(draft).heroFilmStart || 0}
               />
@@ -197,6 +218,26 @@ export default function SettingsForm({ initial }: { initial: SettingsInput }) {
                 value={draft.heroFilmStart}
                 onChange={(value) => set('heroFilmStart', value)}
                 error={errors.heroFilmStart}
+              />
+              <TextField
+                id={fieldId('heroFilmLoopStart')}
+                label="Loop from (seconds)"
+                help="The film loops between this time and the next, so any black at its start or end never leaves the first screen empty."
+                inputMode="decimal"
+                maxLength={6}
+                value={draft.heroFilmLoopStart}
+                onChange={(value) => set('heroFilmLoopStart', value)}
+                error={errors.heroFilmLoopStart}
+              />
+              <TextField
+                id={fieldId('heroFilmLoopEnd')}
+                label="Loop to (seconds)"
+                help="0 plays the whole film. Replacing or removing the film puts both loop times back to 0, because they belong to the old film."
+                inputMode="decimal"
+                maxLength={6}
+                value={draft.heroFilmLoopEnd}
+                onChange={(value) => set('heroFilmLoopEnd', value)}
+                error={errors.heroFilmLoopEnd}
               />
             </section>
 

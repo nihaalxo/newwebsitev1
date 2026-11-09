@@ -130,7 +130,7 @@ export default function CaseStudy({ project, next, preview = false }: { project:
 
         <footer className="cs-foot">
           {next && <NextProject next={next} />}
-          <Link className="btn btn-ghost" href="/#work">
+          <Link className="btn btn-ghost" href="/work">
             Back to all work
           </Link>
         </footer>

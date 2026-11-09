@@ -1,9 +1,9 @@
 # nihaalnazeer.com
 
-The portfolio of Nihaal Nazeer, designer. A dark, film-led site: the hero film, a grid of featured case studies, the
-rest of the work as a list, the Lair (the walk-through 3D portfolio at interactive.nihaalnazeer.com), About and
-Contact. Every case study and most of the site's text is edited in a password-protected admin at `/admin`, so
-nothing needs a developer once it is live.
+The portfolio of Nihaal Nazeer, designer. A dark, film-led site: the hero film, a few highlighted case studies with the
+rest of the work listed under them, the Lair (the walk-through 3D portfolio at interactive.nihaalnazeer.com), About and
+Contact, plus an All projects page with every case study. Every case study and most of the site's text is edited in a
+password-protected admin at `/admin`, so nothing needs a developer once it is live.
 
 Built with Next.js 15 (App Router), React 19 and plain CSS. Content is stored in one of two places:
 
@@ -44,8 +44,9 @@ Other commands: `npm run typecheck` checks the code, `npm run build` then `npm s
 3. Add a cover image, pick the colour the case study is lit with, and build the page from text, image, gallery,
    video and quote blocks. Images are converted to WebP in your browser before they upload.
 4. Save it as a draft and use **Preview** to see it exactly as visitors will. Drafts never appear on the public site.
-5. Publish it. Tick **Featured** to give it a large plate on the home page; otherwise it is listed with the rest of
-   the work. Change the order in the project list.
+5. Publish it. Turn on **Highlight** to give it a large plate on the home page, up to three at a time; otherwise it
+   is listed under the highlights. **View all projects** on the home page opens the All projects page, where every
+   published project gets a plate. Change the order in the project list.
 
 ## How local mode works
 
@@ -132,6 +133,8 @@ From then on, edit the site at `nihaalnazeer.com/admin`. Saved changes appear on
 - **Make the hero film lighter.** `finalheroshot.compressed.mp4` is about 20 MB and is most of what a first visit
   downloads. Re-export it as an H.264 MP4 of 1–1.5 MB (1280–1920 px wide, at a lower bitrate) and upload it in the
   admin under **Site settings**. If the new cut starts differently, change the hero film's start time there too.
+  The film loops between **Loop from** and **Loop to**, so any black at its start or end never leaves the first
+  screen empty. Replacing the film sets both back to 0, which plays the whole film, so set them again for the new cut.
 - **Free-plan pausing.** Supabase may pause free projects that see no activity for a while; check their current
   rules. A paused project stops serving the images and films until you press **Restore** in its dashboard.
 

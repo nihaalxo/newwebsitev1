@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import About from '@/components/site/About';
 import { absoluteUrl, OWNER_NAME, SITE_URL } from '@/components/site/config';
 import Contact from '@/components/site/Contact';
-import { getSettings, hasLair, listPublished } from '@/components/site/data';
+import { getSettings, hasLair, listPublished, splitHighlights } from '@/components/site/data';
 import Hero from '@/components/site/Hero';
 import Lair from '@/components/site/Lair';
 import MailPill from '@/components/site/MailPill';
 import { still } from '@/components/site/media';
-import Work, { type WorkItem } from '@/components/site/Work';
-import type { Project } from '@/lib/cms/types';
+import Work from '@/components/site/Work';
+import { toWorkItem } from '@/components/site/work-item';
 
 export const revalidate = 300;
 
@@ -23,7 +23,8 @@ const FALLBACK_DESCRIPTION = 'Brand identities, app interfaces and spatial exper
 export async function generateMetadata(): Promise<Metadata> {
   const [projects, settings] = await Promise.all([listPublished(), getSettings()]);
   const description = settings.heroLead || FALLBACK_DESCRIPTION;
-  const share = still(projects.find((p) => p.featured && p.cover)?.cover ?? null);
+  const { highlights, rest } = splitHighlights(projects);
+  const share = still([...highlights, ...rest].find((p) => p.cover)?.cover ?? null);
   const images = share
     ? [{ url: absoluteUrl(share.src), width: share.width, height: share.height, alt: share.alt }]
     : undefined;
@@ -37,15 +38,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** Only what the home page draws, so the client bundle doesn't carry every case study's blocks. */
-function toWorkItem({ id, slug, title, category, discipline, year, summary, cover, accent }: Project): WorkItem {
-  return { id, slug, title, category, discipline, year, summary, cover, accent };
-}
-
 export default async function HomePage() {
   const [projects, settings] = await Promise.all([listPublished(), getSettings()]);
-  const featured = projects.filter((p) => p.featured).map(toWorkItem);
-  const more = projects.filter((p) => !p.featured).map(toWorkItem);
+  const { highlights, rest } = splitHighlights(projects);
   const lairProject =
     projects.find((p) => p.id === LAIR_STORY_ID) ?? projects.find((p) => p.slug === LAIR_STORY_SLUG) ?? null;
   const lairStory = lairProject ? `/work/${lairProject.slug}` : null;
@@ -53,8 +48,8 @@ export default async function HomePage() {
   return (
     <>
       <main id="main">
-        <Hero settings={settings} />
-        <Work featured={featured} more={more} />
+        <Hero settings={settings} showCue={projects.length > 0} />
+        <Work highlights={highlights.map(toWorkItem)} rest={rest.map(toWorkItem)} />
         {hasLair(settings) && <Lair settings={settings} buildStoryHref={lairStory} />}
         <About settings={settings} />
         <Contact settings={settings} />

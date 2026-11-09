@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { reorderProjects, setFeatured } from '@/app/admin/actions';
-import type { Project } from '@/lib/cms/types';
+import { MAX_HIGHLIGHTS, type Project } from '@/lib/cms/types';
 import { callServer } from './call-server';
 import { SwitchField } from './fields';
 import { ChevronDown, ChevronUp } from './icons';
@@ -29,6 +29,7 @@ export default function ProjectList({ initialRows }: { initialRows: ProjectRow[]
   const [problem, setProblem] = useState<string | null>(null);
   // Order changes are sent one after another, so quick clicks can't land on the server out of order.
   const orderQueue = useRef<Promise<void>>(Promise.resolve());
+  const highlighted = rows.filter((row) => row.featured).length;
 
   useEffect(() => {
     if (!pendingFocus) return;
@@ -63,16 +64,19 @@ export default function ProjectList({ initialRows }: { initialRows: ProjectRow[]
   }
 
   async function toggleFeatured(row: ProjectRow, featured: boolean) {
-    setRows((current) => current.map((r) => (r.id === row.id ? { ...r, featured } : r)));
+    const setSwitch = (on: boolean) => setRows((current) => current.map((r) => (r.id === row.id ? { ...r, featured: on } : r)));
+    // At the limit the server is expected to refuse, so the switch waits for its answer instead of flashing "4 of 3".
+    if (!featured || highlighted < MAX_HIGHLIGHTS) setSwitch(featured);
     setProblem(null);
     const result = await callServer(() => setFeatured(row.id, featured), (error) => ({ ok: false as const, error }));
     if (!result.ok) {
-      setRows((current) => current.map((r) => (r.id === row.id ? { ...r, featured: !featured } : r)));
+      setSwitch(!featured);
       setProblem(result.error);
       setAnnouncement(result.error);
       return;
     }
-    const where = featured ? 'on the home page as a large image' : 'under More work';
+    setSwitch(featured);
+    const where = featured ? 'large on the home page' : 'in the list under the highlights';
     setAnnouncement(
       row.status === 'published' ? `${nameOf(row)} now appears ${where}.` : `${nameOf(row)} will appear ${where} once published.`,
     );
@@ -80,6 +84,10 @@ export default function ProjectList({ initialRows }: { initialRows: ProjectRow[]
 
   return (
     <>
+      <p className="adm-list-count">
+        {highlighted} of {MAX_HIGHLIGHTS} highlighted
+        {highlighted > MAX_HIGHLIGHTS && `. Turn ${highlighted - MAX_HIGHLIGHTS} off to get back to the limit.`}
+      </p>
       {problem && (
         <div className="adm-alert adm-list-alert">
           <p>{problem}</p>
@@ -108,7 +116,7 @@ export default function ProjectList({ initialRows }: { initialRows: ProjectRow[]
                   id={`featured-${row.id}`}
                   label={
                     <>
-                      On home page<span className="adm-vh">: {name}</span>
+                      Highlight<span className="adm-vh">: {name}</span>
                     </>
                   }
                   checked={row.featured}

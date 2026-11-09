@@ -4,6 +4,7 @@
 import { SLUG_PATTERN } from '@/lib/cms/defaults';
 import {
   CATEGORIES,
+  MAX_HIGHLIGHTS,
   type Block,
   type Category,
   type Project,
@@ -131,6 +132,22 @@ export const STORY_PROMPTS: Record<Category, string[]> = {
   print: ['The brief', 'Process and dropped routes', 'The finished piece', 'Credits and tools'],
 };
 
+const COUNT_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+
+/**
+ * Why project `id` can't be highlighted, or null when there's room. Every other highlighted project counts, drafts
+ * included, so publishing a draft can never take the home page past the limit.
+ */
+export function highlightLimitProblem(projects: Project[], id?: string): string | null {
+  const others = projects.filter((p) => p.featured && p.id !== id).map((p) => p.title.trim() || 'Untitled project');
+  if (others.length < MAX_HIGHLIGHTS) return null;
+  const count = COUNT_WORDS[others.length] ?? String(others.length);
+  const names = new Intl.ListFormat('en-GB').format(others);
+  return others.length === 1
+    ? `${count} project is already highlighted: ${names}. Turn it off first.`
+    : `${count} projects are already highlighted: ${names}. Turn one off first.`;
+}
+
 /**
  * Required fields always; a cover, its description and complete story blocks only when publishing,
  * so a half-written draft can always be saved. Uniqueness of the slug is checked on the server.
@@ -227,8 +244,17 @@ export function validateSettings(settings: SettingsInput): FieldErrors {
     errors.cvUrl = 'Upload a PDF, or paste a full link that starts with https://';
   }
 
-  if (!Number.isFinite(settings.heroFilmStart) || settings.heroFilmStart < 0 || settings.heroFilmStart > HERO_START_MAX) {
+  const validSeconds = (value: number) => Number.isFinite(value) && value >= 0 && value <= HERO_START_MAX;
+  if (!validSeconds(settings.heroFilmStart)) {
     errors.heroFilmStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 9.`;
+  }
+  if (!validSeconds(settings.heroFilmLoopStart)) {
+    errors.heroFilmLoopStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 1.2.`;
+  }
+  if (!validSeconds(settings.heroFilmLoopEnd)) {
+    errors.heroFilmLoopEnd = `Enter a number of seconds between 0 and ${HERO_START_MAX}, or 0 to play the whole film.`;
+  } else if (settings.heroFilmLoopEnd > 0 && settings.heroFilmLoopEnd <= settings.heroFilmLoopStart) {
+    errors.heroFilmLoopEnd = 'Make this later than Loop from, or enter 0 to play the whole film.';
   }
 
   if (settings.avatar?.src && !settings.avatar.alt.trim()) errors['avatar.alt'] = 'Describe the avatar still.';

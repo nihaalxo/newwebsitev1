@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { OWNER_NAME } from './config';
 import MotionToggle from './MotionToggle';
 import SoundToggle from './SoundToggle';
-import XMark from './XMark';
 
 /** Share of the hero scrolled away before the bar frosts over. */
 const HERO_SETTLE = 0.18;
@@ -31,11 +30,13 @@ export default function SiteHeader({ showLair }: { showLair: boolean }) {
     };
   }, [pathname]);
 
+  // All projects has no film behind the bar, and its title and tabs scroll under it from the first pixel.
+  const frosted = solid || pathname === '/work';
+
   return (
-    <header className={solid ? 'bar solid' : 'bar'}>
+    <header className={frosted ? 'bar solid' : 'bar'}>
       <div className="wrap">
         <Link className="brand" href="/#top" aria-label={`${OWNER_NAME}, home`}>
-          <XMark />
           <span>{OWNER_NAME}</span>
         </Link>
         <div className="bar-end">

@@ -1,5 +1,5 @@
 /**
- * Lays the featured plates out on the home page's 12-column grid.
+ * Lays plates out on the 12-column grid: every project on All projects, the highlights on the home page.
  *
  * Rows cycle through [7, 5], [5, 7] and [4, 4, 4]. When the projects run out partway through a row, a single
  * leftover plate spans all 12 columns at a wide ratio and two leftovers share the row as [6, 6].
@@ -35,6 +35,16 @@ export interface Placement<T> {
   ratio: number;
   /** 0-based row index, handy for choosing which images load eagerly. */
   row: number;
+}
+
+/** How wide a plate spanning `span` of 12 columns renders, for the image's `sizes`. */
+export function plateSizes(span: number): string {
+  return `(max-width: 719px) 100vw, (max-width: 1360px) ${Math.round((span / COLUMNS) * 92)}vw, ${Math.round((span / COLUMNS) * 1248)}px`;
+}
+
+/** Columns each of `count` highlights spans on the home page: they share one row equally, so 12, 6 and 6, or 4, 4 and 4. */
+export function highlightSpan(count: number): number {
+  return Math.floor(COLUMNS / Math.max(count, 1));
 }
 
 /** Width of a plate spanning `span` columns, as a fraction of the grid's width, gaps included. */

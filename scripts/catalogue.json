@@ -35,7 +35,7 @@
       "summary": "Browsing and watching when the room becomes the screen.",
       "alt": "A Netflix player window floating over a red, sunlit landscape, with playback controls below",
       "accent": "#D2461C",
-      "featured": true,
+      "featured": false,
       "position": 2,
       "image": "ImmersiveNetflixforApple'sVisionPro.png"
     },
@@ -48,7 +48,7 @@
       "summary": "A club crest and a black-and-gold kit, plus a personal N monogram.",
       "alt": "Black and gold football shirt with a diamond pattern, shown front and back, beside the RGFC crest and an N monogram printed on fabric",
       "accent": "#C9A23A",
-      "featured": true,
+      "featured": false,
       "position": 3,
       "image": "RGFC-BrandingandJerseyDesign.png"
     },
@@ -61,7 +61,7 @@
       "summary": "A butterfly mark built from leaves, shown on shopfront glass.",
       "alt": "A gold butterfly made of small leaves, applied to a shop window",
       "accent": "#D6A02E",
-      "featured": true,
+      "featured": false,
       "position": 4,
       "image": "Silklon&Serione-BrandingDesign.png"
     },
@@ -74,7 +74,7 @@
       "summary": "A carbon-footprint app where a caped hero coaches you to cut emissions.",
       "alt": "Five phone screens from the Green Print app, featuring a superhero in a green suit and blue cape, and emissions charts",
       "accent": "#3A9A72",
-      "featured": true,
+      "featured": false,
       "position": 5,
       "image": "GreenPrint-AppDesign.png"
     },
@@ -87,7 +87,7 @@
       "summary": "A UI and motion study built around a glowing chrysalis.",
       "alt": "A glowing green chrysalis on black under the script title Butterfly Garden",
       "accent": "#9EE07A",
-      "featured": true,
+      "featured": false,
       "position": 6,
       "image": "ButterflyGarden-UIDesignAnimation.png"
     },
@@ -100,7 +100,7 @@
       "summary": "Two posters on the type designers Hermann Zapf and Frederic Goudy.",
       "alt": "Two black typographic posters about Hermann Zapf and Frederic Goudy hanging on a concrete wall",
       "accent": "#B8BDC2",
-      "featured": true,
+      "featured": false,
       "position": 7,
       "image": "TypographicPosters.png"
     },
@@ -113,7 +113,7 @@
       "summary": "A Blender animation set in a retro kitchen lined with family photos.",
       "alt": "A rendered retro kitchen with orange cabinets, a checkered floor and framed family photos",
       "accent": "#D07A2E",
-      "featured": true,
+      "featured": false,
       "position": 8,
       "image": "MemoryPalace-BlenderAnimation.png"
     },

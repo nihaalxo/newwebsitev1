@@ -1210,7 +1210,18 @@ html:has(.adm-bar) {
   font-size: 15px;
 }
 
+.adm-list-count {
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Sticky, so a refused switch far down the list still shows why. */
 .adm-list-alert {
+  position: sticky;
+  top: calc(var(--a-top) + 8px);
+  z-index: 2;
+  background: linear-gradient(var(--a-warn-wash), var(--a-warn-wash)), var(--a-bg);
   display: flex;
   flex-wrap: wrap;
   align-items: center;

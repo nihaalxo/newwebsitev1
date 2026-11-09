@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { requireAdmin } from '@/components/admin/auth';
 import ProjectList, { type ProjectRow } from '@/components/admin/ProjectList';
 import { cmsMode } from '@/lib/cms';
-import type { Project } from '@/lib/cms/types';
+import { MAX_HIGHLIGHTS, type Project } from '@/lib/cms/types';
 
 export const metadata: Metadata = { title: 'Projects' };
 
@@ -47,8 +47,9 @@ export default async function ProjectsPage() {
       ) : (
         <>
           <p className="adm-list-help">
-            The order here is the order on the site. Projects switched to On home page appear there as large images; the
-            rest are listed under More work. Drafts stay hidden until you publish them.
+            Highlighted projects appear large on the home page, up to {MAX_HIGHLIGHTS} at a time. Every other published
+            project is listed under them, and all of them appear on the All projects page. The order here is the order on
+            the site. Drafts stay hidden until you publish them.
           </p>
           <ProjectList initialRows={projects.map(toRow)} />
         </>

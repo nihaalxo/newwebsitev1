@@ -173,13 +173,14 @@ interface SwitchFieldProps {
   id: string;
   label: ReactNode;
   help?: ReactNode;
+  error?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
 }
 
 /** A checkbox presented as an on/off switch; screen readers announce it as a switch. */
-export function SwitchField({ id, label, help, checked, onChange, disabled }: SwitchFieldProps) {
+export function SwitchField({ id, label, help, error, checked, onChange, disabled }: SwitchFieldProps) {
   return (
     <div className="adm-switch">
       <span className="adm-switch-control">
@@ -190,11 +191,13 @@ export function SwitchField({ id, label, help, checked, onChange, disabled }: Sw
           checked={checked}
           disabled={disabled}
           onChange={(event) => onChange(event.target.checked)}
-          aria-describedby={help ? `${id}-help` : undefined}
+          aria-invalid={error ? true : undefined}
+          data-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, help ? 'help' : null, error && 'error')}
         />
         <span className="adm-switch-track" aria-hidden="true" />
       </span>
-      <span className="adm-switch-text">
+      <div className="adm-switch-text">
         <label className="adm-label" htmlFor={id}>
           {label}
         </label>
@@ -203,7 +206,8 @@ export function SwitchField({ id, label, help, checked, onChange, disabled }: Sw
             {help}
           </span>
         )}
-      </span>
+        <FieldError id={`${id}-error`} message={error} />
+      </div>
     </div>
   );
 }

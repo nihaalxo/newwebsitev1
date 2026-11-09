@@ -1,6 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { cms, type Project, type Settings } from '@/lib/cms';
+import { MAX_HIGHLIGHTS } from '@/lib/cms/types';
 
 // Request-scoped memoisation, so a page and its generateMetadata share one read.
 
@@ -15,6 +16,12 @@ export const listPublished = cache(async (): Promise<Project[]> => {
 export const getPublishedProject = cache(async (slug: string): Promise<Project | null> =>
   (await cms()).getPublishedBySlug(slug),
 );
+
+/** Splits published projects for the home page: the highlights, at most MAX_HIGHLIGHTS, and everything else, in order. */
+export function splitHighlights(projects: Project[]): { highlights: Project[]; rest: Project[] } {
+  const highlights = projects.filter((p) => p.featured).slice(0, MAX_HIGHLIGHTS);
+  return { highlights, rest: projects.filter((p) => !highlights.includes(p)) };
+}
 
 /** The project after `current` in the published order, wrapping to the first; null when there is no other. */
 export function nextProject(all: Project[], current: Project): Project | null {

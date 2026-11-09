@@ -9,6 +9,7 @@ import {
   SLUG_TAKEN_MESSAGE,
   errorCount,
   errorSummary,
+  highlightLimitProblem,
   toInput,
   validateProject,
   validateSettings,
@@ -87,6 +88,11 @@ export async function saveProject(payload: ProjectInput): Promise<SaveProjectRes
     if (!fieldErrors.slug && all.some((p) => p.slug === input.slug && p.id !== input.id)) {
       fieldErrors.slug = SLUG_TAKEN_MESSAGE;
     }
+    // Only turning it on is checked, so a project that's already highlighted can always be saved.
+    if (input.featured && !existing?.featured) {
+      const problem = highlightLimitProblem(all, input.id);
+      if (problem) fieldErrors.featured = problem;
+    }
     if (errorCount(fieldErrors) > 0) {
       return { ok: false, error: errorSummary(fieldErrors, publishing ? 'publishing' : 'saving'), fieldErrors };
     }
@@ -145,6 +151,11 @@ export async function setFeatured(id: string, featured: boolean): Promise<Action
     if (!store) return { ok: false, error: SIGNED_OUT };
     const project = typeof id === 'string' ? await store.getById(id) : null;
     if (!project) return { ok: false, error: 'This project no longer exists. Reload the page.' };
+
+    if (featured === true && !project.featured) {
+      const problem = highlightLimitProblem(await store.listAll(), project.id);
+      if (problem) return { ok: false, error: problem };
+    }
 
     // This rewrites the whole record from the copy just read. If an editor save lands in between, the store
     // refuses this instead of undoing that save.

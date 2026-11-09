@@ -58,6 +58,12 @@ function mediaSource(value: unknown): string {
   return isSitePath(source) || isHttpUrl(source) ? source : '';
 }
 
+/** A time in a film, to the tenth of a second. NaN when it isn't a number, which rules.ts refuses. */
+function seconds(value: unknown): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.round(n * 10) / 10 : Number.NaN;
+}
+
 function dimension(value: unknown): number | undefined {
   const n = Number(value);
   return Number.isInteger(n) && n > 0 && n <= 20000 ? n : undefined;
@@ -176,11 +182,9 @@ export function sanitizeProject(value: unknown): { input: ProjectInput; problems
 export function sanitizeSettings(value: unknown): SettingsInput | null {
   if (!isData(value)) return null;
   const education = Array.isArray(value.education) ? value.education : [];
-  const start = Number(value.heroFilmStart);
 
   return {
     heroLead: line(value.heroLead, LIMITS.line),
-    heroCredit: line(value.heroCredit, LIMITS.line),
     aboutStatement: prose(value.aboutStatement, LIMITS.paragraph),
     basedIn: line(value.basedIn),
     availability: line(value.availability),
@@ -196,7 +200,9 @@ export function sanitizeSettings(value: unknown): SettingsInput | null {
     lairBlurb: prose(value.lairBlurb, LIMITS.paragraph),
     lairBuiltWith: line(value.lairBuiltWith),
     heroFilm: optionalMedia(value.heroFilm, 'video'),
-    heroFilmStart: Number.isFinite(start) ? Math.round(start * 10) / 10 : Number.NaN,
+    heroFilmStart: seconds(value.heroFilmStart),
+    heroFilmLoopStart: seconds(value.heroFilmLoopStart),
+    heroFilmLoopEnd: seconds(value.heroFilmLoopEnd),
     lairFilm: optionalMedia(value.lairFilm, 'video'),
     contactFilm: optionalMedia(value.contactFilm, 'video'),
   };

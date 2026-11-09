@@ -59,7 +59,10 @@ export interface Project {
   deliverables: string;
   /** Optional external link (live product, video, press). */
   link: string;
-  /** Shown as a large plate on the home page; otherwise listed under "More work". */
+  /**
+   * Highlighted: shown as a large plate on the home page. Everything else published is listed under the highlights.
+   * The admin labels this "Highlight" and allows at most MAX_HIGHLIGHTS, so the home page stays short.
+   */
   featured: boolean;
   /** Lower comes first. */
   position: number;
@@ -79,14 +82,15 @@ export type ProjectInput = Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'pub
   expectedUpdatedAt?: string;
 };
 
+/** How many projects can be highlighted on the home page at once. */
+export const MAX_HIGHLIGHTS = 3;
+
 export const STALE_PROJECT_MESSAGE =
   'This project was changed somewhere else since you opened it (another tab, or the project list). Reload the page to get the latest version, then make your change again.';
 
 export interface Settings {
   /** Line under the name in the hero. */
   heroLead: string;
-  /** Small note beside the hero on wide screens, e.g. about the avatar. */
-  heroCredit: string;
   aboutStatement: string;
   /** Empty strings are hidden on the public site. */
   basedIn: string;
@@ -109,6 +113,12 @@ export interface Settings {
   heroFilm: Media | null;
   /** Seconds into the hero film to start from (skips the dark power-on on first view). */
   heroFilmStart: number;
+  /**
+   * The hero film loops between these two times, in seconds, so black at its start or end never leaves the first
+   * screen empty. heroFilmLoopEnd 0 means no trimming: the film loops whole.
+   */
+  heroFilmLoopStart: number;
+  heroFilmLoopEnd: number;
   lairFilm: Media | null;
   contactFilm: Media | null;
   updatedAt: string;

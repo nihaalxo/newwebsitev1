@@ -7,8 +7,7 @@ import type { ProjectInput, Settings } from './types';
  * scripts/seed-local.mjs keeps an identical copy for .cms/content.json; change both together.
  */
 export const DEFAULT_SETTINGS: Settings = {
-  heroLead: 'From chai cups to Vision Pro. I design brand identities, app interfaces and spatial experiences.',
-  heroCredit: "That's me in the suit, rebuilt in 3D for my portfolio world.",
+  heroLead: 'Product | UI/UX | Multidisciplinary',
   aboutStatement:
     "I'm Nihaal, a multidisciplinary designer trained in Graphic and Media Design at UAL in London. I work in three places: on the shelf, with identities like My Chaii London and RGFC; on screen, with apps like Green Print; and in space, with Apple Vision Pro concepts reimagining Netflix and live football.",
   basedIn: '',
@@ -33,6 +32,8 @@ export const DEFAULT_SETTINGS: Settings = {
   lairBuiltWith: '',
   heroFilm: { kind: 'video', src: '/finalheroshot.compressed.mp4', poster: '/uploads/seed/hero-poster.jpg', alt: '' },
   heroFilmStart: 9,
+  heroFilmLoopStart: 1.2,
+  heroFilmLoopEnd: 24.5,
   lairFilm: {
     kind: 'video',
     src: '/tutorialfullanimation0000-3500_2.compressed.mp4',

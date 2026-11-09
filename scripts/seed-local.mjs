@@ -27,8 +27,7 @@ const CATEGORIES = ['brand', 'spatial', 'interface', 'print'];
 
 // An exact copy of DEFAULT_SETTINGS in lib/cms/defaults.ts (without updatedAt). Change both together.
 const DEFAULT_SETTINGS = {
-  heroLead: 'From chai cups to Vision Pro. I design brand identities, app interfaces and spatial experiences.',
-  heroCredit: "That's me in the suit, rebuilt in 3D for my portfolio world.",
+  heroLead: 'Product | UI/UX | Multidisciplinary',
   aboutStatement:
     "I'm Nihaal, a multidisciplinary designer trained in Graphic and Media Design at UAL in London. I work in three places: on the shelf, with identities like My Chaii London and RGFC; on screen, with apps like Green Print; and in space, with Apple Vision Pro concepts reimagining Netflix and live football.",
   basedIn: '',
@@ -53,6 +52,8 @@ const DEFAULT_SETTINGS = {
   lairBuiltWith: '',
   heroFilm: { kind: 'video', src: '/finalheroshot.compressed.mp4', poster: '/uploads/seed/hero-poster.jpg', alt: '' },
   heroFilmStart: 9,
+  heroFilmLoopStart: 1.2,
+  heroFilmLoopEnd: 24.5,
   lairFilm: {
     kind: 'video',
     src: '/tutorialfullanimation0000-3500_2.compressed.mp4',
@@ -203,9 +204,9 @@ async function main() {
   await writeFile(temp, `${JSON.stringify(content, null, 2)}\n`, 'utf8');
   await rename(temp, CONTENT_FILE);
 
-  const featured = projects.filter((p) => p.featured).length;
+  const highlighted = projects.filter((p) => p.featured).length;
   console.log(
-    `\nSeeded ${projects.length} projects (${featured} featured) into .cms/content.json, ` +
+    `\nSeeded ${projects.length} projects (${highlighted} highlighted) into .cms/content.json, ` +
       `with ${(imageBytes / 1024 / 1024).toFixed(1)} MB of WebP images in public/uploads/seed.`,
   );
 }

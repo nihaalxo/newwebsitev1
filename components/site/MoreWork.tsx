@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { thumbnail } from './media';
 import { isMotionOn } from './motion-pref';
-import type { WorkItem } from './Work';
+import type { WorkItem } from './work-item';
 
 const PEEK_WIDTH = 260;
 const PEEK_HEIGHT = 195;
 const PEEK_CLIP = 'polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)';
 const PEEK_CLOSED = 'polygon(0 0, 0 0, 0 0, 0 100%, 0 100%)';
 
-/** The published projects that aren't featured, as a list. On fine pointers the cover trails the cursor. */
+/** The published projects that aren't highlighted, as compact rows. On fine pointers the cover trails the cursor. */
 export default function MoreWork({ items }: { items: WorkItem[] }) {
   const listRef = useRef<HTMLUListElement>(null);
   const peekRef = useRef<HTMLImageElement>(null);
@@ -98,13 +98,11 @@ export default function MoreWork({ items }: { items: WorkItem[] }) {
 
   return (
     <div className="more">
-      <h2 className="title-s">More work</h2>
-      <ul className="rows" ref={listRef}>
+      <ul className="rows" ref={listRef} aria-label="More projects">
         {items.map((p) => (
           <li key={p.id}>
             <Link className="row" href={`/work/${p.slug}`} data-peek={thumbnail(p.cover) ?? undefined}>
               <span className="row-title">{p.title}</span>
-              {p.discipline && <span className="row-kind">{p.discipline}</span>}
               {p.year > 0 && <span className="row-year">{p.year}</span>}
             </Link>
           </li>

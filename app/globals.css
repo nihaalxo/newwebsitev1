@@ -34,6 +34,10 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
+}
+/* The admin's sticky header still reserves this space. The public site can't: it would shrink the home page's snap area,
+   so site.css keeps focus clear of the bar with scroll-margin instead. */
+html:not(:has(.site)) {
   scroll-padding-top: calc(var(--bar) + 16px);
 }
 
