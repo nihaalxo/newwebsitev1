@@ -10,7 +10,7 @@
     "preview": "npm run build && wrangler dev --port ${PORT:-4821}",
     "ci": "node scripts/ci.mjs",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit && npm run types --silent && tsc -p worker --noEmit",
+    "typecheck": "tsc --noEmit && npm run types --silent > /dev/null && tsc -p worker --noEmit",
     "types": "wrangler types worker/worker-configuration.d.ts",
     "content:format": "node --import tsx scripts/content-format.ts",
     "test": "node --import tsx --test tests/*.test.ts"

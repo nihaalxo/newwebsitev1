@@ -184,27 +184,6 @@
   padding-block: 8px;
 }
 
-.adm-mode {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--a-muted);
-  font-size: 13px;
-  font-weight: 500;
-}
-.adm-mode::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--a-muted);
-}
-.adm-mode[data-mode='supabase']::before {
-  background: var(--a-accent);
-  box-shadow: 0 0 8px var(--a-accent-soft);
-}
-
 /* Narrower screens: the bar wraps onto more rows, so it scrolls away instead of covering the form. */
 @media (max-width: 1023px) {
   .adm-top {

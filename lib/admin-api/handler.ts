@@ -63,11 +63,22 @@ function isUploadRoute(method: string, route: string): boolean {
   return method === 'PUT' && (route === 'upload' || route === 'upload/part');
 }
 
+/**
+ * Whether a write comes from a page on this site: its Origin is the address it was sent to. On Cloudflare that is
+ * request.url; next dev rewrites request.url's host to localhost, so the Host header the browser sent counts too.
+ */
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  const own = new URL(request.url);
+  const host = request.headers.get('host');
+  return origin === own.origin || (host !== null && origin === `${own.protocol}//${host}`);
+}
+
 /** The checks every request passes before its route runs: Origin and Content-Type for writes. */
 function refused(request: Request, route: string): Response | null {
   const method = request.method;
   if (method === 'GET' || method === 'HEAD') return null;
-  if (request.headers.get('origin') !== new URL(request.url).origin) return problem(403, 'Write from the admin itself.');
+  if (!sameOrigin(request)) return problem(403, 'Write from the admin itself.');
   if (method === 'POST' || method === 'PUT') {
     const type = mimeOf(request.headers.get('content-type') ?? '');
     const ok = isUploadRoute(method, route) ? isAllowedUploadType(type) : type === 'application/json';

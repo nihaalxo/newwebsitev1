@@ -194,7 +194,8 @@ export async function planPublish({ index, head, drafts, homeDraft, knownIds = {
     added,
   });
 
-  const fileWrites: Plan['writes'] = [...writes].map(([path, { content }]) => ({ path, content }));
+  // A file the branch already holds byte for byte (a retried publish) is not written again.
+  const fileWrites: Plan['writes'] = [...writes].filter(([path, { blob }]) => head.files[path] !== blob).map(([path, { content }]) => ({ path, content }));
   const homeText = serializeHome(home);
   if (homeText !== head.homeJson) fileWrites.push({ path: HOME_PATH, content: homeText });
   const redirectsText = serializeRedirects(redirects);

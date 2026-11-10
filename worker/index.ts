@@ -17,6 +17,14 @@ export default {
     const { pathname } = new URL(request.url);
     const read = request.method === 'GET' || request.method === 'HEAD';
 
+    // The API first: an upload's address can end in .mp4 too (/api/admin/media/p/<id>/film-….mp4).
+    if (pathname.startsWith('/api/admin/') || pathname === '/api/admin') return handleAdminApi(request, cloudflareStore(env));
+    if (pathname.startsWith('/api/')) {
+      return new Response(JSON.stringify({ error: 'Not found.' }), {
+        status: 404,
+        headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' },
+      });
+    }
     if (read && FILM.test(pathname)) {
       const size = filmSize(pathname);
       if (size > 0) {
@@ -24,13 +32,6 @@ export default {
         if (film) return film;
       }
       return env.ASSETS.fetch(request);
-    }
-    if (pathname.startsWith('/api/admin/') || pathname === '/api/admin') return handleAdminApi(request, cloudflareStore(env));
-    if (pathname.startsWith('/api/')) {
-      return new Response(JSON.stringify({ error: 'Not found.' }), {
-        status: 404,
-        headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' },
-      });
     }
     return env.ASSETS.fetch(request);
   },

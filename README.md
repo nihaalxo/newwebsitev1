@@ -1,100 +1,109 @@
 # nihaalnazeer.com
 
-The portfolio of Nihaal Nazeer, designer. It is a dark, film-led site with these parts:
+The portfolio of Nihaal Nazeer, designer: the hero film, a few highlighted case studies with the rest of the work
+under them, the Lair (the walk-through 3D portfolio at interactive.nihaalnazeer.com), About, CV and Contact, and an All
+projects page.
 
-- The hero film.
-- A few highlighted case studies, with the rest of the work listed under them.
-- The Lair: the walk-through 3D portfolio at interactive.nihaalnazeer.com.
-- About, CV and Contact.
-- An All projects page with every case study.
+It is a static site: Next.js 15 (App Router) exports every page to `out/` at build time, and Cloudflare serves those
+files. The projects live in this repository as JSON files. A small admin at `/admin` edits the projects and the home
+page's highlights; everything else (the words, the look) is edited here, in code.
 
-Every case study and all of the site's text is edited in a password-protected admin at `/admin`. Nothing needs a
-developer once it is live.
+**[GO-LIVE.md](GO-LIVE.md) has the steps to put it on Cloudflare, what could ever cost money, and how to change the
+password or the GitHub token.**
 
-It is built with Next.js 15 (App Router), React 19 and plain CSS. The live site is a Cloudflare Worker, built with
-OpenNext. Content lives in one of two places:
+## What runs where
 
-- **Local mode** (`npm run dev` on this computer): a JSON file, `.cms/content.json`, with uploaded files in
-  `public/uploads/`.
-- **Cloudflare** (the live site, and `npm run preview`): a D1 database for projects and settings, and an R2 bucket for
-  uploads.
+| Part | Where it runs |
+| --- | --- |
+| Pages, CSS, scripts, fonts, images | Static files in `out/`, served by Cloudflare (Workers static assets). No code runs for them |
+| The films in `public/` (`*.mp4` and friends) | The Worker (`worker/index.ts`), which answers byte ranges so Safari can play them |
+| The admin's pages (`/admin`, `/admin/edit`, `/admin/preview`, `/admin/login`) | Static files, like the site |
+| The admin's API (`/api/admin/*`) | The Worker: sign-in, drafts, uploads, publishing |
+| Drafts, build reports, the session key | R2 bucket `nihaalnazeer-admin` (private) |
+| Images and films uploaded in the admin | R2 bucket `nihaalnazeer-media`, served at `https://media.nihaalnazeer.com` without the Worker |
+| Publishing | One commit to `nihaalxo/newwebsitev1` on `main`, made by the Worker through GitHub's API with `GITHUB_TOKEN`. It only ever writes `content/` |
+| Building and deploying | Workers Builds: each push to `main` runs `npm run ci` (`scripts/ci.mjs`), which builds `out/`, deploys it, and leaves a build report the admin reads to say "Building", "Live" or "Failed" |
 
-**[GO-LIVE.md](GO-LIVE.md) has the steps to put it on Cloudflare and `nihaalnazeer.com`.**
+So a publish from the admin and a commit pushed from this computer go live the same way: a commit on `main`, then a
+build of 2 to 4 minutes.
 
 ## Run it on this computer
 
-It needs [Node.js](https://nodejs.org/) 20.12 or newer.
+It needs Node.js 24 (`.node-version`; 20.12 or newer works).
 
-1. In a terminal, in this folder:
+1. In this folder:
    ```sh
    npm install
-   cp .env.example .env.development.local
    ```
-2. Create `.dev.vars` in this folder with the admin login:
+2. Create `.dev.vars` with a password for the admin on this computer (it is gitignored, never committed):
    ```sh
-   ADMIN_EMAIL=me@example.com
-   ADMIN_PASSWORD=any-password-for-this-computer
-   LOCAL_SESSION_SECRET=a-long-random-string
+   echo "ADMIN_PASSWORD=$(node -e "console.log(require('crypto').randomBytes(18).toString('base64url'))")" > .dev.vars
    ```
-   - Make the session secret with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`.
-   - Keep the login in `.dev.vars`, not in a `.env` file. OpenNext copies every `.env` file into the Worker it
-     builds, and the build stops if one holds these names.
-3. Start it:
-   ```sh
-   npm run dev
-   ```
-4. Open http://localhost:3000 for the site, and http://localhost:3000/admin to edit it.
-
-Other commands:
+3. Use these:
 
 | Command | What it does |
 | --- | --- |
-| `npm run typecheck`, `npm run lint` | Check the code |
-| `npm run build`, then `npm start` | The plain Next.js production build, served at http://localhost:3000 from `.cms/content.json`, read-only. Editing needs `npm run dev` |
-| `npm run cf:build`, then `npm run preview` | The Cloudflare build, run locally with a local database and bucket (GO-LIVE.md shows the full list) |
+| `npm run dev` | The site at http://localhost:3000, read from `content/` on every reload, and the admin at http://localhost:3000/admin. Here the admin publishes straight into `content/` and `public/uploads/p/` instead of GitHub, and refuses files over 25 MiB ("Big films go through the live admin.") |
+| `npm run check` | Type checks (site and Worker), lint, the content check (every file valid and in canonical form), and the unit tests |
+| `npm run build` | The static site in `out/`, then `scripts/postbuild.mjs`: film sizes, the admin's index of `content/`, `_redirects`, and checks on file sizes and stray `localhost` links |
+| `npm run preview` | `npm run build`, then the real Worker with `wrangler dev` on port 4821 (`PORT=…` to change it), with a local R2 on this computer |
+| `npm run content:format` | Rewrites `content/` in canonical form, if `npm run check` asks for it |
 
-## Add a project
+Publishing under `npm run preview` needs a GitHub. To try it without one, start the stand-in, and point the Worker at
+it in `.dev.vars`:
 
-1. Go to `/admin`, sign in and choose **New project**.
-2. Fill in the basics:
-   - A title.
-   - A web address: the last part of the URL, e.g. `my-chaii-london`. Use lowercase letters, numbers and hyphens.
-   - A category, year and discipline.
-   - A one-sentence summary.
-3. Add a cover image and pick the colour the case study is lit with.
-4. Build the page from text, image, gallery, video and quote blocks. Images are converted to WebP in the browser
-   before they upload.
-5. Save it as a draft, and use **Preview** to see it exactly as visitors will. Drafts never appear on the public site.
-6. Publish it. **Highlight** gives it a large plate on the home page, for up to three projects at a time. Other
-   projects are listed under the highlights. Change the order in the project list.
+```sh
+node tests/fake-github.mjs 4830          # in its own terminal
+# .dev.vars gets two more lines:
+#   GITHUB_TOKEN=test
+#   GITHUB_API=http://127.0.0.1:4830
+PORT=4821 npm run preview                # in another
+node tests/preview-admin.mjs http://127.0.0.1:4821 http://127.0.0.1:4830   # the end-to-end check
+```
 
-**View all projects** on the home page opens the All projects page, where every published project gets a plate.
+`tests/preview-admin.mjs` changes `content/` while it runs and puts it back with `git checkout`, so it refuses to start
+while `content/` has uncommitted changes.
 
-## How local mode works
+## How Claude edits the site
 
-- Everything edited under `npm run dev` is written to `.cms/content.json`, and uploads go to `public/uploads/`.
-  - Both are committed to git: they are the content that `npm run cms:to-cloudflare` copies to the live site.
-  - Editing only works under `npm run dev`. `npm start` shows the same content but can't change it.
-- The starting content comes from two places:
-  - `scripts/catalogue.json`: all 21 projects, their summaries and image descriptions.
-  - The project images in `public/`.
-- `npm run cms:seed` builds `.cms/content.json` and the WebP images in `public/uploads/seed/` from them.
-  - It refuses to run if `.cms/content.json` exists, because that would throw away edits.
-  - `npm run cms:seed -- --force` rebuilds it anyway.
+1. `git pull --ff-only` first. The admin commits to `main`, so this computer may be behind.
+2. Edit:
+   - a project: `content/projects/<slug>.json` (the shape is `Project` in `lib/cms/types.ts`);
+   - the home page's order and highlights (up to 3): `content/home.json`;
+   - every other word on the site: `components/site/copy.ts`;
+   - images and films up to 25 MiB: `public/uploads/p/<project id>/`, referred to as `/uploads/p/<project id>/<file>`.
+     Bigger films go up through the live admin, which keeps them in R2.
+   - An old address that should keep working: `content/redirects.json` (the admin adds these itself on a rename).
+3. Check with `npm run dev` (look at it) and `npm run check`.
+4. Commit. Push only with Nihaal's OK.
+5. It is live once https://nihaalnazeer.com/admin/data/index.json shows the commit.
 
-Supabase is still supported as an alternative store. It is used only when both `NEXT_PUBLIC_SUPABASE_*` variables are
-set, and `npm run cms:push` copies content there. The live site doesn't use it.
+## Add a project in the admin
+
+1. Go to `/admin`, sign in, and choose **New project**.
+2. Fill in the title, the web address (lowercase letters, numbers and hyphens, e.g. `my-chaii-london`), the category,
+   year, discipline and one-sentence summary.
+3. Add a cover image. The accent colour is taken from it; change it if you like.
+4. Build the page from text, image, gallery, video and quote blocks. Images become WebP in the browser before they
+   upload. Films upload in parts, with a poster taken from the film.
+5. It saves by itself every few seconds. **Preview** shows the case file, the home page and All projects as they will
+   look.
+6. **Publish**. After 2 to 4 minutes the admin says **Live**. If a build fails, it shows why, with **Try again** and
+   **Undo this publish**.
+7. In the project list, **Highlight** gives a project a large plate on the home page (up to three), and the arrows set
+   the order. Changes to the list are published with **Publish all changes**.
 
 ## Where things are
 
 | Path | What it is |
 | --- | --- |
-| `app/(site)/`, `components/site/` | The public site |
-| `app/admin/`, `components/admin/` | The admin |
-| `lib/cms/` | The content model (`types.ts`) and the stores: `local.ts`, `cloudflare.ts` (D1 and R2) and `supabase.ts` |
-| `cloudflare/worker.mjs`, `wrangler.jsonc` | The Worker's entry point and configuration |
-| `d1/migrations/` | The Cloudflare database tables |
-| `app/cms/`, `app/api/cms/upload/` | Serving and receiving uploads on Cloudflare |
-| `app/api/cms/local-upload/` | Receiving uploads in local mode |
-| `scripts/` | `catalogue.json`, `seed-local.mjs`, `push-to-cloudflare.mjs`, `check-deploy-env.mjs`, `film-sizes.mjs`, `dev.mjs` |
-| `.cms/content.json`, `public/uploads/` | Local-mode content and uploads |
+| `content/` | The projects, `home.json` and `redirects.json`: the site's content |
+| `public/uploads/` | Images and films that ship with the site |
+| `app/(site)/`, `components/site/` | The public site; `components/site/copy.ts` holds its words |
+| `app/admin/`, `components/admin/` | The admin's pages |
+| `lib/content/` | Reading, checking and writing `content/` |
+| `lib/admin-api/` | The admin's API: `handler.ts` (routes), `plan.ts` (what a publish changes), `github.ts`, `auth.ts`, and `file-store.ts` (the `npm run dev` version) |
+| `worker/` | The Worker: films, the API on R2 (`cloudflare-store.ts`) |
+| `wrangler.jsonc`, `public/_headers`, `scripts/postbuild.mjs` | The Cloudflare configuration |
+| `scripts/ci.mjs` | The Workers Builds deploy command |
+| `tests/` | Unit tests (`npm run check`), the GitHub stand-in, the end-to-end check, and a CPU timing (`node --import tsx tests/cpu-proxy.ts`) |

@@ -1,10 +1,6 @@
 #!/usr/bin/env node
-// `npm run dev`: next dev, with the admin's email, password and session secret from .dev.vars.
-//
-// They live in .dev.vars, not a .env file, because OpenNext copies every .env file into the Worker it builds (the
-// development ones included), while nothing is built from .dev.vars. The Cloudflare preview reads .dev.vars too.
-// Loaded before Next starts, so Next keeps them; a variable already set in the shell is never replaced, and a .env
-// file never replaces these.
+// `npm run dev`: next dev, with the admin's password (ADMIN_PASSWORD) from .dev.vars, the same file `npm run preview`
+// reads. Loaded before Next starts, so Next keeps it; a variable already set in the shell is never replaced.
 
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';

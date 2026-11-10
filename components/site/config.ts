@@ -10,7 +10,7 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://nihaalnaze
  */
 export const LAIR_URL = process.env.NEXT_PUBLIC_LAIR_URL || 'https://interactive.nihaalnazeer.com/?film=on';
 
-/** Resolves a site path ("/uploads/x.webp") or an already absolute URL (Supabase Storage) to an absolute URL. */
+/** Resolves a site path ("/uploads/x.webp") or an already absolute URL (an upload on the media domain) to an absolute URL. */
 export function absoluteUrl(pathOrUrl: string): string {
   return new URL(pathOrUrl, `${SITE_URL}/`).toString();
 }
