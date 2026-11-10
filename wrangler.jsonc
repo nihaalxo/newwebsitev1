@@ -1,49 +1,36 @@
-// The Cloudflare Worker that serves the site, built by OpenNext (`npm run cf:build`, `npm run deploy`).
-// GO-LIVE.md walks through creating the database and bucket, the secrets and the custom domain.
+// The site on Cloudflare: one Worker named nihaalnazeer, created by Workers Builds from the GitHub repository
+// (GO-LIVE.md). Every page, image and font in out/ is a static asset, answered without running the Worker. The Worker
+// runs only for the paths in run_worker_first: the films in public/ (to answer byte ranges, which Safari needs) and
+// the admin's API.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nihaalnazeer",
-  // cloudflare/worker.mjs hands every request to the site OpenNext builds into .open-next/worker.js, and serves the
-  // films in public/ with byte ranges, which Safari needs to play them.
-  "main": "cloudflare/worker.mjs",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-11-04",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  // Everything in public/ plus Next's static files, served before the Worker runs. Films go to the Worker first, so
-  // a Range request gets 206 and the requested bytes (static assets alone answer 200 with the whole file).
+  "workers_dev": true,
   "assets": {
-    "directory": ".open-next/assets",
+    "directory": "out",
     "binding": "ASSETS",
-    "run_worker_first": ["/*.mp4", "/*.webm", "/*.mov", "/*.m4v"],
-    // Files only at their exact path, as Next serves public/ (OpenNext requires this with run_worker_first).
-    "html_handling": "none",
-    "not_found_handling": "none"
+    // /work serves work.html, and /work.html and /work/ redirect to /work.
+    "html_handling": "auto-trailing-slash",
+    // Any address the site doesn't have gets out/404.html with status 404.
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*", "/*.mp4", "/*.webm", "/*.mov", "/*.m4v"]
   },
-  // Lets the Worker call itself (OpenNext uses it for revalidation).
-  "services": [
-    {
-      "binding": "WORKER_SELF_REFERENCE",
-      "service": "nihaalnazeer"
-    }
-  ],
-  // Projects and site settings. Replace database_id with the id `npx wrangler d1 create nihaalnazeer-cms` prints.
-  "d1_databases": [
-    {
-      "binding": "CMS_DB",
-      "database_name": "nihaalnazeer-cms",
-      "database_id": "00000000-0000-0000-0000-000000000000",
-      "migrations_dir": "d1/migrations"
-    }
-  ],
-  // Images, films and the CV uploaded in the admin, served at /cms/...
   "r2_buckets": [
-    {
-      "binding": "CMS_UPLOADS",
-      "bucket_name": "nihaalnazeer-uploads"
-    }
+    // The admin's uploads, served to visitors at media.nihaalnazeer.com (a custom domain on the bucket).
+    { "binding": "MEDIA", "bucket_name": "nihaalnazeer-media" },
+    // The admin's drafts, the publish record, the build reports and the session key. Private.
+    { "binding": "ADMIN", "bucket_name": "nihaalnazeer-admin" }
   ],
+  "vars": {
+    "GITHUB_REPO": "nihaalxo/newwebsitev1",
+    "GITHUB_BRANCH": "main",
+    "MEDIA_ORIGIN": "https://media.nihaalnazeer.com"
+  },
   "observability": {
     "enabled": true
   }
-  // The custom domain is attached in step 10 of GO-LIVE.md. ADMIN_EMAIL, ADMIN_PASSWORD and LOCAL_SESSION_SECRET are
-  // secrets (`npx wrangler secret put NAME`, step 5), never vars in this file; the local preview reads them from .dev.vars.
+  // Secrets, set in the dashboard (Settings > Variables and Secrets), never here: ADMIN_PASSWORD and GITHUB_TOKEN.
+  // `npm run preview` reads them from .dev.vars. The custom domains are added in the dashboard (GO-LIVE.md).
 }
