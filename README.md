@@ -43,7 +43,7 @@ It needs Node.js 24 (`.node-version`; 20.12 or newer works).
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | The site at http://localhost:3000, read from `content/` on every reload, and the admin at http://localhost:3000/admin. Here the admin publishes straight into `content/` and `public/uploads/p/` instead of GitHub, and refuses files over 25 MiB ("Big films go through the live admin.") |
+| `npm run dev` | The site at http://127.0.0.1:3000, read from `content/` on every reload, and the admin at http://127.0.0.1:3000/admin. Here the admin publishes straight into `content/` and `public/uploads/p/` instead of GitHub, and refuses files over 25 MiB ("Big films go through the live admin."). It listens on this computer only; `npm run dev -- -H 0.0.0.0` opens it to the local network, to try the site on a phone. A project just published here can answer 404 once or twice: reload. Old addresses (`/about`, `/branding`, renamed projects) redirect only under `npm run preview` and on Cloudflare |
 | `npm run check` | Type checks (site and Worker), lint, the content check (every file valid and in canonical form), and the unit tests |
 | `npm run build` | The static site in `out/`, then `scripts/postbuild.mjs`: film sizes, the admin's index of `content/`, `_redirects`, and checks on file sizes and stray `localhost` links |
 | `npm run preview` | `npm run build`, then the real Worker with `wrangler dev` on port 4821 (`PORT=…` to change it), with a local R2 on this computer |
@@ -91,7 +91,11 @@ while `content/` has uncommitted changes.
 6. **Publish**. After 2 to 4 minutes the admin says **Live**. If a build fails, it shows why, with **Try again** and
    **Undo this publish**.
 7. In the project list, **Highlight** gives a project a large plate on the home page (up to three), and the arrows set
-   the order. Changes to the list are published with **Publish all changes**.
+   the order. Changes to the list are published with **Publish all changes**, or with the next **Publish** in an
+   editor (the editor says so). A new project can be highlighted before it is on the site: **Publish all changes**
+   then sends it with the home page, and its highlight waits until it is published.
+8. **Take off the site** keeps the project as a hidden draft and sends its address to All projects (a 302); publishing
+   it again brings the address back, along with any older addresses it had. **Sign out** signs out every browser.
 
 ## Where things are
 

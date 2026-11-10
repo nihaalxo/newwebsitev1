@@ -104,6 +104,11 @@ export interface StoreConfig {
   tooBigMessage?: string;
   /** Whether big files can go up in parts. */
   multipart: boolean;
+  /**
+   * True under `npm run dev`: no Cloudflare in front, so a cf-connecting-ip header is whatever the client sent, and
+   * next dev gives request.url the host localhost whatever address the browser used.
+   */
+  devServer?: boolean;
 }
 
 export interface Store {
@@ -124,15 +129,23 @@ export interface Store {
   meta: {
     get<T>(key: string): Promise<T | null>;
     put(key: string, value: unknown): Promise<void>;
+    /** The record with its etag, for putIf. */
+    getStored<T>(key: string): Promise<Stored<T> | null>;
+    /** Writes only if the record is still at `ifMatch` (null: only if there is none). False when it wasn't. */
+    putIf(key: string, value: unknown, ifMatch: string | null): Promise<boolean>;
   };
   media: {
     /** Stores a file of `length` bytes from a stream. */
     put(key: string, body: ReadableStream<Uint8Array>, length: number, contentType: string): Promise<void>;
-    startMultipart(key: string, contentType: string): Promise<string>;
+    /** Starts an upload in parts of a file the client says is `size` bytes; the size is kept with it. */
+    startMultipart(key: string, contentType: string, size: number): Promise<string>;
     uploadPart(key: string, uploadId: string, partNumber: number, body: ReadableStream<Uint8Array>, length: number): Promise<{ partNumber: number; etag: string }>;
-    finishMultipart(key: string, uploadId: string, parts: { partNumber: number; etag: string }[]): Promise<void>;
+    /** The finished file's size, and the size given when it was started. */
+    finishMultipart(key: string, uploadId: string, parts: { partNumber: number; etag: string }[]): Promise<{ size: number; declaredSize: number | null }>;
     abortMultipart(key: string, uploadId: string): Promise<void>;
     head(key: string): Promise<MediaObject | null>;
+    /** Which of `keys` are stored, with their size and age: one listing per project folder, not one call per file. */
+    find(keys: string[]): Promise<Map<string, MediaObject>>;
     /** Answers a GET or HEAD for the file, with ranges (206, 416) and 304. */
     serve(key: string, request: Request): Promise<Response>;
     /** Every file under p/, at most `maxPages` list calls. */

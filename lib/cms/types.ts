@@ -98,8 +98,12 @@ export interface HomeLayout {
   order: string[];
 }
 
-/** content/redirects.json: old project addresses, e.g. "/work/old-name": { to: "/work/new-name", status: 301 }. */
-export type Redirects = Record<string, { to: string; status: 301 | 302 }>;
+/**
+ * content/redirects.json: old project addresses, e.g. "/work/old-name": { to: "/work/new-name", status: 301 }. While a
+ * project is off the site, its addresses go to "/work" with a 302 and carry its `id`, so they lead to it again once it
+ * is published again.
+ */
+export type Redirects = Record<string, { to: string; status: 301 | 302; id?: string }>;
 
 /**
  * A project being edited in the admin, kept in R2 (drafts/<id>.json) until it is published. `base` is the published

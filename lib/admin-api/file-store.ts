@@ -177,6 +177,7 @@ export function fileStore(root = process.cwd()): Store {
       maxUploadBytes: DEV_UPLOAD_MAX,
       tooBigMessage: 'Big films go through the live admin.',
       multipart: false,
+      devServer: true,
     },
 
     drafts: {
@@ -216,6 +217,14 @@ export function fileStore(root = process.cwd()): Store {
         if (!META_KEY.test(key)) throw new Error('Not a meta key.');
         await writeAtomic(path.join(DRAFTS, 'meta', ...key.split('/')), JSON.stringify(value));
       },
+      async getStored<T>(key: string) {
+        if (!META_KEY.test(key)) return null;
+        return getStored<T>(path.join(DRAFTS, 'meta', ...key.split('/')));
+      },
+      async putIf(key, value, ifMatch) {
+        if (!META_KEY.test(key)) throw new Error('Not a meta key.');
+        return (await putStored(path.join(DRAFTS, 'meta', ...key.split('/')), value, ifMatch)) !== null;
+      },
     },
 
     media: {
@@ -245,6 +254,14 @@ export function fileStore(root = process.cwd()): Store {
         } catch {
           return null;
         }
+      },
+      async find(keys) {
+        const found = new Map<string, MediaObject>();
+        for (const key of new Set(keys)) {
+          const object = await store.media.head(key);
+          if (object) found.set(key, object);
+        }
+        return found;
       },
       async serve(key, request) {
         const object = MEDIA_KEY.test(key) ? await store.media.head(key) : null;

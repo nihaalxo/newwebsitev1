@@ -115,6 +115,15 @@ export interface CaseViewProps {
   closeHref?: string;
 }
 
+/** "example.com" from "https://www.example.com/x". A draft's link may not be an address yet (the admin's preview). */
+function linkHost(link: string): string {
+  try {
+    return new URL(link).host.replace(/^www\./, '');
+  } catch {
+    return link;
+  }
+}
+
 export default function CaseView({
   project: p,
   fiveLine,
@@ -210,7 +219,7 @@ export default function CaseView({
               <dt>{labels.specLink}</dt>
               <dd>
                 <a className="ext" href={p.link} target="_blank" rel="noopener">
-                  {new URL(p.link).host.replace(/^www\./, '')}
+                  {linkHost(p.link)}
                   <svg className="icon" aria-hidden="true">
                     <use href="#ext" />
                   </svg>

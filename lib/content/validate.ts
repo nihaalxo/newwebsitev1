@@ -103,8 +103,10 @@ export function redirectProblems(redirects: Redirects, slugs: Set<string>): stri
     const match = /^\/work\/([a-z0-9-]+)$/.exec(from);
     if (!match) problems.push(`${from}: only /work/<slug> addresses can be redirected`);
     else if (slugs.has(match[1])) problems.push(`${from}: is a live project, so it can't also redirect`);
-    if (typeof rule?.to !== 'string' || !rule.to.startsWith('/') || rule.to.startsWith('//')) problems.push(`${from}: "to" must be a path on this site`);
+    // A path on this site: no "//", backslash or space, which a browser could read as another host.
+    if (typeof rule?.to !== 'string' || !isSitePath(rule.to)) problems.push(`${from}: "to" must be a path on this site`);
     if (rule?.status !== 301 && rule?.status !== 302) problems.push(`${from}: status must be 301 or 302`);
+    if (rule?.id !== undefined && (typeof rule.id !== 'string' || !/^[0-9a-f-]{36}$/.test(rule.id))) problems.push(`${from}: id must be a project id`);
   }
   return problems;
 }

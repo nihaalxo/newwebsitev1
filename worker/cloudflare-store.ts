@@ -149,6 +149,10 @@ export function cloudflareStore(env: WorkerEnv): Store {
       async put(key, value) {
         await env.ADMIN.put(key, JSON.stringify(value), { httpMetadata: { contentType: 'application/json' } });
       },
+      getStored: <T>(key: string) => getJson<T>(env.ADMIN, key),
+      async putIf(key, value, ifMatch) {
+        return (await putJson(env.ADMIN, key, value, ifMatch)) !== null;
+      },
     },
 
     media: {
@@ -157,9 +161,10 @@ export function cloudflareStore(env: WorkerEnv): Store {
           httpMetadata: { contentType, cacheControl: 'public, max-age=31536000, immutable' },
         });
       },
-      async startMultipart(key, contentType) {
+      async startMultipart(key, contentType, size) {
         const upload = await env.MEDIA.createMultipartUpload(key, {
           httpMetadata: { contentType, cacheControl: 'public, max-age=31536000, immutable' },
+          customMetadata: { declaredSize: String(size) },
         });
         return upload.uploadId;
       },
@@ -168,7 +173,9 @@ export function cloudflareStore(env: WorkerEnv): Store {
         return { partNumber: part.partNumber, etag: part.etag };
       },
       async finishMultipart(key, uploadId, parts) {
-        await env.MEDIA.resumeMultipartUpload(key, uploadId).complete(parts);
+        const object = await env.MEDIA.resumeMultipartUpload(key, uploadId).complete(parts);
+        const declared = Number(object.customMetadata?.declaredSize);
+        return { size: object.size, declaredSize: Number.isFinite(declared) && declared > 0 ? declared : null };
       },
       async abortMultipart(key, uploadId) {
         await env.MEDIA.resumeMultipartUpload(key, uploadId).abort().catch(() => {});
@@ -176,6 +183,26 @@ export function cloudflareStore(env: WorkerEnv): Store {
       async head(key) {
         const object = await env.MEDIA.head(key);
         return object ? { key, size: object.size, uploaded: object.uploaded } : null;
+      },
+      async find(keys) {
+        const wanted = new Set(keys.filter((key) => MEDIA_KEY.test(key)));
+        const found = new Map<string, MediaObject>();
+        // p/<project id>/: a project's uploads share a folder, so one listing answers for all of them.
+        const folders = new Set([...wanted].map((key) => key.slice(0, key.indexOf('/', 2) + 1)));
+        const listed = await Promise.all([...folders].map(async (folder) => ({ folder, ...(await listAll(env.MEDIA, folder, 5)) })));
+        for (const { objects } of listed) {
+          for (const o of objects) if (wanted.has(o.key)) found.set(o.key, { key: o.key, size: o.size, uploaded: o.uploaded });
+        }
+        // A folder too big to list in full: look the rest up one by one.
+        for (const { folder, truncated } of listed) {
+          if (!truncated) continue;
+          for (const key of wanted) {
+            if (!key.startsWith(folder) || found.has(key)) continue;
+            const object = await env.MEDIA.head(key);
+            if (object) found.set(key, { key, size: object.size, uploaded: object.uploaded });
+          }
+        }
+        return found;
       },
       serve: (key, request) => serveUpload(env.MEDIA as unknown as R2Readable, key, request),
       async list(maxPages) {

@@ -1,4 +1,4 @@
-import type { Draft } from '@/lib/cms/types';
+import type { Draft, HomeDraft } from '@/lib/cms/types';
 import { projectMediaUrls } from '@/lib/cms/media-refs';
 import { gitBlobSha } from '@/lib/content/blob-sha';
 import { HOME_PATH, serializeProject } from '@/lib/content/serialize';
@@ -14,7 +14,6 @@ import { RepoMoved, type DeployedIndex, type DraftSummary, type RepoHead, type S
 
 export const LATEST_KEY = 'publish/latest.json';
 export const BUILD_TIMEOUT_MS = 15 * 60 * 1000;
-const MEDIA_CHECK_LIMIT = 300;
 
 export interface LatestPublish {
   kind: 'publish' | 'undo';
@@ -107,22 +106,21 @@ export async function publish(store: Store, request: { items: { id: string; etag
   if (request.home && homeStored?.etag !== request.home) conflicts.push({ id: 'home', reason: 'Changed since you clicked Publish' });
   if (conflicts.length) return { status: 409, body: { conflicts } };
 
-  // ---- every upload a published project points at must be in the bucket
+  // ---- every upload a published project points at must be in the bucket (one listing per project folder)
   const errors: Record<string, Record<string, string>> = {};
-  let checked = 0;
+  const uses: { id: string; field: string; mediaKey: string }[] = [];
   for (const { draft } of drafts) {
     if (draft.action !== 'publish') continue;
     for (const { key, media } of mediaList(draft.project)) {
       for (const url of [media.src, media.srcSmall, media.poster, media.srcTall]) {
         const mediaKey = url ? store.media.keyOf(url) : null;
-        if (!mediaKey || checked >= MEDIA_CHECK_LIMIT) continue;
-        checked++;
-        if (!(await store.media.head(mediaKey))) {
-          const field = key.replace(/\.items\.\d+$/, '.items');
-          errors[draft.project.id] = { ...errors[draft.project.id], [field]: "This file didn't finish uploading: upload it again" };
-        }
+        if (mediaKey) uses.push({ id: draft.project.id, field: key.replace(/\.items\.\d+$/, '.items'), mediaKey });
       }
     }
+  }
+  const stored = uses.length ? await store.media.find(uses.map((u) => u.mediaKey)) : new Map();
+  for (const { id, field, mediaKey } of uses) {
+    if (!stored.has(mediaKey)) errors[id] = { ...errors[id], [field]: "This file didn't finish uploading: upload it again" };
   }
   if (Object.keys(errors).length) return { status: 422, body: { errors } };
 
@@ -142,9 +140,10 @@ export async function publish(store: Store, request: { items: { id: string; etag
     if (Object.keys(plan.errors).length) return { status: 422, body: { errors: plan.errors } };
 
     if (plan.writes.length === 0 && plan.deletes.length === 0) {
-      // Nothing differs from the site: the drafts are done with.
+      // Nothing differs from the site: the drafts are done with. A home draft still holding a highlight for a project
+      // that isn't on the site yet stays, so the highlight waits for that project as it does after a build.
       for (const { draft } of drafts) await store.drafts.delete(draft.project.id);
-      if (homeStored) await store.homeDraft.delete();
+      if (homeStored && !(await holdsWaitingHighlight(store, index, homeStored.value))) await store.homeDraft.delete();
       return { status: 200, body: { commit: null } };
     }
 
@@ -163,22 +162,58 @@ export async function publish(store: Store, request: { items: { id: string; etag
     const items: LatestPublish['items'] = [];
     for (const item of plan.items) {
       const published = drafts.find((d) => d.draft.project.id === item.id);
-      let unchangedSince = true;
-      const etag = await updateDraft(store, item.id, (draft) => {
-        unchangedSince = JSON.stringify(draft.project) === JSON.stringify(published?.draft.project) && draft.action === published?.draft.action;
-        return {
-          ...draft,
-          state: 'publishing',
-          commit,
-          base: item.path && item.blobSha ? { path: item.path, blobSha: item.blobSha } : null,
-        };
+      const mark = (draft: Draft): Draft => ({
+        ...draft,
+        state: 'publishing',
+        commit,
+        base: item.path && item.blobSha ? { path: item.path, blobSha: item.blobSha } : null,
       });
+      // Usually the draft is still exactly what was published: one conditional write, no read.
+      let etag = published ? await store.drafts.put(item.id, mark(published.draft), published.etag) : null;
+      let unchangedSince = etag !== null;
+      if (etag === null) {
+        unchangedSince = true;
+        etag = await updateDraft(store, item.id, (draft) => {
+          unchangedSince = JSON.stringify(draft.project) === JSON.stringify(published?.draft.project) && draft.action === published?.draft.action;
+          return mark(draft);
+        });
+      }
       items.push({ ...item, etag: unchangedSince ? etag : null });
     }
     const record: LatestPublish = { kind: 'publish', commit, at: now.toISOString(), items, changes: plan.changes, home: homeStored ? { etag: homeStored.etag } : null };
-    await store.meta.put(LATEST_KEY, record);
+    // A publish made while the one before is still building goes live with it (its commit holds both): follow both.
+    const building = latest && latest.kind === 'publish' && !latest.liveAt ? latest : null;
+    await store.meta.put(LATEST_KEY, building ? mergePublishes(building, record) : record);
     return { status: 200, body: { commit } };
   }
+}
+
+/**
+ * One record for a publish and the one still building before it: every project of both (the newer item wins, keeping
+ * where the project was before either), each path from its state before the first to its state after the second,
+ * and the newer commit, whose build holds both.
+ */
+export function mergePublishes(earlier: LatestPublish, later: LatestPublish): LatestPublish {
+  const items = [
+    ...earlier.items.filter((e) => !later.items.some((l) => l.id === e.id)),
+    ...later.items.map((l) => {
+      const e = earlier.items.find((i) => i.id === l.id);
+      return e ? { ...l, prevPath: e.prevPath, prevBlobSha: e.prevBlobSha } : l;
+    }),
+  ];
+  const changes = new Map(earlier.changes.map((c) => [c.path, { ...c }]));
+  for (const c of later.changes) {
+    const e = changes.get(c.path);
+    changes.set(c.path, e ? { path: c.path, before: e.before, after: c.after } : { ...c });
+  }
+  return { ...later, items, changes: [...changes.values()], home: later.home ?? earlier.home };
+}
+
+/** Whether the home draft highlights a project that isn't on the site but has a draft: that highlight waits for it. */
+async function holdsWaitingHighlight(store: Store, index: DeployedIndex, home: HomeDraft): Promise<boolean> {
+  const liveIds = new Set(Object.values(index.files).map((file) => file.id));
+  for (const id of home.highlights) if (!liveIds.has(id) && (await store.drafts.get(id))) return true;
+  return false;
 }
 
 // ---------------------------------------------------------------- following a publish
@@ -218,7 +253,10 @@ export async function settle(store: Store, index: DeployedIndex, latest: LatestP
     }
     if (latest.home) {
       const home = await store.homeDraft.get();
-      if (home?.etag === latest.home.etag) await store.homeDraft.delete();
+      // A highlight for a project that isn't on the site yet waits in the home draft until that project is published.
+      const liveIds = new Set(Object.values(index.files).map((file) => file.id));
+      const waiting = home?.value.highlights.some((id) => !liveIds.has(id) && summaries.some((s) => s.id === id));
+      if (home?.etag === latest.home.etag && !waiting) await store.homeDraft.delete();
       else if (home) {
         const blobSha = index.files[HOME_PATH]?.blobSha;
         if (blobSha) await store.homeDraft.put({ ...home.value, base: { blobSha } }, home.etag);
@@ -234,7 +272,8 @@ export async function settle(store: Store, index: DeployedIndex, latest: LatestP
     let changed = false;
     for (const item of latest.items) {
       const summary = summaries.find((s) => s.id === item.id);
-      if (summary?.state === 'publishing' && summary.commit === latest.commit) {
+      // Every project in the record goes up with this build, including those of a publish it took over.
+      if (summary?.state === 'publishing') {
         await updateDraft(store, item.id, (draft) => ({ ...draft, state: 'failed' }));
         changed = true;
       }
@@ -253,7 +292,9 @@ export async function rebuild(store: Store, now: Date): Promise<{ commit: string
   const latest = await store.meta.get<LatestPublish>(LATEST_KEY);
   if (latest && !latest.liveAt) {
     await store.meta.put(LATEST_KEY, { ...latest, commit, at: now.toISOString() });
-    for (const item of latest.items) await updateDraft(store, item.id, (draft) => (draft.commit === latest.commit ? { ...draft, state: 'publishing', commit } : draft));
+    for (const item of latest.items) {
+      await updateDraft(store, item.id, (draft) => (draft.state === 'publishing' || draft.state === 'failed' ? { ...draft, state: 'publishing', commit } : draft));
+    }
   }
   return { commit };
 }

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { api, mediaKeyOf } from '@/lib/admin-api/client';
 import { projectMediaUrls } from '@/lib/cms/media-refs';
+import { STORAGE_WARN_BYTES, TIDY_BATCH } from '@/lib/cms/defaults';
 import { MAX_HIGHLIGHTS, type Project } from '@/lib/cms/types';
 import { useAdmin } from './AdminShell';
 import { SwitchField } from './fields';
@@ -14,11 +15,10 @@ import StatusBadge, { statusOf } from './StatusBadge';
 /*
  * The project list: the order and highlights of the site, each project's state, the drafts not on the site, and the
  * storage used. Order and highlight changes are a draft of the home page (PUT /api/admin/home), published like any
- * other change.
+ * other change. A project not on the site yet can be highlighted too: the highlight goes up when it is published.
  */
 
 const GB = 1e9;
-const WARN_STORAGE = 7 * GB;
 const TIDY_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 interface Row {
@@ -64,9 +64,25 @@ export default function ProjectsScreen() {
     const kept = ids.filter((id) => live.has(id));
     return [...kept, ...fallback.filter((id) => !kept.includes(id))];
   };
+  // A highlight may wait for a project that isn't on the site yet.
+  const highlightsFrom = () => (state.homeDraft ? state.homeDraft.highlights.filter((id) => live.has(id) || drafts.has(id)) : liveHighlights);
   const [order, setOrder] = useState(() => fromDraft(state.homeDraft?.order, liveOrder));
-  const [highlights, setHighlights] = useState(() => (state.homeDraft ? state.homeDraft.highlights.filter((id) => live.has(id)) : liveHighlights));
+  const [highlights, setHighlights] = useState(highlightsFrom);
   const etag = useRef<string | null>(state.homeDraft?.etag ?? null);
+  // Saves still on their way: the layout on screen is newer than the one the server has.
+  const [saving, setSaving] = useState(0);
+  // A new build went live while this page was open: start again from what it holds, once every save is in.
+  const [shown, setShown] = useState(published);
+  if (shown !== published && saving === 0) {
+    setShown(published);
+    setOrder(fromDraft(state.homeDraft?.order, liveOrder));
+    setHighlights(highlightsFrom());
+  }
+  useEffect(() => {
+    etag.current = state.homeDraft?.etag ?? null;
+    // Only when the build changes: between builds this page keeps its own etag, which its saves move on.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown]);
   const queue = useRef<Promise<void>>(Promise.resolve());
   const [problem, setProblem] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState('');
@@ -95,18 +111,25 @@ export default function ProjectsScreen() {
     setOrder(nextOrder);
     setHighlights(nextHighlights);
     setProblem(null);
+    setSaving((n) => n + 1);
     queue.current = queue.current.then(async () => {
-      const matchesSite = sameList(nextOrder, liveOrder) && sameList(nextHighlights, liveHighlights);
-      if (matchesSite) {
-        const result = await api.deleteHome();
-        if (result.ok) etag.current = null;
-        else setProblem(`Couldn't save the new order. ${result.error}`);
-      } else {
-        const result = await api.saveHome(nextHighlights, nextOrder, etag.current);
-        if (result.ok) etag.current = result.etag;
-        else setProblem(result.status === 409 ? 'The order was changed in another tab. Reload the list.' : `Couldn't save the new order. ${result.error}`);
+      try {
+        const matchesSite = sameList(nextOrder, liveOrder) && sameList(nextHighlights, liveHighlights);
+        if (matchesSite) {
+          const result = await api.deleteHome();
+          if (result.ok) etag.current = null;
+          else setProblem(`Couldn't save the new order. ${result.error}`);
+        } else {
+          // A highlighted project not on the site yet joins the end of the order, where publishing puts it.
+          const waiting = nextHighlights.filter((id) => !nextOrder.includes(id));
+          const result = await api.saveHome(nextHighlights, [...nextOrder, ...waiting], etag.current);
+          if (result.ok) etag.current = result.etag;
+          else setProblem(result.status === 409 ? 'The order was changed in another tab. Reload the list.' : `Couldn't save the new order. ${result.error}`);
+        }
+        await refresh();
+      } finally {
+        setSaving((n) => n - 1);
       }
-      await refresh();
     });
   }
 
@@ -148,6 +171,20 @@ export default function ProjectsScreen() {
 
   const offSite = state.drafts.filter((d) => !live.has(d.id));
   const layoutChanged = Boolean(state.homeDraft);
+  const highlightSwitch = (id: string, name: string) => (
+    <div className="adm-row-feature">
+      <SwitchField
+        id={`featured-${id}`}
+        label={
+          <>
+            Highlight<span className="adm-vh">: {name}</span>
+          </>
+        }
+        checked={highlights.includes(id)}
+        onChange={(on) => toggleHighlight(id, on)}
+      />
+    </div>
+  );
 
   return (
     <>
@@ -195,7 +232,8 @@ export default function ProjectsScreen() {
                       {index + 1}. {name}
                     </h3>
                     <p className="adm-row-meta">
-                      <span>{row.meta}</span>
+                      {!live.has(id) && <StatusBadge status={row.status} />}
+                      <span>{live.has(id) ? row.meta : 'Highlighted once it is published'}</span>
                     </p>
                   </div>
                   <div className="adm-row-move" role="group" aria-label={`Highlight position of ${name}`}>
@@ -246,18 +284,7 @@ export default function ProjectsScreen() {
                     <span>{row.meta}</span>
                   </p>
                 </div>
-                <div className="adm-row-feature">
-                  <SwitchField
-                    id={`featured-${id}`}
-                    label={
-                      <>
-                        Highlight<span className="adm-vh">: {name}</span>
-                      </>
-                    }
-                    checked={highlights.includes(id)}
-                    onChange={(on) => toggleHighlight(id, on)}
-                  />
-                </div>
+                {highlightSwitch(id, name)}
                 <div className="adm-row-move" role="group" aria-label={`Position of ${name}`}>
                   <button id={`order-${id}-top`} type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={() => move('order', index, 0)} disabled={index === 0}>
                     Move to top<span className="adm-vh">: {name}</span>
@@ -286,7 +313,10 @@ export default function ProjectsScreen() {
           <h2 className="adm-h2" id="off-site-title">
             Not on the site
           </h2>
-          <p className="adm-section-intro">New projects not published yet, and projects taken off the site. Only you can see them.</p>
+          <p className="adm-section-intro">
+            New projects not published yet, and projects taken off the site. Only you can see them. Highlight one to put
+            it on the home page when it is published.
+          </p>
           <ol className="adm-rows">
             {offSite.map((draft) => {
               const row = rowOf(draft.id);
@@ -301,6 +331,7 @@ export default function ProjectsScreen() {
                       <span>{row.meta}</span>
                     </p>
                   </div>
+                  {draft.action === 'publish' && highlightSwitch(draft.id, name)}
                   <a className="adm-btn adm-btn-small adm-row-edit" href={editPath(draft.id)}>
                     Edit<span className="adm-vh"> {name}</span>
                   </a>
@@ -320,7 +351,7 @@ export default function ProjectsScreen() {
   );
 }
 
-type StorageInfo = { bytes: number; truncated: boolean; media: { key: string; size: number; uploaded: string }[] };
+type StorageInfo = { bytes: number; cap: number; truncated: boolean; media: { key: string; size: number; uploaded: string }[] };
 
 /** The storage line, and tidying uploads nothing uses any more. */
 function Storage() {
@@ -364,10 +395,18 @@ function Storage() {
   async function tidy() {
     if (!unused?.length || busy) return;
     setBusy(true);
-    const result = await api.tidy(unused.map((m) => m.key));
+    // In batches, so each request stays small enough for the Free plan.
+    let deleted = 0;
+    let failed: string | null = null;
+    for (let i = 0; i < unused.length && !failed; i += TIDY_BATCH) {
+      const result = await api.tidy(unused.slice(i, i + TIDY_BATCH).map((m) => m.key));
+      if (result.ok) deleted += result.deleted.length;
+      else failed = result.error;
+    }
     setBusy(false);
     setUnused(null);
-    setNote(result.ok ? `Deleted ${result.deleted.length} unused ${result.deleted.length === 1 ? 'file' : 'files'}.` : result.error);
+    const done = `Deleted ${deleted} unused ${deleted === 1 ? 'file' : 'files'}.`;
+    setNote(failed ? `${deleted ? `${done} ` : ''}${failed}` : done);
     await load();
   }
 
@@ -378,13 +417,14 @@ function Storage() {
         Storage
       </h2>
       <p>
-        Uploads use {size(info.bytes)} of the 10 GB free storage (the Lair&apos;s files count too).
+        Uploads use {size(info.bytes)} of the {size(info.cap)} the admin allows. Cloudflare&apos;s 10 GB of free storage is
+        shared with the Lair&apos;s files, which are not counted here.
         {info.truncated ? ' (Counted from the first part of a long list.)' : ''}
       </p>
-      {info.bytes > WARN_STORAGE && (
+      {info.bytes > STORAGE_WARN_BYTES && (
         <p className="adm-alert">
-          That is over 7 GB. Past 10 GB, Cloudflare charges for storage. Tidy unused files, or replace big films with smaller
-          exports.
+          Nearly full: uploads stop at {size(info.cap)}, so the account stays inside the free storage. Tidy unused files, or
+          replace big films with smaller exports.
         </p>
       )}
       {unused === null ? (

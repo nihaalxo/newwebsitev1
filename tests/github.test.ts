@@ -132,3 +132,78 @@ test('without a build report for 15 minutes, the publish is late', async () => {
   const result = await settle(store, fixture.index, latest, await store.drafts.list(), new Date(NOW.getTime() + 16 * 60_000));
   assert.equal(result.build?.state, 'late');
 });
+
+test('a ref update whose answer is lost still counts once the branch shows it', async () => {
+  const fake = createFakeGitHub(seedFrom(ROOT));
+  let drop = true;
+  const lossy = (async (input: string, init: RequestInit = {}) => {
+    const response = await fake.fetch(input, init);
+    if (init.method === 'PATCH' && drop) {
+      drop = false;
+      throw new TypeError('The connection was lost.');
+    }
+    return response;
+  }) as typeof fetch;
+  const repo = githubRepo({ token: 'test-token', repo: 'owner/site', branch: 'main', api: 'https://api.example', fetch: lossy });
+  const store = memoryStore({ repo });
+  const fixture = contentFixture();
+  const chaii = fixture.content.projects.find((p) => p.slug === 'my-chaii-london') as Project;
+  const path = 'content/projects/my-chaii-london.json';
+  const etag = await saveDraft(store, { ...chaii, summary: 'The answer got lost.' }, path, fixture.head.files[path]);
+  const outcome = await publish(store, { items: [{ id: chaii.id, etag }], home: null }, NOW);
+  assert.equal(outcome.status, 200);
+  assert.equal((await store.meta.get<LatestPublish>(LATEST_KEY))?.commit, fake.head);
+  assert.equal((await store.drafts.get(chaii.id))?.value.state, 'publishing');
+});
+
+test('a ref update that GitHub refused with an error says nothing was published; one that cannot be checked says so', async () => {
+  const { fake, repo } = setup();
+  const head = await repo.readHead();
+  fake.failNext('PATCH', 503);
+  await assert.rejects(repo.commit(head, { writes: [{ path: 'content/home.json', content: '{}\n' }], deletes: [], message: 'x' }), /Nothing was published/);
+  fake.failNext('PATCH', 503);
+  fake.failNext('GET', 503, 1, 'ref/');
+  await assert.rejects(repo.commit(head, { writes: [{ path: 'content/home.json', content: '{}\n' }], deletes: [], message: 'x' }), /isn't clear whether this was published/);
+});
+
+test('a publish made while the one before is still building is followed with it, and both settle when live', async () => {
+  const { fake, store, chaii, path, fixture } = setup();
+  const football = fixture.content.projects.find((p) => p.slug === 'football-on-the-vision-pro') as Project;
+  const footballPath = 'content/projects/football-on-the-vision-pro.json';
+  const first = await saveDraft(store, { ...chaii, summary: 'First.' }, path, fixture.head.files[path]);
+  await publish(store, { items: [{ id: chaii.id, etag: first }], home: null }, NOW);
+  const second = await saveDraft(store, { ...football, summary: 'Second.' }, footballPath, fixture.head.files[footballPath]);
+  await publish(store, { items: [{ id: football.id, etag: second }], home: null }, new Date(NOW.getTime() + 30_000));
+
+  const latest = (await store.meta.get<LatestPublish>(LATEST_KEY)) as LatestPublish;
+  assert.equal(latest.commit, fake.head);
+  assert.deepEqual(latest.items.map((i) => i.id).sort(), [chaii.id, football.id].sort());
+
+  const flat = fake.flatten();
+  const files = { ...fixture.index.files, [path]: { id: chaii.id, blobSha: flat[path] }, [footballPath]: { id: football.id, blobSha: flat[footballPath] } };
+  const live = await settle(store, { ...fixture.index, files }, latest, await store.drafts.list(), new Date(NOW.getTime() + 300_000));
+  assert.equal(live.build?.state, 'live');
+  assert.equal(await store.drafts.get(chaii.id), null);
+  assert.equal(await store.drafts.get(football.id), null);
+});
+
+test('a highlight waiting for a new project survives publishing the home page without that project', async () => {
+  const { fake, store, chaii, fixture } = setup();
+  const fresh = { ...chaii, id: '44444444-4444-4444-8444-444444444444', slug: 'waiting-one', title: 'Waiting one' };
+  await store.drafts.put(fresh.id, draftOf(fresh, null), null);
+  const idOf = (slug: string) => (fixture.content.projects.find((p) => p.slug === slug) as Project).id;
+  const homeEtag = await store.homeDraft.put(
+    {
+      highlights: [...fixture.content.home.highlights.map(idOf), fresh.id],
+      order: [...fixture.content.home.order.map(idOf), fresh.id],
+      base: { blobSha: fixture.index.files['content/home.json'].blobSha },
+      savedAt: NOW.toISOString(),
+    },
+    null,
+  );
+  const before = fake.head;
+  const outcome = await publish(store, { items: [], home: homeEtag }, NOW);
+  assert.deepEqual(outcome, { status: 200, body: { commit: null } });
+  assert.equal(fake.head, before);
+  assert.deepEqual((await store.homeDraft.get())?.value.highlights.at(-1), fresh.id);
+});

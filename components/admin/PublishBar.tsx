@@ -19,7 +19,10 @@ export interface Change {
   id: string;
   label: string;
   etag: string;
-  /** Live projects' changes are ticked to start with; new projects are published from their editor or ticked here. */
+  /**
+   * Live projects' changes are ticked to start with, and new projects highlighted on the home page; other new projects
+   * are published from their editor or ticked here.
+   */
   ticked: boolean;
   stale: boolean;
 }
@@ -41,7 +44,9 @@ export function pendingChanges(state: AdminState, published: Published): Change[
           : live.get(draft.id)?.slug !== draft.slug && draft.slug
             ? `${title} (edited, new web address)`
             : `${title} (edited)`;
-    changes.push({ id: draft.id, label, etag: draft.etag, ticked: onSite && !draft.stale, stale: draft.stale });
+    // A new project highlighted on the home page goes up with it unless unticked.
+    const highlighted = !onSite && draft.action === 'publish' && Boolean(state.homeDraft?.highlights.includes(draft.id));
+    changes.push({ id: draft.id, label, etag: draft.etag, ticked: (onSite || highlighted) && !draft.stale, stale: draft.stale });
   }
   return changes;
 }
@@ -238,7 +243,8 @@ function PublishDialog({
             <ul>
               {failure.conflicts.map((c) => (
                 <li key={c.id}>
-                  {c.id === 'home' ? 'Home page' : (titles.get(c.id) ?? 'A project')}: {c.reason}
+                  {c.id === 'site' ? '' : `${c.id === 'home' ? 'Home page' : (titles.get(c.id) ?? 'A project')}: `}
+                  {c.reason}
                 </li>
               ))}
             </ul>

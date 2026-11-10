@@ -85,7 +85,8 @@ const ifMatch = (etag: string | null): Record<string, string> => (etag ? { 'if-m
 export const api = {
   session: () => call<{ signedIn: boolean }>('GET', 'session'),
   signIn: (password: string) => call<object>('POST', 'session', { password }),
-  signOut: (everywhere = false) => call<object>('DELETE', `session${everywhere ? '?everywhere=1' : ''}`),
+  /** Ends every session, on every device. */
+  signOut: () => call<object>('DELETE', 'session'),
 
   state: () => call<AdminState>('GET', 'state'),
   draft: (id: string) => call<{ draft: Draft; etag: string }>('GET', `drafts/${id}`),
@@ -100,7 +101,7 @@ export const api = {
   rebuild: () => call<{ commit: string }>('POST', 'rebuild', {}),
   undo: () => call<{ commit: string }>('POST', 'undo', {}),
 
-  storage: () => call<{ bytes: number; objects: number; truncated: boolean; media: { key: string; size: number; uploaded: string }[] }>('GET', 'storage'),
+  storage: () => call<{ bytes: number; cap: number; truncated: boolean; media: { key: string; size: number; uploaded: string }[] }>('GET', 'storage'),
   tidy: (keys: string[]) => call<{ deleted: string[] }>('POST', 'tidy', { keys }),
 };
 

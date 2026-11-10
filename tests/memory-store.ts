@@ -44,6 +44,7 @@ export function memoryStore(options: { repo?: Repo; index?: DeployedIndex; proje
   const drafts = new Map<string, { value: Draft; etag: string }>();
   let home: { value: HomeDraft; etag: string } | null = null;
   const meta = new Map<string, unknown>();
+  const metaEtags = new Map<string, string>();
   const media = new Map<string, MediaObject>();
   let counter = 0;
   const etag = () => `e${++counter}`;
@@ -108,6 +109,16 @@ export function memoryStore(options: { repo?: Repo; index?: DeployedIndex; proje
       },
       async put(key, value) {
         meta.set(key, structuredClone(value));
+        metaEtags.set(key, etag());
+      },
+      async getStored<T>(key: string) {
+        return meta.has(key) ? { value: structuredClone(meta.get(key)) as T, etag: metaEtags.get(key) as string } : null;
+      },
+      async putIf(key, value, ifMatch) {
+        if (ifMatch === null ? meta.has(key) : metaEtags.get(key) !== ifMatch) return false;
+        meta.set(key, structuredClone(value));
+        metaEtags.set(key, etag());
+        return true;
       },
     },
     media: {
@@ -121,10 +132,15 @@ export function memoryStore(options: { repo?: Repo; index?: DeployedIndex; proje
       async uploadPart(_key, _id, partNumber) {
         return { partNumber, etag: `p${partNumber}` };
       },
-      async finishMultipart() {},
+      async finishMultipart() {
+        return { size: 0, declaredSize: null };
+      },
       async abortMultipart() {},
       async head(key) {
         return media.get(key) ?? null;
+      },
+      async find(keys) {
+        return new Map(keys.filter((key) => media.has(key)).map((key) => [key, media.get(key) as MediaObject]));
       },
       async serve() {
         return new Response(null, { status: 404 });

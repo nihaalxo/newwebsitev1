@@ -67,6 +67,19 @@ export const VIDEO_WARN_BYTES = 200 * 1000 * 1000;
 export const SINGLE_PUT_MAX = 95 * 1000 * 1000;
 /** Bigger files go up in parts of this size (R2 takes parts of 5 MiB to 5 GiB). */
 export const PART_SIZE = 50 * MiB;
+/** The most parts one film can have. */
+export const MAX_PARTS = Math.ceil(MAX_VIDEO_BYTES / PART_SIZE);
+
+/**
+ * The most the uploads (and the admin's own bucket) may hold. R2 is free up to 10 GB a month across the account, and
+ * the Lair's bucket (assets.nihaalnazeer.com) counts too, so the admin stops taking uploads at 8 GB: past 10 GB R2
+ * bills instead of refusing. Lower it if the Lair's bucket grows past 2 GB (GO-LIVE.md).
+ */
+export const STORAGE_CAP_BYTES = 8 * 1000 * 1000 * 1000;
+/** The project list warns from here. */
+export const STORAGE_WARN_BYTES = 7 * 1000 * 1000 * 1000;
+/** Tidy unused files sends this many at a time. */
+export const TIDY_BATCH = 250;
 
 /**
  * An upload's key in the media bucket: p/<project id>/<field>-<YYYYMMDDHHmmss>-<6 base36>.<ext>. Keys are only ever

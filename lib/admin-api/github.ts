@@ -22,6 +22,10 @@ export interface GitHubConfig {
 
 const TOKEN_REFUSED = 'The GitHub token was refused: make a new one (GO-LIVE.md)';
 const NO_ANSWER = "GitHub didn't answer. Nothing was published. Try again in a few minutes";
+const MAYBE = "GitHub didn't answer, so it isn't clear whether this was published. Publish again in a few minutes: if it went through, nothing is published twice";
+
+/** A failure with no clear answer from GitHub (no response, a timeout, or GitHub's own error). */
+const unanswered = (error: unknown) => error instanceof RepoError && (error.status >= 500 || error.status === 429);
 
 type GitTreeEntry = { path: string; mode: string; type: string; sha: string };
 
@@ -75,7 +79,15 @@ export function githubRepo(config: GitHubConfig): Repo {
 
   async function newCommit(parent: string, tree: string, message: string): Promise<string> {
     const commit = await call<{ sha: string }>('POST', 'git/commits', { message, tree, parents: [parent] });
-    await call('PATCH', refsPath, { sha: commit.sha, force: false });
+    try {
+      await call('PATCH', refsPath, { sha: commit.sha, force: false });
+    } catch (error) {
+      if (!unanswered(error)) throw error;
+      // The branch may have moved even though the answer never came: look before saying anything.
+      const ref = await call<{ object: { sha: string } }>('GET', refPath).catch(() => null);
+      if (ref?.object.sha === commit.sha) return commit.sha;
+      throw ref ? error : new RepoError(MAYBE, (error as RepoError).status);
+    }
     return commit.sha;
   }
 

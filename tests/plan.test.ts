@@ -69,7 +69,7 @@ test('taking a project off the site removes its file and sends its address to Al
   const result = await plan([draftOf(chaii, base, 'unpublish')]);
   assert.deepEqual(result.deletes, [path]);
   const rules = redirects(result.writes.find((w) => w.path === 'content/redirects.json')?.content);
-  assert.deepEqual(rules['/work/my-chaii-london'], { to: '/work', status: 302 });
+  assert.deepEqual(rules['/work/my-chaii-london'], { to: '/work', status: 302, id: chaii.id });
   const layout = home(result.writes.find((w) => w.path === 'content/home.json')?.content);
   assert.ok(!layout.order.includes('my-chaii-london') && !layout.highlights.includes('my-chaii-london'));
   assert.equal(result.message, `Publish: ${chaii.title} (taken off the site)`);
@@ -148,4 +148,35 @@ test('a web address another project uses is refused', async () => {
   const { chaii, base, plan } = setup();
   const result = await plan([draftOf({ ...chaii, slug: 'football-on-the-vision-pro' }, base)]);
   assert.ok(result.errors[chaii.id]?.slug);
+});
+
+/** HEAD after a plan's commit. */
+function applied(head: ReturnType<typeof setup>['fixture']['head'], result: Awaited<ReturnType<ReturnType<typeof setup>['plan']>>) {
+  const files = { ...head.files };
+  for (const change of result.changes) {
+    if (change.after) files[change.path] = change.after;
+    else delete files[change.path];
+  }
+  const text = (path: string) => result.writes.find((w) => w.path === path)?.content;
+  return { ...head, files, homeJson: text('content/home.json') ?? head.homeJson, redirectsJson: text('content/redirects.json') ?? head.redirectsJson };
+}
+
+test('renamed, taken off, then published again: the old addresses lead to the project again', async () => {
+  const { chaii, base, plan, fixture } = setup();
+  const renamed = await plan([draftOf({ ...chaii, slug: 'my-chaii' }, base)]);
+  const head1 = applied(fixture.head, renamed);
+  const newPath = 'content/projects/my-chaii.json';
+
+  const off = await plan([draftOf({ ...chaii, slug: 'my-chaii' }, { path: newPath, blobSha: head1.files[newPath] }, 'unpublish')], null, head1);
+  const head2 = applied(head1, off);
+  // While it is off the site: both addresses go to All projects with a 302, which browsers don't keep.
+  assert.deepEqual(redirects(head2.redirectsJson), {
+    '/work/my-chaii': { to: '/work', status: 302, id: chaii.id },
+    '/work/my-chaii-london': { to: '/work', status: 302, id: chaii.id },
+  });
+
+  const back = await plan([{ ...draftOf({ ...chaii, slug: 'my-chaii' }, null), state: 'hidden' as const }], null, head2);
+  assert.deepEqual(back.conflicts, []);
+  const head3 = applied(head2, back);
+  assert.deepEqual(redirects(head3.redirectsJson), { '/work/my-chaii-london': { to: '/work/my-chaii', status: 301 } });
 });

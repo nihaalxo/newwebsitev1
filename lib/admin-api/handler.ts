@@ -1,5 +1,5 @@
 import { MAX_HIGHLIGHTS, type Draft, type HomeDraft } from '@/lib/cms/types';
-import { MAX_VIDEO_BYTES, MEDIA_KEY, PART_SIZE, isAllowedUploadType, mimeOf } from '@/lib/cms/defaults';
+import { MAX_PARTS, MAX_VIDEO_BYTES, MEDIA_KEY, PART_SIZE, STORAGE_CAP_BYTES, TIDY_BATCH, isAllowedUploadType, mimeOf } from '@/lib/cms/defaults';
 import { HOME_PATH } from '@/lib/content/serialize';
 import { endSessionCookie, isSignedIn, rotateSessionKey, signIn } from './auth';
 import { LATEST_KEY, baseFor, isStale, publish, rebuild, settle, undo, uploadKeys, type LatestPublish } from './publish';
@@ -65,20 +65,23 @@ function isUploadRoute(method: string, route: string): boolean {
 
 /**
  * Whether a write comes from a page on this site: its Origin is the address it was sent to. On Cloudflare that is
- * request.url; next dev rewrites request.url's host to localhost, so the Host header the browser sent counts too.
+ * request.url. next dev rewrites request.url's host to localhost, so there the Host header the browser sent counts
+ * too, but only for this computer's own names, so a page on another host can't reach the dev admin through DNS.
  */
-function sameOrigin(request: Request): boolean {
+function sameOrigin(request: Request, devServer: boolean): boolean {
   const origin = request.headers.get('origin');
   const own = new URL(request.url);
+  if (origin === own.origin) return true;
   const host = request.headers.get('host');
-  return origin === own.origin || (host !== null && origin === `${own.protocol}//${host}`);
+  if (!devServer || host === null || !/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(host)) return false;
+  return origin === `${own.protocol}//${host}`;
 }
 
 /** The checks every request passes before its route runs: Origin and Content-Type for writes. */
-function refused(request: Request, route: string): Response | null {
+function refused(request: Request, route: string, devServer: boolean): Response | null {
   const method = request.method;
   if (method === 'GET' || method === 'HEAD') return null;
-  if (!sameOrigin(request)) return problem(403, 'Write from the admin itself.');
+  if (!sameOrigin(request, devServer)) return problem(403, 'Write from the admin itself.');
   if (method === 'POST' || method === 'PUT') {
     const type = mimeOf(request.headers.get('content-type') ?? '');
     const ok = isUploadRoute(method, route) ? isAllowedUploadType(type) : type === 'application/json';
@@ -97,11 +100,11 @@ export async function handleAdminApi(request: Request, store: Store, options: Ha
   const route = url.pathname.replace(/^\/api\/admin\/?/, '').replace(/\/+$/, '');
   const method = request.method.toUpperCase();
 
-  const refusal = refused(request, route);
+  const refusal = refused(request, route, Boolean(store.config.devServer));
   if (refusal) return refusal;
 
   try {
-    if (route === 'session') return await sessionRoute(request, store, method, url, now);
+    if (route === 'session') return await sessionRoute(request, store, method, now);
     if (!(await isSignedIn(store, request, now.getTime()))) return problem(401, SIGNED_OUT);
     return await routes(request, store, method, route, url, now);
   } catch (error) {
@@ -112,19 +115,21 @@ export async function handleAdminApi(request: Request, store: Store, options: Ha
   }
 }
 
-async function sessionRoute(request: Request, store: Store, method: string, url: URL, now: Date): Promise<Response> {
+async function sessionRoute(request: Request, store: Store, method: string, now: Date): Promise<Response> {
   if (method === 'GET') return json(200, { signedIn: await isSignedIn(store, request, now.getTime()) });
   if (method === 'POST') {
     const body = await readJson<{ password?: unknown }>(request, 4096);
     const password = typeof body.password === 'string' ? body.password.slice(0, 500) : '';
-    const ip = request.headers.get('cf-connecting-ip') ?? 'local';
+    // Cloudflare sets cf-connecting-ip itself; with no Cloudflare in front (npm run dev) it would be the client's word.
+    const ip = (!store.config.devServer && request.headers.get('cf-connecting-ip')) || 'local';
     const result = await signIn(store, password, ip, now.getTime());
     if (result.ok) return empty(204, { 'set-cookie': result.cookie });
     if (result.retryAfter > 0) return json(429, { retryAfter: result.retryAfter }, { 'retry-after': String(result.retryAfter) });
     return problem(401, "That password isn't right.");
   }
   if (method === 'DELETE') {
-    if (url.searchParams.get('everywhere') === '1' && (await isSignedIn(store, request, now.getTime()))) await rotateSessionKey(store);
+    // One admin: signing out ends every session, so a copy of the cookie stops working too.
+    if (await isSignedIn(store, request, now.getTime())) await rotateSessionKey(store);
     return empty(204, { 'set-cookie': endSessionCookie(store) });
   }
   return problem(405, 'Not allowed.');
@@ -319,6 +324,8 @@ async function upload(request: Request, store: Store, url: URL, now: Date): Prom
   if (length > store.config.maxUploadBytes) return problem(413, TOO_BIG(store, store.config.maxUploadBytes));
   const key = buildUploadPath({ project: url.searchParams.get('project'), field: url.searchParams.get('field') }, extension, now);
   if (!key || !request.body) return problem(400, "Couldn't work out where to store that file. Reload the page and try again.");
+  const full = await storageFull(store, length);
+  if (full) return full;
   await store.media.put(key, request.body, length, type);
   return json(200, { url: store.media.url(key), key });
 }
@@ -334,7 +341,9 @@ async function uploadStart(request: Request, store: Store, now: Date): Promise<R
   if (!store.config.multipart) return problem(413, TOO_BIG(store, store.config.maxUploadBytes));
   const key = buildUploadPath({ project: body.project, field: body.field }, extension, now);
   if (!key) return problem(400, "Couldn't work out where to store that file. Reload the page and try again.");
-  const uploadId = await store.media.startMultipart(key, type);
+  const full = await storageFull(store, size);
+  if (full) return full;
+  const uploadId = await store.media.startMultipart(key, type, size);
   return json(200, { key, uploadId, partSize: PART_SIZE });
 }
 
@@ -342,7 +351,7 @@ async function uploadPart(request: Request, store: Store, url: URL): Promise<Res
   const key = url.searchParams.get('key') ?? '';
   const uploadId = url.searchParams.get('uploadId') ?? '';
   const n = Number(url.searchParams.get('n'));
-  if (!MEDIA_KEY.test(key) || !uploadId || !Number.isInteger(n) || n < 1 || n > 10000) return problem(400, 'That part could not be placed.');
+  if (!MEDIA_KEY.test(key) || !uploadId || !Number.isInteger(n) || n < 1 || n > MAX_PARTS) return problem(400, 'That part could not be placed.');
   const length = contentLength(request);
   if (length < 0) return problem(411, 'The part needs its length.');
   if (length > PART_SIZE) return problem(413, 'That part is too big.');
@@ -358,35 +367,61 @@ async function uploadFinish(request: Request, store: Store): Promise<Response> {
     ? body.parts.filter((p): p is { partNumber: number; etag: string } => Number.isInteger(p?.partNumber) && typeof p?.etag === 'string')
     : [];
   if (!MEDIA_KEY.test(key) || !uploadId || parts.length === 0) return problem(400, 'The upload could not be finished. Try again.');
-  await store.media.finishMultipart(key, uploadId, parts.sort((a, b) => a.partNumber - b.partNumber));
+  const { size, declaredSize } = await store.media.finishMultipart(key, uploadId, parts.sort((a, b) => a.partNumber - b.partNumber));
+  // Only as big as it said it was at the start, which the storage limit was checked against.
+  if (size > MAX_VIDEO_BYTES || declaredSize === null || size > declaredSize) {
+    await store.media.delete([key]);
+    return problem(413, 'That film arrived bigger than it said it was, so it was not kept. Upload it again.');
+  }
   return json(200, { url: store.media.url(key), key });
 }
 
-async function storage(store: Store) {
+/** Bytes in both buckets: the uploads and the admin's own. */
+async function usedBytes(store: Store): Promise<{ bytes: number; media: Awaited<ReturnType<Store['media']['list']>> }> {
   const [media, admin] = await Promise.all([store.media.list(LIST_PAGES), store.adminUsage(LIST_PAGES)]);
-  const mediaBytes = media.objects.reduce((sum, o) => sum + o.size, 0);
+  return { bytes: media.objects.reduce((sum, o) => sum + o.size, 0) + admin.bytes, media };
+}
+
+/** A refusal when `adding` more bytes would take the uploads past STORAGE_CAP_BYTES, or null. */
+async function storageFull(store: Store, adding: number): Promise<Response | null> {
+  const { bytes } = await usedBytes(store);
+  if (bytes + adding <= STORAGE_CAP_BYTES) return null;
+  const gb = (n: number) => `${(n / 1e9).toFixed(1)} GB`;
+  return problem(
+    507,
+    `Uploads already use ${gb(bytes)} of the ${gb(STORAGE_CAP_BYTES)} the admin allows, so this file won't fit. Tidy unused files in the project list, or upload a smaller export.`,
+  );
+}
+
+async function storage(store: Store) {
+  const { bytes, media } = await usedBytes(store);
   return {
-    bytes: mediaBytes + admin.bytes,
-    objects: media.objects.length + admin.objects,
+    bytes,
+    cap: STORAGE_CAP_BYTES,
     truncated: media.truncated,
     media: media.objects.map((o) => ({ key: o.key, size: o.size, uploaded: o.uploaded.toISOString() })),
   };
 }
 
-/** Deletes uploads nothing uses: not on the site, not in a draft, and at least 7 days old. */
+/**
+ * Deletes uploads nothing uses: not on the site, not in a draft, and at least 7 days old. At most TIDY_BATCH files a
+ * request (the admin sends them in batches), and their age comes from one listing per project folder, so a tidy stays
+ * within the Free plan's CPU time and its 1,000 calls to R2.
+ */
 async function tidy(request: Request, store: Store, now: Date): Promise<Response> {
   const body = await readJson<{ keys?: unknown }>(request, 256 * 1024);
   const keys = Array.isArray(body.keys) ? body.keys.filter((k): k is string => typeof k === 'string' && MEDIA_KEY.test(k)) : [];
+  if (keys.length > TIDY_BATCH) return problem(400, `Tidy at most ${TIDY_BATCH} files at a time.`);
   if (keys.length === 0) return json(200, { deleted: [] });
   const [published, summaries] = await Promise.all([store.deployed.published(), store.drafts.list()]);
   const drafts = (await Promise.all(summaries.map((s) => store.drafts.get(s.id)))).filter(Boolean).map((d) => (d as { value: Draft }).value.project);
   const used = uploadKeys(store, [...published.projects, ...drafts]);
-  const deleted: string[] = [];
-  for (const key of keys.slice(0, 1000)) {
-    if (used.has(key)) continue;
-    const object = await store.media.head(key);
-    if (object && now.getTime() - object.uploaded.getTime() > TIDY_AGE_MS) deleted.push(key);
-  }
+  const candidates = keys.filter((key) => !used.has(key));
+  const objects = candidates.length ? await store.media.find(candidates) : new Map();
+  const deleted = candidates.filter((key) => {
+    const object = objects.get(key);
+    return object && now.getTime() - object.uploaded.getTime() > TIDY_AGE_MS;
+  });
   if (deleted.length) await store.media.delete(deleted);
   return json(200, { deleted });
 }

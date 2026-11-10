@@ -13,12 +13,18 @@ import { FILM, filmSize, serveFilm } from './films';
  */
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const { pathname } = new URL(request.url);
     const read = request.method === 'GET' || request.method === 'HEAD';
 
     // The API first: an upload's address can end in .mp4 too (/api/admin/media/p/<id>/film-….mp4).
-    if (pathname.startsWith('/api/admin/') || pathname === '/api/admin') return handleAdminApi(request, cloudflareStore(env));
+    if (pathname.startsWith('/api/admin/') || pathname === '/api/admin') {
+      const answer = handleAdminApi(request, cloudflareStore(env));
+      // A write runs to its end even if the browser goes away meanwhile (closed tab, lost connection): a publish
+      // that has moved the branch then still records itself, so the admin follows its build.
+      if (!read) ctx.waitUntil(answer.then(() => undefined, () => undefined));
+      return answer;
+    }
     if (pathname.startsWith('/api/')) {
       return new Response(JSON.stringify({ error: 'Not found.' }), {
         status: 404,

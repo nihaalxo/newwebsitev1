@@ -3,7 +3,8 @@ import type { Store } from './store';
 /*
  * Signing in to the admin. One password (the ADMIN_PASSWORD secret), compared as SHA-256 hashes in constant time:
  * cheap enough for the Free plan's 10 ms of CPU, where PBKDF2 would not be. A session is a signed cookie holding
- * only its expiry; "Sign out everywhere" replaces the key that signs them, so every cookie stops working.
+ * only its expiry. Cookies are signed with a key made from a random key in the admin bucket and the password, so
+ * signing out (which replaces the random key) or changing ADMIN_PASSWORD makes every cookie stop working.
  */
 
 export const SESSION_DAYS = 7;
@@ -11,11 +12,14 @@ const SESSION_KEY = 'auth/session-key';
 const FAILURES_KEY = 'auth/failures.json';
 
 export const THROTTLE = {
-  /** Failures from one address within the window before it is locked out for the window. */
+  /** Tries from one address (an IPv6 /64 counts as one) within the window before it is locked out for the window. */
   perIp: 5,
   ipWindowMs: 15 * 60 * 1000,
-  /** Failures from everywhere within an hour before sign-in pauses until the hour ends. */
-  global: 50,
+  /**
+   * Tries recorded in an hour from everywhere. Past it no more are written, which keeps a flood of tries from
+   * running up R2 writes; nobody is locked out by it, so it can't be used to keep the right password out.
+   */
+  recordsPerHour: 300,
   globalWindowMs: 60 * 60 * 1000,
 } as const;
 
@@ -61,6 +65,11 @@ export async function passwordMatches(input: string, password: string | undefine
 
 async function hmacKey(raw: Uint8Array): Promise<CryptoKey> {
   return crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+}
+
+/** The key cookies are signed with: the stored random key, bound to the password. */
+async function signingKey(raw: Uint8Array, password: string): Promise<Uint8Array> {
+  return new Uint8Array(await crypto.subtle.sign('HMAC', await hmacKey(raw), encoder.encode(`session:${password}`)));
 }
 
 /** The key that signs sessions, made at the first sign-in. */
@@ -118,16 +127,18 @@ export function sessionCookie(store: Store, value: string, maxAge: number): stri
 
 export async function isSignedIn(store: Store, request: Request, now = Date.now()): Promise<boolean> {
   const value = readCookie(request, store.config.cookieName);
-  if (!value) return false;
+  const password = store.config.adminPassword;
+  if (!value || !password) return false;
   const key = await sessionKey(store, false);
-  return key ? verifySession(key, value, now) : false;
+  return key ? verifySession(await signingKey(key, password), value, now) : false;
 }
 
 /** A new session cookie, made after the password matched. */
 export async function startSession(store: Store, now = Date.now()): Promise<string> {
   const key = (await sessionKey(store, true)) as Uint8Array;
   const maxAge = SESSION_DAYS * 24 * 60 * 60;
-  return sessionCookie(store, await signSession(key, now + maxAge * 1000), maxAge);
+  const signing = await signingKey(key, store.config.adminPassword ?? '');
+  return sessionCookie(store, await signSession(signing, now + maxAge * 1000), maxAge);
 }
 
 export function endSessionCookie(store: Store): string {
@@ -136,8 +147,21 @@ export function endSessionCookie(store: Store): string {
 
 // ---------------------------------------------------------------- throttle
 
+/** The address a try is counted against: an IPv4 address, or the /64 network of an IPv6 one. */
+export function addressKey(ip: string): string {
+  if (!ip.includes(':') || ip.includes('.')) return ip;
+  const [head, tail] = ip.split('::');
+  const left = head ? head.split(':') : [];
+  const right = tail ? tail.split(':') : [];
+  const groups = tail === undefined ? left : [...left, ...Array(Math.max(0, 8 - left.length - right.length)).fill('0'), ...right];
+  return `${groups
+    .slice(0, 4)
+    .map((g) => (parseInt(g, 16) || 0).toString(16))
+    .join(':')}::/64`;
+}
+
 function freshFailures(failures: Failures | null, now: number): Failures {
-  const state: Failures = failures && typeof failures === 'object' ? failures : { ips: {}, global: { count: 0, since: now } };
+  const state: Failures = failures && typeof failures === 'object' ? structuredClone(failures) : { ips: {}, global: { count: 0, since: now } };
   if (!state.global || now - state.global.since >= THROTTLE.globalWindowMs) state.global = { count: 0, since: now };
   const ips: Failures['ips'] = {};
   for (const [ip, entry] of Object.entries(state.ips ?? {})) {
@@ -150,14 +174,11 @@ function freshFailures(failures: Failures | null, now: number): Failures {
 
 /** Seconds until `ip` may try again, or 0 when it may try now. */
 export function retryAfter(failures: Failures | null, ip: string, now: number): number {
-  const state = freshFailures(failures, now);
-  const lockedUntil = state.ips[ip]?.lockedUntil ?? 0;
-  const globalUntil = state.global.count >= THROTTLE.global ? state.global.since + THROTTLE.globalWindowMs : 0;
-  const until = Math.max(lockedUntil, globalUntil);
-  return until > now ? Math.ceil((until - now) / 1000) : 0;
+  const lockedUntil = freshFailures(failures, now).ips[ip]?.lockedUntil ?? 0;
+  return lockedUntil > now ? Math.ceil((lockedUntil - now) / 1000) : 0;
 }
 
-/** Counts one failed sign-in from `ip`. */
+/** Counts one try from `ip`. */
 export function recordFailure(failures: Failures | null, ip: string, now: number): Failures {
   const state = freshFailures(failures, now);
   state.global.count += 1;
@@ -170,20 +191,30 @@ export function recordFailure(failures: Failures | null, ip: string, now: number
 
 export type SignInResult = { ok: true; cookie: string } | { ok: false; retryAfter: number };
 
-/** Checks the password, with the throttle. retryAfter 0 means simply the wrong password. */
+/**
+ * Checks the password, with the throttle. retryAfter 0 means simply the wrong password.
+ *
+ * Each try is counted before its password is checked, with a write that only lands if nobody else wrote in
+ * between. A try that loses that race is told to try again in a second, unchecked, so a burst of tries at once
+ * checks no more passwords than the throttle allows.
+ */
 export async function signIn(store: Store, password: string, ip: string, now = Date.now()): Promise<SignInResult> {
-  const failures = await store.meta.get<Failures>(FAILURES_KEY);
-  const wait = retryAfter(failures, ip, now);
+  const address = addressKey(ip);
+  const stored = await store.meta.getStored<Failures>(FAILURES_KEY);
+  const failures = stored?.value ?? null;
+  const wait = retryAfter(failures, address, now);
   if (wait > 0) return { ok: false, retryAfter: wait };
-  if (await passwordMatches(password, store.config.adminPassword)) {
-    if (failures?.ips?.[ip]) {
-      const state = freshFailures(failures, now);
-      delete state.ips[ip];
-      await store.meta.put(FAILURES_KEY, state);
-    }
-    return { ok: true, cookie: await startSession(store, now) };
+  if (freshFailures(failures, now).global.count < THROTTLE.recordsPerHour) {
+    const counted = await store.meta.putIf(FAILURES_KEY, recordFailure(failures, address, now), stored?.etag ?? null);
+    if (!counted) return { ok: false, retryAfter: 1 };
   }
-  // This try was answered: a lock it causes applies from the next one.
-  await store.meta.put(FAILURES_KEY, recordFailure(failures, ip, now));
-  return { ok: false, retryAfter: 0 };
+  if (!(await passwordMatches(password, store.config.adminPassword))) return { ok: false, retryAfter: 0 };
+  // Signed in: this address starts again from nothing.
+  const after = await store.meta.getStored<Failures>(FAILURES_KEY);
+  if (after?.value?.ips?.[address]) {
+    const state = freshFailures(after.value, now);
+    delete state.ips[address];
+    await store.meta.putIf(FAILURES_KEY, state, after.etag);
+  }
+  return { ok: true, cookie: await startSession(store, now) };
 }

@@ -88,7 +88,7 @@ export async function planPublish({ index, head, drafts, homeDraft, knownIds = {
   const writes = new Map<string, { content: string; blob: string; id: string }>();
   const deletes = new Set<string>();
   const renames: { from: string; to: string }[] = [];
-  const removed: string[] = [];
+  const removed: { slug: string; id: string }[] = [];
   const added: string[] = [];
   const labels: string[] = [];
 
@@ -131,7 +131,7 @@ export async function planPublish({ index, head, drafts, homeDraft, knownIds = {
     if (!basePath) continue;
     if (draft.action !== 'publish') {
       if (head.files[basePath] !== undefined) deletes.add(basePath);
-      removed.push(slugOfPath(basePath) as string);
+      removed.push({ slug: slugOfPath(basePath) as string, id: draft.project.id });
     } else if (target && target !== basePath) {
       if (head.files[basePath] !== undefined) deletes.add(basePath);
       renames.push({ from: slugOfPath(basePath) as string, to: draft.project.slug });
@@ -167,15 +167,25 @@ export async function planPublish({ index, head, drafts, homeDraft, knownIds = {
     );
   }
 
-  // ---- redirects: renamed projects keep their old address, removed ones go to All projects
+  // ---- redirects: renamed projects keep their old address, removed ones go to All projects for now
   const redirects: Redirects = { ...parse<Redirects>(head.redirectsJson, {}) };
   for (const { from, to } of renames) {
     for (const rule of Object.values(redirects)) if (rule.to === `/work/${from}`) rule.to = `/work/${to}`;
     redirects[`/work/${from}`] = { to: `/work/${to}`, status: 301 };
   }
-  for (const slug of removed) {
-    for (const rule of Object.values(redirects)) if (rule.to === `/work/${slug}`) rule.to = '/work';
-    redirects[`/work/${slug}`] = { to: '/work', status: 302 };
+  // While a project is off the site its addresses lead to All projects with a 302, which browsers don't keep, and
+  // remember whose they are: if it comes back, they lead to it again.
+  for (const { slug, id } of removed) {
+    for (const rule of Object.values(redirects)) {
+      if (rule.to === `/work/${slug}`) Object.assign(rule, { to: '/work', status: 302, id });
+    }
+    redirects[`/work/${slug}`] = { to: '/work', status: 302, id };
+  }
+  for (const [path, { id }] of writes) {
+    const slug = slugOfPath(path) as string;
+    for (const [from, rule] of Object.entries(redirects)) {
+      if (rule.id === id) redirects[from] = { to: `/work/${slug}`, status: 301 };
+    }
   }
   for (const from of Object.keys(redirects)) {
     const slug = /^\/work\/([a-z0-9-]+)$/.exec(from)?.[1];

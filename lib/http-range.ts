@@ -6,7 +6,7 @@
  * - `{ start, end }`: inclusive byte offsets. Answer 206 with `content-range: bytes start-end/size`.
  *
  * Safari only plays a film whose server answers ranges with 206, so every film the site serves goes through this:
- * uploads in R2 (app/cms/[...path]/route.ts) and the films in public/ (cloudflare/worker.mjs).
+ * uploads in R2 (lib/cms/r2-files.ts) and the films in public/ (worker/films.ts).
  */
 export type ByteRange = { start: number; end: number };
 

@@ -85,7 +85,10 @@ export function serializeHome(home: HomeLayout): string {
 
 export function serializeRedirects(redirects: Redirects): string {
   const sorted: Json = {};
-  for (const from of Object.keys(redirects).sort()) sorted[from] = { to: redirects[from].to, status: redirects[from].status };
+  for (const from of Object.keys(redirects).sort()) {
+    const { to, status, id } = redirects[from];
+    sorted[from] = id ? { to, status, id } : { to, status };
+  }
   return text(sorted);
 }
 

@@ -996,6 +996,14 @@ html:has(.adm-bar) {
   }
 }
 
+/* A line under the status and the buttons. */
+.adm-bar-note {
+  flex-basis: 100%;
+  order: 2;
+  margin: 0;
+  font-size: 14px;
+}
+
 .adm-bar-buttons {
   display: flex;
   flex-wrap: wrap;

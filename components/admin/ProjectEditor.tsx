@@ -683,7 +683,8 @@ export default function ProjectEditor({ initial, stored: initialStored, live: in
                 Home page
               </h2>
               <p className="adm-help adm-help-flush">
-                Highlight it on the home page from the <a href="/admin">project list</a>.
+                Highlight it on the home page from the <a href="/admin">project list</a>
+                {onSite ? '.' : ': a project not on the site yet can be highlighted there, and the highlight goes up when it is published.'}
               </p>
             </section>
           </div>
@@ -701,9 +702,12 @@ export default function ProjectEditor({ initial, stored: initialStored, live: in
               </>
             )}
           </p>
+          {adminState.homeDraft && !confirming && (
+            <p className="adm-help adm-bar-note">Publish also sends the home page&apos;s new order and highlights from the project list.</p>
+          )}
           {confirming ? (
             <div className="adm-confirm" role="group" aria-labelledby="adm-confirm-question">
-              <p id="adm-confirm-question">{confirmQuestion(confirming, draft.title, onSite)}</p>
+              <p id="adm-confirm-question">{confirmQuestion(confirming, draft.title, onSite, stored?.state === 'hidden')}</p>
               <button
                 type="button"
                 className={`adm-btn ${confirming === 'discard' ? 'adm-btn-primary' : 'adm-btn-danger'}`}
@@ -766,13 +770,15 @@ export default function ProjectEditor({ initial, stored: initialStored, live: in
   );
 }
 
-function confirmQuestion(which: Exclude<Confirm, null>, title: string, onSite: boolean): string {
+function confirmQuestion(which: Exclude<Confirm, null>, title: string, onSite: boolean, hidden: boolean): string {
   const name = `“${title.trim() || 'this project'}”`;
   switch (which) {
     case 'delete':
       return onSite
         ? `Delete ${name}? It leaves the site when the build is live, its address leads to All projects, and this can’t be undone here.`
-        : `Delete ${name}? It was never on the site, and this can’t be undone.`;
+        : hidden
+          ? `Delete ${name}? It is not on the site now, its address keeps leading to All projects, and this can’t be undone.`
+          : `Delete ${name}? It was never on the site, and this can’t be undone.`;
     case 'unpublish':
       return `Take ${name} off the site? Its address will lead to All projects. It stays here, hidden, to publish again later.`;
     case 'discard':

@@ -8,10 +8,10 @@ import { XMark } from './icons';
 export default function AdminHeader() {
   const [busy, setBusy] = useState(false);
 
-  async function signOut(everywhere: boolean) {
+  async function signOut() {
     if (busy) return;
     setBusy(true);
-    await api.signOut(everywhere);
+    await api.signOut();
     // A full page load, so an editor with unsaved changes gets the browser's prompt first.
     window.location.assign('/admin/login');
     setBusy(false);
@@ -27,10 +27,8 @@ export default function AdminHeader() {
         </a>
         <AdminNav />
         <div className="adm-top-end">
-          <button type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={() => signOut(true)} aria-disabled={busy || undefined}>
-            Sign out everywhere
-          </button>
-          <button type="button" className="adm-btn adm-btn-small" onClick={() => signOut(false)} aria-disabled={busy || undefined}>
+          {/* Ends the session on every device, so a copied cookie stops working too. */}
+          <button type="button" className="adm-btn adm-btn-small" onClick={signOut} aria-disabled={busy || undefined}>
             Sign out
           </button>
         </div>
