@@ -1,0 +1,43 @@
+{
+  "id": "b37af488-6a3b-578f-b879-8d27842f9154",
+  "slug": "silklon-and-serione",
+  "title": "Silklon & Serione",
+  "category": "brand",
+  "discipline": "Brand identity",
+  "year": 2024,
+  "summary": "A butterfly mark built from leaves, shown on shopfront glass.",
+  "accent": "#D6A02E",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/silklon-and-serione.webp",
+    "srcSmall": "/uploads/seed/silklon-and-serione-sm.webp",
+    "alt": "A gold butterfly made of small leaves, applied to a shop window",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "Butterfly mark on shopfront glass",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "862946f8-5c4c-57cb-9a34-e570c5602f86",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/silklon-and-serione.webp",
+        "srcSmall": "/uploads/seed/silklon-and-serione-sm.webp",
+        "alt": "A gold butterfly made of small leaves, applied to a shop window",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

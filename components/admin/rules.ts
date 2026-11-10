@@ -1,17 +1,9 @@
-// Rules shared by the admin's forms (messages next to fields) and its server actions (the check that counts).
-// Pure functions only, so this module is safe in both client and server bundles.
+// Rules shared by the admin's forms (messages next to fields), the admin API's publish (the check that counts) and
+// the build's content check (lib/content/validate.ts). Pure functions only, so this module is safe in the browser,
+// the Worker and Node.
 
 import { SLUG_PATTERN } from '@/lib/cms/defaults';
-import {
-  CATEGORIES,
-  MAX_HIGHLIGHTS,
-  type Block,
-  type Category,
-  type Project,
-  type ProjectInput,
-  type Settings,
-  type UploadTicket,
-} from '@/lib/cms/types';
+import { CATEGORIES, MAX_HIGHLIGHTS, type Block, type Category, type Project, type ProjectInput } from '@/lib/cms/types';
 
 export const LIMITS = {
   title: 120,
@@ -31,13 +23,6 @@ export const LIMITS = {
   blocks: 120,
   galleryItems: 48,
   line: 200,
-  paragraph: 2000,
-  educationEntries: 12,
-  description: 300,
-  controls: 12,
-  cvSections: 12,
-  cvEntries: 20,
-  storyPrompts: 8,
 } as const;
 
 /** How the site's text renderer (components/site/RichText) reads plain text. Shown under long text fields. */
@@ -48,7 +33,6 @@ export const PROSE_HELP =
 export const SUMMARY_TARGET = 140;
 
 export const YEAR_RANGE = { min: 1990, max: 2100 } as const;
-export const HERO_START_MAX = 600;
 
 export const HEX_PATTERN = /^#[0-9A-F]{6}$/i;
 
@@ -57,14 +41,7 @@ export type FieldErrors = Record<string, string>;
 export const SLUG_TAKEN_MESSAGE = 'Another project already uses this web address. Try adding the year, like my-chaii-2024.';
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
-export type SaveProjectResult = { ok: true; project: Project } | { ok: false; error: string; fieldErrors: FieldErrors };
-export type SaveSettingsResult = { ok: true; settings: Settings } | { ok: false; error: string; fieldErrors: FieldErrors };
-export type UploadTicketResult = { ok: true; ticket: UploadTicket } | { ok: false; error: string };
-export type SignInState = { error: string | null; email: string };
 
-export type SettingsInput = Omit<Settings, 'updatedAt'>;
-
-/** Same pattern the storage layer and the database enforce. */
 export { SLUG_PATTERN };
 
 /** "My Chaii London!" -> "my-chaii-london" */
@@ -78,12 +55,6 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, '')
     .slice(0, LIMITS.slug)
     .replace(/-+$/, '');
-}
-
-/** "@nihaal" or "nihaal" -> the profile URL, so a pasted handle just works. Anything else is returned as-is. */
-export function instagramUrl(value: string): string {
-  const handle = /^@?([A-Za-z0-9._]{1,30})$/.exec(value);
-  return handle ? `https://www.instagram.com/${handle[1]}/` : value;
 }
 
 export function isHttpUrl(value: string): boolean {
@@ -100,44 +71,31 @@ export function isSitePath(value: string): boolean {
   return /^\/(?!\/)[^\s\\]*$/.test(value);
 }
 
-export function isEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
 /** DOM id for the control that shows the error stored under `key` (e.g. "blocks.abc.media.alt"). */
 export function fieldId(key: string): string {
   return `f-${key.replace(/[^A-Za-z0-9_-]/g, '-')}`;
 }
 
 export function toInput(project: Project): ProjectInput {
-  const { createdAt: _created, updatedAt: _updated, publishedAt: _published, ...input } = project;
-  return input;
+  return { ...project };
 }
 
 export function categoryLabel(id: Category): string {
   return CATEGORIES.find((c) => c.id === id)?.label ?? id;
 }
 
-/** What a strong case study contains, per category. Shown under the Story heading. */
-export { STORY_PROMPTS } from '@/lib/cms/story-prompts';
-
-/** "[walk through my spaceship]": the words in square brackets become the link to the Lair. */
-export const FIVE_LINK_PATTERN = /\[([^\]\n]+)\]/;
-
 const COUNT_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
 
 /**
- * Why project `id` can't be highlighted, or null when there's room. Every other highlighted project counts, drafts
- * included, so publishing a draft can never take the home page past the limit.
+ * Why one more project can't be highlighted, or null when there's room. `highlighted` holds the titles of the
+ * projects already highlighted.
  */
-export function highlightLimitProblem(projects: Project[], id?: string): string | null {
-  const others = projects.filter((p) => p.featured && p.id !== id).map((p) => p.title.trim() || 'Untitled project');
+export function highlightLimitProblem(highlighted: string[]): string | null {
+  const others = highlighted.map((title) => title.trim() || 'Untitled project');
   if (others.length < MAX_HIGHLIGHTS) return null;
   const count = COUNT_WORDS[others.length] ?? String(others.length);
   const names = new Intl.ListFormat('en-GB').format(others);
-  return others.length === 1
-    ? `${count} project is already highlighted: ${names}. Turn it off first.`
-    : `${count} projects are already highlighted: ${names}. Turn one off first.`;
+  return `${count} projects are already highlighted: ${names}. Remove one first.`;
 }
 
 /**
@@ -209,81 +167,6 @@ function validateBlockForPublishing(block: Block): FieldErrors {
       return errors;
     }
   }
-}
-
-export function validateSettings(settings: SettingsInput): FieldErrors {
-  const errors: FieldErrors = {};
-
-  if (settings.email && !isEmail(settings.email)) errors.email = 'Enter an email address like name@example.com.';
-
-  const links: [keyof SettingsInput, string][] = [
-    ['linkedin', 'LinkedIn'],
-    ['instagram', 'Instagram'],
-  ];
-  for (const [key, name] of links) {
-    const value = settings[key];
-    if (typeof value === 'string' && value && !isHttpUrl(value)) {
-      errors[key] = `Use the full ${name} address, starting with https://`;
-    }
-  }
-
-  if (settings.education.length > LIMITS.educationEntries) {
-    errors.education = `List at most ${LIMITS.educationEntries} qualifications, one per line.`;
-  }
-
-  if (settings.cvUrl && !isHttpUrl(settings.cvUrl) && !isSitePath(settings.cvUrl)) {
-    errors.cvUrl = 'Upload a PDF, or paste a full link that starts with https://';
-  }
-
-  const validSeconds = (value: number) => Number.isFinite(value) && value >= 0 && value <= HERO_START_MAX;
-  if (!validSeconds(settings.heroFilmLoopStart)) {
-    errors.heroFilmLoopStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 4.5.`;
-  }
-  if (!validSeconds(settings.heroFilmLoopEnd)) {
-    errors.heroFilmLoopEnd = `Enter a number of seconds between 0 and ${HERO_START_MAX}, or 0 to play the whole film.`;
-  } else if (settings.heroFilmLoopEnd > 0 && settings.heroFilmLoopEnd <= settings.heroFilmLoopStart) {
-    errors.heroFilmLoopEnd = 'Make this later than Loop from, or enter 0 to play the whole film.';
-  }
-  if (!validSeconds(settings.contactFilmStart)) {
-    errors.contactFilmStart = `Enter a number of seconds between 0 and ${HERO_START_MAX}, like 0.8.`;
-  }
-
-  for (const key of ['fiveLine', 'fiveFooter'] as const) {
-    if (settings[key] && !FIVE_LINK_PATTERN.test(settings[key])) {
-      errors[key] = 'Put the words that link to the Lair in [square brackets].';
-    }
-  }
-
-  const controls = settings.lairControls.split('\n').filter((line) => line.trim());
-  if (controls.length > LIMITS.controls) errors.lairControls = `List at most ${LIMITS.controls} controls, one per line.`;
-  else if (controls.some((line) => !/^[^:]+:\s*\S/.test(line))) {
-    errors.lairControls = 'Write each control as keys, a colon, then what they do, like "Shift: Run".';
-  }
-
-  for (const { id, label } of CATEGORIES) {
-    if (settings.storyPrompts[id].length > LIMITS.storyPrompts) {
-      errors[`storyPrompts.${id}`] = `List at most ${LIMITS.storyPrompts} parts for ${label.toLowerCase()} projects.`;
-    }
-  }
-
-  if (settings.cvSections.length > LIMITS.cvSections) {
-    errors.cvSections = `The CV can have at most ${LIMITS.cvSections} sections.`;
-  }
-  settings.cvSections.forEach((section, index) => {
-    const key = `cvSections.${index}`;
-    if (!section.title.trim()) errors[`${key}.title`] = 'Give this section a title, or remove it.';
-    if (section.entries.length > LIMITS.cvEntries) {
-      errors[`${key}.entries`] = `A section can list at most ${LIMITS.cvEntries} lines.`;
-    }
-    section.entries.forEach((entry, line) => {
-      if (!entry.role.trim()) errors[`${key}.entries.${line}.role`] = 'Write the position, or remove this line.';
-    });
-  });
-
-  if (settings.portrait?.src && !settings.portrait.alt.trim()) errors['portrait.alt'] = 'Describe the photo.';
-  if (settings.lairFilm?.src && !settings.lairFilm.alt.trim()) errors['lairFilm.alt'] = 'Describe what the film shows.';
-
-  return errors;
 }
 
 export function errorCount(errors: FieldErrors): number {

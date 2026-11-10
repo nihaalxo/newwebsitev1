@@ -1,0 +1,43 @@
+{
+  "id": "49673e79-9e17-5b34-8f61-83cebe416238",
+  "slug": "static-action",
+  "title": "Static Action",
+  "category": "print",
+  "discipline": "Animation",
+  "year": 2024,
+  "summary": "A black-and-white animation. In this frame, parallel lines bend around a glowing disc.",
+  "accent": "#EDEDED",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/static-action.webp",
+    "srcSmall": "/uploads/seed/static-action-sm.webp",
+    "alt": "White parallel lines on black bending around two rings and a glowing white disc at the centre",
+    "width": 1362,
+    "height": 1012
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "9c8c632c-9f93-5c12-9ce6-ad631b62c12f",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/static-action.webp",
+        "srcSmall": "/uploads/seed/static-action-sm.webp",
+        "alt": "White parallel lines on black bending around two rings and a glowing white disc at the centre",
+        "width": 1362,
+        "height": 1012
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

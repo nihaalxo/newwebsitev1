@@ -1,4 +1,6 @@
-// Shared content model. Every storage mode (local file, Cloudflare D1 + R2, Supabase) reads and writes exactly these shapes.
+// The content model. Projects live in content/projects/<slug>.json, the home page's order and highlights in
+// content/home.json, and every other word on the site in components/site/copy.ts. The admin's drafts (Draft,
+// HomeDraft) live in R2 until they are published.
 
 import type { Labels } from './labels';
 
@@ -46,16 +48,20 @@ export type Block =
 
 export type BlockType = Block['type'];
 
+/** One case study, as stored in content/projects/<slug>.json. Only published projects have a file. */
 export interface Project {
   id: string;
   slug: string;
   title: string;
   category: Category;
-  year: number;
   /** Short discipline label shown on cards, e.g. "Brand identity" or "Vision Pro concept". */
   discipline: string;
+  year: number;
   /** One sentence shown under the card title and at the top of the case file. */
   summary: string;
+  /** Hex colour the case study is lit with, sampled from the cover. */
+  accent: string;
+  cover: Media | null;
   /** What the images show, e.g. "Bags, cups, sachets, an enamel mug". Listed as "In the images" when set. */
   shown: string;
   /**
@@ -63,43 +69,61 @@ export interface Project {
    * Only matters for spatial projects, which otherwise show a placeholder for a headset capture until a video is added.
    */
   stillOnly: boolean;
-  cover: Media | null;
-  /** Hex colour the case study is lit with, sampled from the cover. */
-  accent: string;
   role: string;
   projectType: ProjectType;
   tools: string;
   deliverables: string;
   /** Optional external link (live product, video, press). */
   link: string;
-  /**
-   * Highlighted: shown as a large plate on the home page. Everything else published is listed under the highlights.
-   * The admin labels this "Highlight" and allows at most MAX_HIGHLIGHTS, so the home page stays short.
-   */
-  featured: boolean;
-  /** Lower comes first. */
-  position: number;
-  status: 'draft' | 'published';
   blocks: Block[];
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
 }
 
-export type ProjectInput = Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'publishedAt'> & {
-  id?: string;
-  /**
-   * The `updatedAt` the editor loaded. When set and the stored project has changed since, saveProject throws
-   * STALE_PROJECT_MESSAGE instead of overwriting the newer version.
-   */
-  expectedUpdatedAt?: string;
-};
+/**
+ * A project as the editor holds it. A new one has no id until the editor gives it one, and empty timestamps until
+ * it is first published (lib/admin-api/plan.ts sets them).
+ */
+export type ProjectInput = Omit<Project, 'id'> & { id?: string };
 
 /** How many projects can be highlighted on the home page at once. */
 export const MAX_HIGHLIGHTS = 3;
 
-export const STALE_PROJECT_MESSAGE =
-  'This project was changed somewhere else since you opened it (another tab, or the project list). Reload the page to get the latest version, then make your change again.';
+/** content/home.json: the order of the work, and the projects shown large on the home page. Both by slug. */
+export interface HomeLayout {
+  /** At most MAX_HIGHLIGHTS slugs, in the order they show. Each is also in `order`. */
+  highlights: string[];
+  /** Every published project's slug, in site order. */
+  order: string[];
+}
+
+/** content/redirects.json: old project addresses, e.g. "/work/old-name": { to: "/work/new-name", status: 301 }. */
+export type Redirects = Record<string, { to: string; status: 301 | 302 }>;
+
+/**
+ * A project being edited in the admin, kept in R2 (drafts/<id>.json) until it is published. `base` is the published
+ * file the draft started from, so a change made elsewhere since (by Claude, or another tab) is noticed.
+ */
+export interface Draft {
+  project: ProjectInput & { id: string };
+  /** What Publish does with it: put it on the site, take it off (keeping the draft), or delete it. */
+  action: 'publish' | 'unpublish' | 'delete';
+  /** editing: being worked on. publishing: committed, waiting for the build. failed: the build failed. hidden: taken off the site. */
+  state: 'editing' | 'publishing' | 'failed' | 'hidden';
+  base: { path: string; blobSha: string } | null;
+  /** The commit that published it, while it is publishing. */
+  commit?: string;
+  savedAt: string;
+}
+
+/** The home page's order and highlights as changed in the admin, by project id, until they are published. */
+export interface HomeDraft {
+  highlights: string[];
+  order: string[];
+  base: { blobSha: string };
+  savedAt: string;
+}
 
 /** One line of the CV: the position, when, and where. */
 export interface CvEntry {
@@ -129,8 +153,9 @@ export interface StoryPrompt {
 export type StoryPrompts = Record<Category, StoryPrompt[]>;
 
 /**
- * Every word on the public site that isn't a project. Lines marked "inline" accept **bold**; lines marked "five" put
- * the words in [square brackets] on the link to the Lair. Empty optional strings are hidden on the public site.
+ * Every word on the public site that isn't a project (components/site/copy.ts). Lines marked "inline" accept
+ * **bold**; lines marked "five" put the words in [square brackets] on the link to the Lair. Empty optional strings are
+ * hidden on the public site.
  */
 export interface Settings {
   /** The home page's description for search engines and link previews. "{count}" becomes the number of projects. */
@@ -198,16 +223,4 @@ export interface Settings {
    * editor.
    */
   storyPrompts: StoryPrompts;
-  updatedAt: string;
 }
-
-/**
- * How the admin uploads a file: straight to disk in local mode, to the site's own upload route on Cloudflare (which
- * writes to R2), or to a Supabase signed URL.
- */
-export type UploadTicket =
-  | { mode: 'local'; url: string; publicUrl: string }
-  | { mode: 'cloudflare'; url: string; publicUrl: string }
-  | { mode: 'supabase'; bucket: string; path: string; token: string; publicUrl: string };
-
-export type AuthResult = { ok: true } | { ok: false; error: string };

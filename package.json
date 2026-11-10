@@ -1,27 +1,22 @@
 {
   "name": "nihaalnazeer",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "next build",
-    "start": "next start",
+    "build": "next build && node scripts/postbuild.mjs",
+    "check": "npm run typecheck --silent && next lint && node --import tsx scripts/check-content.ts && node --import tsx --test tests/*.test.ts",
+    "preview": "npm run build && wrangler dev --port ${PORT:-4821}",
+    "ci": "node scripts/ci.mjs",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "cms:seed": "node scripts/seed-local.mjs",
-    "cms:push": "node scripts/push-to-supabase.mjs",
-    "cms:to-cloudflare": "node scripts/push-to-cloudflare.mjs",
-    "cf:build": "node scripts/check-deploy-env.mjs && opennextjs-cloudflare build && node scripts/film-sizes.mjs",
-    "preview": "opennextjs-cloudflare preview",
-    "deploy": "npm run cf:build && opennextjs-cloudflare deploy",
-    "db:migrate:local": "wrangler d1 migrations apply CMS_DB --local",
-    "db:migrate:remote": "wrangler d1 migrations apply CMS_DB --remote",
-    "cf-typegen": "wrangler types"
+    "typecheck": "tsc --noEmit && npm run types --silent && tsc -p worker --noEmit",
+    "types": "wrangler types worker/worker-configuration.d.ts",
+    "content:format": "node --import tsx scripts/content-format.ts",
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@emailjs/browser": "4.4.1",
-    "@supabase/ssr": "0.12.7",
-    "@supabase/supabase-js": "2.118.0",
     "next": "15.5.29",
     "react": "19.1.1",
     "react-dom": "19.1.1",
@@ -29,13 +24,12 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.1",
-    "@opennextjs/cloudflare": "1.20.16",
     "@types/node": "20.19.0",
     "@types/react": "19.1.10",
     "@types/react-dom": "19.1.7",
     "eslint": "9.39.1",
     "eslint-config-next": "15.5.29",
-    "sharp": "0.34.3",
+    "tsx": "4.20.6",
     "typescript": "5.8.3",
     "wrangler": "4.158.0"
   }

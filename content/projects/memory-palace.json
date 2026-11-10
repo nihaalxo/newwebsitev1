@@ -1,0 +1,43 @@
+{
+  "id": "6b7d6cf4-f2bf-5e9a-b2fe-5ebfb2ba198d",
+  "slug": "memory-palace",
+  "title": "Memory Palace",
+  "category": "print",
+  "discipline": "3D animation",
+  "year": 2024,
+  "summary": "A Blender animation set in a retro kitchen lined with family photos.",
+  "accent": "#D07A2E",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/memory-palace.webp",
+    "srcSmall": "/uploads/seed/memory-palace-sm.webp",
+    "alt": "A rendered retro kitchen with orange cabinets, a checkered floor and framed family photos",
+    "width": 1362,
+    "height": 1012
+  },
+  "shown": "Blender animation",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "bd1227c7-37eb-57e5-ab41-02543fc65e38",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/memory-palace.webp",
+        "srcSmall": "/uploads/seed/memory-palace-sm.webp",
+        "alt": "A rendered retro kitchen with orange cabinets, a checkered floor and framed family photos",
+        "width": 1362,
+        "height": 1012
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

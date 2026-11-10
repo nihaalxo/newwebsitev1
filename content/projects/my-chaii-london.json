@@ -1,0 +1,43 @@
+{
+  "id": "bb673602-b605-5a68-8420-057659e62e4b",
+  "slug": "my-chaii-london",
+  "title": "My Chaii London",
+  "category": "brand",
+  "discipline": "Brand identity",
+  "year": 2024,
+  "summary": "A rebrand shown across takeaway bags, cups, sachets and an enamel mug.",
+  "accent": "#D9962B",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/my-chaii-london.webp",
+    "srcSmall": "/uploads/seed/my-chaii-london-sm.webp",
+    "alt": "Takeaway bags, paper cups, sachets and an enamel mug printed with the MY CHAII wordmark and a striped pattern",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "Bags, cups, sachets, an enamel mug, teapot mark",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "001a6ed9-1b62-5bfa-be88-3313b712fbab",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/my-chaii-london.webp",
+        "srcSmall": "/uploads/seed/my-chaii-london-sm.webp",
+        "alt": "Takeaway bags, paper cups, sachets and an enamel mug printed with the MY CHAII wordmark and a striped pattern",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

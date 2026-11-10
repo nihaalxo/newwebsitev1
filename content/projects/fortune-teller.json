@@ -1,0 +1,43 @@
+{
+  "id": "32947c3a-05eb-5042-babd-8d9f47671054",
+  "slug": "fortune-teller",
+  "title": "Fortune Teller",
+  "category": "print",
+  "discipline": "Interactive pamphlet",
+  "year": 2024,
+  "summary": "A folded black pamphlet printed with concentric rings of type.",
+  "accent": "#D4D4CC",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/fortune-teller.webp",
+    "srcSmall": "/uploads/seed/fortune-teller-sm.webp",
+    "alt": "Close-up of a black folded paper piece printed in white with concentric rings of the repeated words AM NOT HAPPY, creased along its folds",
+    "width": 1284,
+    "height": 932
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "611b8218-73c4-5358-b8fc-5385167ef0c7",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/fortune-teller.webp",
+        "srcSmall": "/uploads/seed/fortune-teller-sm.webp",
+        "alt": "Close-up of a black folded paper piece printed in white with concentric rings of the repeated words AM NOT HAPPY, creased along its folds",
+        "width": 1284,
+        "height": 932
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

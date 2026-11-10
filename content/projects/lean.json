@@ -1,0 +1,43 @@
+{
+  "id": "dcfb2888-387d-51b4-ba99-4faa18258f33",
+  "slug": "lean",
+  "title": "Lean",
+  "category": "interface",
+  "discipline": "Website design",
+  "year": 2023,
+  "summary": "A website for Lean, with the tagline Whey Too Tasty and a menu of its dishes.",
+  "accent": "#5A8A57",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/lean.webp",
+    "srcSmall": "/uploads/seed/lean-sm.webp",
+    "alt": "Two laptops showing the Lean website: a green wordmark, the line Whey Too Tasty, a plated dish and cards for its famous dishes",
+    "width": 677,
+    "height": 502
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "3a41fd73-e987-5607-8dda-0f79a32faedb",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/lean.webp",
+        "srcSmall": "/uploads/seed/lean-sm.webp",
+        "alt": "Two laptops showing the Lean website: a green wordmark, the line Whey Too Tasty, a plated dish and cards for its famous dishes",
+        "width": 677,
+        "height": 502
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

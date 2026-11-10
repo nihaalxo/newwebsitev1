@@ -1,0 +1,43 @@
+{
+  "id": "8bb3aa48-1a82-5896-accf-418d472eee39",
+  "slug": "immersive-netflix-for-vision-pro",
+  "title": "Immersive Netflix for Vision Pro",
+  "category": "spatial",
+  "discipline": "Vision Pro concept",
+  "year": 2024,
+  "summary": "Browsing and watching when the room becomes the screen.",
+  "accent": "#D2461C",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/immersive-netflix-for-vision-pro.webp",
+    "srcSmall": "/uploads/seed/immersive-netflix-for-vision-pro-sm.webp",
+    "alt": "A Netflix player window floating over a red, sunlit landscape, with playback controls below",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "Immersive environment, player window, playback controls",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "49aa7099-901e-5eae-83e2-aa9b3ccc2908",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/immersive-netflix-for-vision-pro.webp",
+        "srcSmall": "/uploads/seed/immersive-netflix-for-vision-pro-sm.webp",
+        "alt": "A Netflix player window floating over a red, sunlit landscape, with playback controls below",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

@@ -1,0 +1,43 @@
+{
+  "id": "0d4200bf-df6f-50ea-bec0-bb975ce12d5e",
+  "slug": "original-machines",
+  "title": "Original Machines",
+  "category": "brand",
+  "discipline": "Brand identity",
+  "year": 2024,
+  "summary": "A twisting ribbon form in green, blue and red halftone, on black.",
+  "accent": "#3BD64B",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/original-machines.webp",
+    "srcSmall": "/uploads/seed/original-machines-sm.webp",
+    "alt": "A twisting, leaf-like form made of curved ribbons, printed as a green, blue and red halftone on black",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "03117656-e5b0-5cd6-823f-92b03d0afa76",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/original-machines.webp",
+        "srcSmall": "/uploads/seed/original-machines-sm.webp",
+        "alt": "A twisting, leaf-like form made of curved ribbons, printed as a green, blue and red halftone on black",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

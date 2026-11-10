@@ -1,0 +1,43 @@
+{
+  "id": "ed2fb1e5-8869-5c43-93da-f73475b868a8",
+  "slug": "mental-health-advocate",
+  "title": "Mental Health Advocate",
+  "category": "print",
+  "discipline": "Campaign",
+  "year": 2024,
+  "summary": "A pink pin badge that reads Take Your Mind's Medicine, around a pill patterned like a brain.",
+  "accent": "#D9A3A6",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/mental-health-advocate.webp",
+    "srcSmall": "/uploads/seed/mental-health-advocate-sm.webp",
+    "alt": "Two pink pin badges, one face up printed with the words Take Your Mind's Medicine around a pill patterned like a brain, the other face down showing its pin",
+    "width": 1362,
+    "height": 1012
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "9668bed8-608f-5fd8-9363-d0dbc5ff7cc9",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/mental-health-advocate.webp",
+        "srcSmall": "/uploads/seed/mental-health-advocate-sm.webp",
+        "alt": "Two pink pin badges, one face up printed with the words Take Your Mind's Medicine around a pill patterned like a brain, the other face down showing its pin",
+        "width": 1362,
+        "height": 1012
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

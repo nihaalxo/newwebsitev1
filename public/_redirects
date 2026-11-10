@@ -1,0 +1,17 @@
+# Addresses of the site before the redesign. The game's About link uses /about.
+# Cloudflare reads this file (out/_redirects); `npm run build` adds the renamed and removed projects from
+# content/redirects.json below these lines.
+/about /#about 301
+/about/ /#about 301
+/branding /work 301
+/branding/ /work 301
+/branding.html /work 301
+/immersive /work 301
+/immersive/ /work 301
+/immersive.html /work 301
+/uiux /work 301
+/uiux/ /work 301
+/uiux.html /work 301
+/multidisciplinary /work 301
+/multidisciplinary/ /work 301
+/multidisciplinary.html /work 301

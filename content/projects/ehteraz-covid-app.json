@@ -1,0 +1,43 @@
+{
+  "id": "7d220bfd-2fdb-527a-b1b4-d38582c131b2",
+  "slug": "ehteraz-covid-app",
+  "title": "Ehteraz Covid App",
+  "category": "interface",
+  "discipline": "App redesign",
+  "year": 2024,
+  "summary": "A redesign of the Ehteraz Covid-19 app, from the health-status QR code to vaccination records and helplines.",
+  "accent": "#8A1538",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/ehteraz-covid-app.webp",
+    "srcSmall": "/uploads/seed/ehteraz-covid-app-sm.webp",
+    "alt": "Phone screens from the Ehteraz app in maroon and white: a health-status QR code marked Vaccinated, Covid-19 statistics, a vaccination record, helpline numbers and a news feed",
+    "width": 1910,
+    "height": 1348
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "a868124f-3bb9-5c9a-befb-5d75e1472000",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/ehteraz-covid-app.webp",
+        "srcSmall": "/uploads/seed/ehteraz-covid-app-sm.webp",
+        "alt": "Phone screens from the Ehteraz app in maroon and white: a health-status QR code marked Vaccinated, Covid-19 statistics, a vaccination record, helpline numbers and a news feed",
+        "width": 1910,
+        "height": 1348
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

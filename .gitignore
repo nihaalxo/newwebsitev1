@@ -28,17 +28,18 @@ yarn-error.log*
 # local env files: local addresses and keys, never committed
 .env*.local
 
-# The admin's email, password and session secret (read by `npm run dev` and `npm run preview`), wrangler's local
-# D1/R2 state, and the OpenNext build
+# The admin password for this computer (read by `npm run dev` and `npm run preview`), wrangler's local R2 state,
+# the build's film sizes, the dev admin's drafts, and the Worker's generated types
 .dev.vars
 .dev.vars.*
 /.wrangler/
-/.open-next/
+/.build/
+/.drafts/
+/worker/worker-configuration.d.ts
 
 # typescript
 *.tsbuildinfo
 
-# Local-mode content IS committed: .cms/content.json and public/uploads are the site's content until you move to
-# Supabase. Only ignore the half-written files a crash mid-save or mid-upload could leave behind.
-/.cms/*.tmp
+# content/ and public/uploads/ ARE committed: they are the site's content. Only ignore the half-written files a crash
+# mid-upload could leave behind.
 /public/uploads/**/*.part

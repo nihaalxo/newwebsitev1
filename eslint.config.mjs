@@ -7,7 +7,7 @@ const compat = new FlatCompat({ baseDirectory: dirname(fileURLToPath(import.meta
 const config = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
-    ignores: ['node_modules/**', '.next/**', '.open-next/**', '.wrangler/**', 'next-env.d.ts', 'public/**', 'cloudflare-env.d.ts'],
+    ignores: ['node_modules/**', '.next/**', 'out/**', '.build/**', '.wrangler/**', 'next-env.d.ts', 'public/**', 'worker/worker-configuration.d.ts'],
   },
   {
     rules: {

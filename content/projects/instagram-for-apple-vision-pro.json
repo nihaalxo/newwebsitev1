@@ -1,0 +1,43 @@
+{
+  "id": "5c52d39f-f5c7-5b59-bf5c-e9c1181e1abe",
+  "slug": "instagram-for-apple-vision-pro",
+  "title": "Instagram for Apple Vision Pro",
+  "category": "spatial",
+  "discipline": "Vision Pro concept",
+  "year": 2023,
+  "summary": "A spatial redesign of the Instagram app for Apple Vision Pro.",
+  "accent": "#A9B9E4",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/instagram-for-apple-vision-pro.webp",
+    "srcSmall": "/uploads/seed/instagram-for-apple-vision-pro-sm.webp",
+    "alt": "An Apple Vision Pro headset floating above its shadow on dark grey, beside the title Apple Vision Pro, Instagram Redesign and a short statement of the aim",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "01957738-21c7-5343-ab42-5dc0ca3e9b9f",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/instagram-for-apple-vision-pro.webp",
+        "srcSmall": "/uploads/seed/instagram-for-apple-vision-pro-sm.webp",
+        "alt": "An Apple Vision Pro headset floating above its shadow on dark grey, beside the title Apple Vision Pro, Instagram Redesign and a short statement of the aim",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

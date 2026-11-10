@@ -1,0 +1,43 @@
+{
+  "id": "8539d841-cdd8-538a-896e-0754dac929e1",
+  "slug": "light-and-dark",
+  "title": "Light and Dark",
+  "category": "print",
+  "discipline": "Animation",
+  "year": 2024,
+  "summary": "An animation, shown here by a frame of glowing cream particles.",
+  "accent": "#D9CFA6",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/light-and-dark.webp",
+    "srcSmall": "/uploads/seed/light-and-dark-sm.webp",
+    "alt": "A dense field of soft, glowing cream dots scattered over a dark background",
+    "width": 1362,
+    "height": 1012
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "676a8358-4221-5e52-89bc-8a52fb24acb9",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/light-and-dark.webp",
+        "srcSmall": "/uploads/seed/light-and-dark-sm.webp",
+        "alt": "A dense field of soft, glowing cream dots scattered over a dark background",
+        "width": 1362,
+        "height": 1012
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

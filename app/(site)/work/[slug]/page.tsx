@@ -1,18 +1,28 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import AllProjects from '@/components/site/AllProjects';
+import AllProjectsView from '@/components/site/AllProjectsView';
 import { absoluteUrl, OWNER_NAME } from '@/components/site/config';
-import { getPublishedProject } from '@/components/site/data';
+import { SITE } from '@/components/site/copy';
 import { still } from '@/components/site/media';
+import { loadContent } from '@/lib/content/load';
 
-// A project's own address: All projects, with that project's case file open over it.
-export const dynamic = 'force-dynamic';
+// A project's own address: All projects, with that project's case file open over it. One page is built per project;
+// any other /work/<slug> is the 404 page.
 
 type Params = Promise<{ slug: string }>;
 
+export const dynamicParams = false;
+
+export function generateStaticParams(): { slug: string }[] {
+  return loadContent().projects.map((p) => ({ slug: p.slug }));
+}
+
+function findProject(slug: string) {
+  return loadContent().projects.find((p) => p.slug === slug) ?? null;
+}
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params;
-  const project = await getPublishedProject(slug);
+  const project = findProject((await params).slug);
   if (!project) return { title: 'Page not found' };
 
   const path = `/work/${project.slug}`;
@@ -41,9 +51,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function WorkPage({ params }: { params: Params }) {
-  const { slug } = await params;
-  const project = await getPublishedProject(slug);
+  const project = findProject((await params).slug);
   if (!project) notFound();
-
-  return <AllProjects openSlug={project.slug} />;
+  return <AllProjectsView settings={SITE} projects={loadContent().projects} openSlug={project.slug} />;
 }

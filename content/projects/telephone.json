@@ -1,0 +1,43 @@
+{
+  "id": "23e2a480-628c-5541-a1b1-cd6dfa475e70",
+  "slug": "telephone",
+  "title": "Telephone",
+  "category": "print",
+  "discipline": "Publication design",
+  "year": 2024,
+  "summary": "A book design for Percival Everett's Telephone, with crackled covers in black and white and a yellow title.",
+  "accent": "#D9AE14",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/telephone.webp",
+    "srcSmall": "/uploads/seed/telephone-sm.webp",
+    "alt": "Three copies of Telephone by Percival Everett on a grey surface: one with a black cover crazed with white cracks, two with white covers and black cracks, the title in yellow",
+    "width": 1362,
+    "height": 1012
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "91ba9caa-89ec-59ea-84a2-bdaa9c81da9b",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/telephone.webp",
+        "srcSmall": "/uploads/seed/telephone-sm.webp",
+        "alt": "Three copies of Telephone by Percival Everett on a grey surface: one with a black cover crazed with white cracks, two with white covers and black cracks, the title in yellow",
+        "width": 1362,
+        "height": 1012
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

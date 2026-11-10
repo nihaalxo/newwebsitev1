@@ -1,0 +1,43 @@
+{
+  "id": "b2f3f3cd-38ee-5821-8498-db1a3e9ce573",
+  "slug": "immersive-portfolio-website",
+  "title": "Immersive Portfolio Website",
+  "category": "spatial",
+  "discipline": "3D web experience",
+  "year": 2025,
+  "summary": "This portfolio as a world you walk through, with a keyboard and mouse.",
+  "accent": "#6FF3FF",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/immersive-portfolio-website.webp",
+    "srcSmall": "/uploads/seed/immersive-portfolio-website-sm.webp",
+    "alt": "First-person view of a dark 3D hall with cyan light lines, hexagon ceiling lights and a shooting range",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "Hall, shooting range, screens, glowing hands",
+  "stillOnly": true,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "16cf4d0f-8492-5467-bb57-a99c0270f774",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/immersive-portfolio-website.webp",
+        "srcSmall": "/uploads/seed/immersive-portfolio-website-sm.webp",
+        "alt": "First-person view of a dark 3D hall with cyan light lines, hexagon ceiling lights and a shooting range",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

@@ -1,0 +1,43 @@
+{
+  "id": "c8631655-8d1c-5f72-a5a9-1cac70e2e15f",
+  "slug": "rgfc-branding-and-jersey",
+  "title": "RGFC Branding and Jersey",
+  "category": "brand",
+  "discipline": "Brand identity, kit",
+  "year": 2024,
+  "summary": "A club crest and a black-and-gold kit, plus a personal N monogram.",
+  "accent": "#C9A23A",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/rgfc-branding-and-jersey.webp",
+    "srcSmall": "/uploads/seed/rgfc-branding-and-jersey-sm.webp",
+    "alt": "Black and gold football shirt with a diamond pattern, shown front and back, beside the RGFC crest and an N monogram printed on fabric",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "Club crest, personal monogram, black-and-gold kit",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "2aea5d87-3505-5610-851d-8db157a0dbe4",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/rgfc-branding-and-jersey.webp",
+        "srcSmall": "/uploads/seed/rgfc-branding-and-jersey-sm.webp",
+        "alt": "Black and gold football shirt with a diamond pattern, shown front and back, beside the RGFC crest and an N monogram printed on fabric",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

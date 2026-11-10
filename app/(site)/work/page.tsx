@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
-import AllProjects from '@/components/site/AllProjects';
+import AllProjectsView from '@/components/site/AllProjectsView';
 import { absoluteUrl, OWNER_NAME } from '@/components/site/config';
-import { getSettings } from '@/components/site/data';
-
-export const dynamic = 'force-dynamic';
+import { SITE } from '@/components/site/copy';
+import { loadContent } from '@/lib/content/load';
 
 const DESCRIPTION = `Every project by ${OWNER_NAME}: brand identities, spatial experiences, app interfaces, print and motion.`;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
-  const title = settings.allProjectsTitle || 'All projects';
+export function generateMetadata(): Metadata {
+  const title = SITE.allProjectsTitle || 'All projects';
   return {
     title,
     description: DESCRIPTION,
@@ -19,11 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
       url: absoluteUrl('/work'),
       siteName: OWNER_NAME,
       title: `${title} | ${OWNER_NAME}`,
-      description: settings.heroLead || DESCRIPTION,
+      description: SITE.heroLead || DESCRIPTION,
     },
   };
 }
 
 export default function AllProjectsPage() {
-  return <AllProjects />;
+  return <AllProjectsView settings={SITE} projects={loadContent().projects} />;
 }

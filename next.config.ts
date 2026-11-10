@@ -1,25 +1,28 @@
 import type { NextConfig } from 'next';
-
-const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname : null;
+import { PHASE_DEVELOPMENT_SERVER } from 'next/constants';
 
 /**
- * open-next.config.ts runs the build with CMS_BUILD_TARGET=cloudflare. That build leaves local mode out completely
- * (lib/cms/index.ts), so node:fs never reaches the Worker. Any other build (`npm run build`, then `npm start`) keeps
- * local mode, read-only, so a plain Node server can show the content in .cms/content.json.
+ * `npm run build` exports the whole site as plain files in out/ (output 'export'): the public pages, the 404 page and
+ * the admin's pages. Nothing renders per request on Cloudflare.
+ *
+ * `npm run dev` also serves the two dev-only routes (route.dev.ts): the admin API, which writes straight into
+ * content/ and public/uploads/p/, and the admin's copy of the published content. They are left out of the export
+ * because their extension is only listed here.
  */
-const cloudflareBuild = process.env.CMS_BUILD_TARGET === 'cloudflare';
-
-const nextConfig: NextConfig = {
-  reactStrictMode: true,
-  // Fixed into the code at build time, so the Cloudflare build can drop the local-mode branch.
-  env: { CMS_LOCAL_FILES: cloudflareBuild ? 'off' : 'on' },
-  // Title and meta tags go in <head> for every visitor, as the mockup has them, instead of streaming into a hidden
-  // <div> in <body> after the page.
-  htmlLimitedBots: /.*/,
-  images: {
-    // Uploads are already resized to WebP in the browser, so pages use plain <img> tags; this only covers next/image use.
-    remotePatterns: supabaseHost ? [{ protocol: 'https', hostname: supabaseHost, pathname: '/storage/v1/object/public/**' }] : [],
-  },
-};
-
-export default nextConfig;
+export default function config(phase: string): NextConfig {
+  const shared: NextConfig = {
+    reactStrictMode: true,
+    // Title and meta tags go in <head> for every visitor, as the mockup has them, instead of streaming into a hidden
+    // <div> in <body> after the page.
+    htmlLimitedBots: /.*/,
+  };
+  if (phase === PHASE_DEVELOPMENT_SERVER) return { ...shared, pageExtensions: ['tsx', 'ts', 'dev.ts'] };
+  return {
+    ...shared,
+    output: 'export',
+    trailingSlash: false,
+    // Uploads are already resized to WebP in the browser, so pages use plain <img> tags.
+    images: { unoptimized: true },
+    pageExtensions: ['tsx', 'ts'],
+  };
+}

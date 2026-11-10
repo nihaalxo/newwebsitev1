@@ -1,0 +1,43 @@
+{
+  "id": "4298ab0a-d819-58c8-b9af-afe810acdc70",
+  "slug": "typographic-posters",
+  "title": "Typographic Posters",
+  "category": "print",
+  "discipline": "Posters",
+  "year": 2024,
+  "summary": "Two posters on the type designers Hermann Zapf and Frederic Goudy.",
+  "accent": "#B8BDC2",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/typographic-posters.webp",
+    "srcSmall": "/uploads/seed/typographic-posters-sm.webp",
+    "alt": "Two black typographic posters about Hermann Zapf and Frederic Goudy hanging on a concrete wall",
+    "width": 1362,
+    "height": 1012
+  },
+  "shown": "Two posters",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "a46ec3c2-10ea-58d7-813e-30686c0781ca",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/typographic-posters.webp",
+        "srcSmall": "/uploads/seed/typographic-posters-sm.webp",
+        "alt": "Two black typographic posters about Hermann Zapf and Frederic Goudy hanging on a concrete wall",
+        "width": 1362,
+        "height": 1012
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

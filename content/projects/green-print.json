@@ -1,0 +1,43 @@
+{
+  "id": "98f15500-0fc7-5ae6-af47-7efda1ea0d46",
+  "slug": "green-print",
+  "title": "Green Print",
+  "category": "interface",
+  "discipline": "App design",
+  "year": 2024,
+  "summary": "A carbon-footprint app where a caped hero coaches you to cut emissions.",
+  "accent": "#3A9A72",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/green-print.webp",
+    "srcSmall": "/uploads/seed/green-print-sm.webp",
+    "alt": "Five phone screens from the Green Print app, featuring a superhero in a green suit and blue cape, and emissions charts",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "Onboarding, statistics, profile, item logging",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "2762b886-4475-5aa0-a019-2070df90ecec",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/green-print.webp",
+        "srcSmall": "/uploads/seed/green-print-sm.webp",
+        "alt": "Five phone screens from the Green Print app, featuring a superhero in a green suit and blue cape, and emissions charts",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

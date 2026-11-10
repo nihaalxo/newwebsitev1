@@ -1,0 +1,43 @@
+{
+  "id": "4f6a77be-5f19-5fde-bcb8-e9d56cf9ee22",
+  "slug": "escape-room",
+  "title": "Escape Room",
+  "category": "interface",
+  "discipline": "Game design",
+  "year": 2023,
+  "summary": "A phone game with a keypad, a keyboard and a level called The Mad Doctor.",
+  "accent": "#E8552D",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/escape-room.webp",
+    "srcSmall": "/uploads/seed/escape-room-sm.webp",
+    "alt": "Seven phone screens from an escape-room game: a title screen with a Play button, dark teal keypad and keyboard screens, and two cards for a level called The Mad Doctor",
+    "width": 677,
+    "height": 502
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "6d4c406d-16ff-5518-a430-6c178ad6fcef",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/escape-room.webp",
+        "srcSmall": "/uploads/seed/escape-room-sm.webp",
+        "alt": "Seven phone screens from an escape-room game: a title screen with a Play button, dark teal keypad and keyboard screens, and two cards for a level called The Mad Doctor",
+        "width": 677,
+        "height": 502
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

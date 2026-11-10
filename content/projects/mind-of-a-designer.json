@@ -1,0 +1,43 @@
+{
+  "id": "49273259-f670-574c-aabe-ba7682254b8f",
+  "slug": "mind-of-a-designer",
+  "title": "Mind of a Designer",
+  "category": "print",
+  "discipline": "Short film",
+  "year": 2024,
+  "summary": "A short film, shown here by a frame of a glowing ring in a field of stars.",
+  "accent": "#DCD8E6",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/mind-of-a-designer.webp",
+    "srcSmall": "/uploads/seed/mind-of-a-designer-sm.webp",
+    "alt": "A small white ring with a thin line through it, centred in a black starfield",
+    "width": 1919,
+    "height": 1079
+  },
+  "shown": "",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "c770d561-6e11-5a27-92c9-fd94a7c2d583",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/mind-of-a-designer.webp",
+        "srcSmall": "/uploads/seed/mind-of-a-designer-sm.webp",
+        "alt": "A small white ring with a thin line through it, centred in a black starfield",
+        "width": 1919,
+        "height": 1079
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

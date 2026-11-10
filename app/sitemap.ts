@@ -1,12 +1,13 @@
 import type { MetadataRoute } from 'next';
 import { absoluteUrl } from '@/components/site/config';
-import { getSettings, listPublished } from '@/components/site/data';
+import { loadContent } from '@/lib/content/load';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [projects, settings] = await Promise.all([listPublished(), getSettings()]);
-  const newest = [settings.updatedAt, ...projects.map((p) => p.updatedAt)].filter(Boolean).sort().at(-1);
+export default function sitemap(): MetadataRoute.Sitemap {
+  const { projects, home } = loadContent();
+  const newest = projects.map((p) => p.updatedAt).filter(Boolean).sort().at(-1);
+  const highlighted = new Set(home.highlights);
 
   return [
     { url: absoluteUrl('/'), lastModified: newest, changeFrequency: 'monthly', priority: 1 },
@@ -15,7 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: absoluteUrl(`/work/${p.slug}`),
       lastModified: p.updatedAt,
       changeFrequency: 'yearly' as const,
-      priority: p.featured ? 0.8 : 0.6,
+      priority: highlighted.has(p.slug) ? 0.8 : 0.6,
     })),
   ];
 }

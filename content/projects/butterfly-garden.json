@@ -1,0 +1,43 @@
+{
+  "id": "2d8c3200-caa1-5861-9afd-d7522040e966",
+  "slug": "butterfly-garden",
+  "title": "Butterfly Garden",
+  "category": "interface",
+  "discipline": "UI and animation",
+  "year": 2024,
+  "summary": "A UI and motion study built around a glowing chrysalis.",
+  "accent": "#9EE07A",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/butterfly-garden.webp",
+    "srcSmall": "/uploads/seed/butterfly-garden-sm.webp",
+    "alt": "A glowing green chrysalis on black under the script title Butterfly Garden",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "UI design and animation",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "ba8c6251-b648-5d6e-8a14-ed2358d85522",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/butterfly-garden.webp",
+        "srcSmall": "/uploads/seed/butterfly-garden-sm.webp",
+        "alt": "A glowing green chrysalis on black under the script title Butterfly Garden",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}

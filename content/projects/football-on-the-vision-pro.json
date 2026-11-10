@@ -1,0 +1,43 @@
+{
+  "id": "dff127c7-7b1a-5f72-8bc2-abfc1001c31d",
+  "slug": "football-on-the-vision-pro",
+  "title": "Football On the Vision Pro",
+  "category": "spatial",
+  "discipline": "Vision Pro concept",
+  "year": 2025,
+  "summary": "A match as a window in your living room, with player tags and a 90-minute momentum ribbon.",
+  "accent": "#3E9B4F",
+  "cover": {
+    "kind": "image",
+    "src": "/uploads/seed/football-on-the-vision-pro.webp",
+    "srcSmall": "/uploads/seed/football-on-the-vision-pro-sm.webp",
+    "alt": "A football match floating as a large window in a living room, with player name tags and a momentum bar from 0 to 90 minutes",
+    "width": 679,
+    "height": 504
+  },
+  "shown": "Match window, player tags, minimap, momentum ribbon",
+  "stillOnly": false,
+  "role": "",
+  "projectType": "",
+  "tools": "",
+  "deliverables": "",
+  "link": "",
+  "blocks": [
+    {
+      "id": "340e4ec4-54b6-5f14-9e7b-d1abdb1714e2",
+      "type": "image",
+      "media": {
+        "kind": "image",
+        "src": "/uploads/seed/football-on-the-vision-pro.webp",
+        "srcSmall": "/uploads/seed/football-on-the-vision-pro-sm.webp",
+        "alt": "A football match floating as a large window in a living room, with player name tags and a momentum bar from 0 to 90 minutes",
+        "width": 679,
+        "height": 504
+      },
+      "size": "wide"
+    }
+  ],
+  "createdAt": "2026-11-09T21:10:43.416Z",
+  "updatedAt": "2026-11-09T21:10:43.416Z",
+  "publishedAt": "2026-11-09T21:10:43.416Z"
+}
