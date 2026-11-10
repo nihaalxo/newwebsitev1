@@ -5,6 +5,8 @@ import type { Media } from '@/lib/cms/types';
 import {
   IMAGE_ACCEPT,
   VIDEO_ACCEPT,
+  VIDEO_ADVICE,
+  VIDEO_WARN_BYTES,
   uploadErrorMessage,
   uploadImage,
   uploadStill,
@@ -25,7 +27,7 @@ export interface MediaFieldProps {
   kind: 'image' | 'video';
   value: Media | null;
   onChange: (media: Media | null) => void;
-  /** Where uploads are filed, e.g. "projects/my-chaii/cover" or "site/avatar". */
+  /** Where uploads are filed: "<project id>/<field>", e.g. "6f1c…/cover" (lib/upload-client.ts). */
   folderHint: string;
   required?: boolean;
   error?: string;
@@ -36,11 +38,11 @@ export interface MediaFieldProps {
   tallCut?: boolean;
 }
 
-type Busy = { label: string; progress: number | null };
+type Busy = { label: string; progress: number | null; cancel?: () => void };
 
 const FORMATS = {
   image: 'JPG, PNG, WebP or GIF. Large images are resized to 2400 pixels wide and saved as WebP.',
-  video: 'MP4, WebM or MOV, up to 50 MB. MP4 (H.264) plays in every browser.',
+  video: `MP4, WebM or MOV, up to 1 GB. ${VIDEO_ADVICE}: MP4 (H.264) plays in every browser. The poster is taken from the film at 1 second.`,
 };
 
 export default function MediaField({
@@ -71,6 +73,7 @@ export default function MediaField({
 
   const [busy, setBusy] = useState<Busy | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
+  const [advice, setAdvice] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState('');
   const [dragging, setDragging] = useState(false);
   const [pendingFocus, setPendingFocus] = useState<string | null>(null);
@@ -86,12 +89,14 @@ export default function MediaField({
   const article = kind === 'image' ? 'an image' : 'a video';
   const message = problem ?? error;
 
-  async function run(busyLabel: string, done: string, work: (onProgress: ProgressHandler) => Promise<void>) {
+  async function run(busyLabel: string, done: string, work: (onProgress: ProgressHandler, signal: AbortSignal) => Promise<void>) {
     setProblem(null);
-    setBusy({ label: busyLabel, progress: null });
+    const controller = new AbortController();
+    const cancel = kind === 'video' ? () => controller.abort() : undefined;
+    setBusy({ label: busyLabel, progress: null, cancel });
     setAnnouncement(`${busyLabel}.`);
     try {
-      await track(work((progress) => setBusy({ label: busyLabel, progress })));
+      await track(work((progress) => setBusy({ label: busyLabel, progress, cancel }), controller.signal));
       setAnnouncement(done);
     } catch (failure) {
       const text = uploadErrorMessage(failure);
@@ -104,9 +109,10 @@ export default function MediaField({
 
   function upload(file: File) {
     if (busy) return;
-    void run(`Uploading ${file.name}`, `${kind === 'image' ? 'Image' : 'Video'} uploaded.`, async (onProgress) => {
+    setAdvice(kind === 'video' && file.size > VIDEO_WARN_BYTES ? `This film is ${Math.round(file.size / 1e6)} MB. ${VIDEO_ADVICE}.` : null);
+    void run(`Uploading ${file.name}`, `${kind === 'image' ? 'Image' : 'Video'} uploaded.`, async (onProgress, signal) => {
       const uploaded =
-        kind === 'image' ? await uploadImage(file, folderHint, onProgress) : await uploadVideo(file, folderHint, onProgress);
+        kind === 'image' ? await uploadImage(file, folderHint, onProgress) : await uploadVideo(file, folderHint, onProgress, { signal });
       // The first file swaps "Choose" for Replace and the description field. Follow it there, unless the owner has
       // moved on to another field while it uploaded.
       const active = document.activeElement;
@@ -139,8 +145,8 @@ export default function MediaField({
 
   function uploadTall(file: File) {
     if (busy) return;
-    void run(`Uploading ${file.name}`, 'Tall cut uploaded.', async (onProgress) => {
-      const tall = await uploadVideo(file, `${folderHint}-tall`, onProgress);
+    void run(`Uploading ${file.name}`, 'Tall cut uploaded.', async (onProgress, signal) => {
+      const tall = await uploadVideo(file, `${folderHint}-tall`, onProgress, { signal, poster: false });
       if (latest.current) onChange({ ...latest.current, srcTall: tall.src });
     });
   }
@@ -249,6 +255,7 @@ export default function MediaField({
       </div>
 
       {busy && <UploadProgress busy={busy} />}
+      {advice && <p className="adm-help">{advice}</p>}
 
       {value && (
         <div className="adm-media-actions">
@@ -411,6 +418,11 @@ export function UploadProgress({ busy }: { busy: Busy }) {
         {percent === null ? '…' : `, ${percent}%`}
       </span>
       <progress max={100} value={percent ?? undefined} aria-label={busy.label} />
+      {busy.cancel && (
+        <button type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={busy.cancel}>
+          Cancel<span className="adm-vh"> the upload</span>
+        </button>
+      )}
     </div>
   );
 }

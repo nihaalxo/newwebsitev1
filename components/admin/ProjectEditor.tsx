@@ -1,68 +1,69 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { deleteProject, saveProject } from '@/app/admin/actions';
-import {
-  CATEGORIES,
-  MAX_HIGHLIGHTS,
-  PROJECT_TYPES,
-  type Block,
-  type Project,
-  type ProjectInput,
-  type ProjectType,
-  type StoryPrompts,
-} from '@/lib/cms/types';
+import { api } from '@/lib/admin-api/client';
+import { sanitizeProject } from '@/lib/admin-api/sanitize';
+import { STORY_PROMPTS } from '@/lib/cms/story-prompts';
+import { CATEGORIES, PROJECT_TYPES, type Block, type Draft, type Media, type Project, type ProjectInput, type ProjectType } from '@/lib/cms/types';
 import AccentField from './AccentField';
+import { useAdmin } from './AdminShell';
 import BlockEditor from './BlockEditor';
-import { callServer } from './call-server';
+import { sampleAccent } from './color';
 import { SelectField, SwitchField, TextAreaField, TextField } from './fields';
 import { useFocusFirstInvalid, useStickyBarHeight } from './focus';
 import MediaField from './MediaField';
-import { caseStudyPath, editPath, previewPath } from './paths';
+import { caseStudyPath, editPath, previewPath, type PreviewView } from './paths';
 import {
   LIMITS,
   SLUG_TAKEN_MESSAGE,
-  STORY_PROMPTS,
   SUMMARY_TARGET,
   categoryLabel,
   errorCount,
   errorSummary,
   fieldId,
   slugify,
-  toInput,
   validateProject,
   type FieldErrors,
 } from './rules';
-import StatusBadge from './StatusBadge';
+import StatusBadge, { statusOf } from './StatusBadge';
 import { UploadTrackerProvider, useUploadCount } from './upload-tracker';
 import { useUnsavedWarning } from './useUnsavedWarning';
 
-/** What is stored right now, as opposed to what is being edited. */
-export interface SavedState {
-  status: Project['status'];
-  slug: string;
-  publishedAt: string | null;
-  /** The stored version. Sent with each save, so one made from an out-of-date copy is refused, not written over it. */
-  updatedAt: string;
+/*
+ * One project's editor. Every change is saved as a draft (autosave 3 s after the last change, or Save), which only
+ * the admin sees. Publish sends the draft to the site as a commit; the site rebuilds in 2 to 4 minutes.
+ */
+
+export type EditableProject = ProjectInput & { id: string };
+
+/** The draft as the server holds it, or null when there is none. */
+export interface StoredDraft {
+  etag: string;
+  savedAt: string;
+  state: Draft['state'];
+  action: Draft['action'];
 }
 
 interface ProjectEditorProps {
-  /** emptyProject() for a new project, otherwise the stored project. */
-  initial: ProjectInput;
-  /** null until the project has been saved once. */
-  saved: SavedState | null;
+  initial: EditableProject;
+  stored: StoredDraft | null;
+  /** The project as the live site shows it, or null when it isn't on the site. */
+  live: Project | null;
+  /** The site changed this project since the draft began. */
+  stale: boolean;
   /** Web addresses other projects already use. */
   takenSlugs: string[];
   /** e.g. "nihaalnazeer.com", for showing the case study's address. */
   siteHost: string;
-  /** What a strong case file covers, as set in Site settings > Case files. */
-  storyPrompts?: StoryPrompts;
 }
 
-type Intent = 'draft' | 'publish' | 'unpublish';
-type Notice = { tone: 'saved' | 'info' | 'error'; text: string; fromFields?: boolean };
+type Busy = 'save' | 'publish' | 'unpublish' | 'delete' | 'discard' | 'resolve' | null;
+type Notice = { tone: 'saved' | 'info' | 'error'; text: string; fromFields?: boolean; reload?: boolean };
 type Status = { tone: 'idle' | 'busy' | 'saved' | 'dirty' | 'error' | 'info'; text: string };
+type Confirm = 'delete' | 'unpublish' | 'discard' | null;
+
+const AUTOSAVE_MS = 3000;
+const DEFAULT_ACCENT = '#6FF3FF';
 
 const SECTIONS = [
   { id: 'basics', label: 'Basics' },
@@ -74,39 +75,36 @@ const SECTIONS = [
 
 const PROJECT_TYPE_OPTIONS: { id: ProjectType; label: string }[] = [{ id: '', label: 'Not set' }, ...PROJECT_TYPES];
 
-/** The slug follows the title until the project is published or the owner writes their own. */
-function slugFollowsTitle(project: ProjectInput, saved: SavedState | null): boolean {
-  if (saved?.publishedAt) return false;
-  return project.slug === '' || project.slug === slugify(project.title);
-}
+/** The content as the server would store it, to tell a real change from the server's own tidying. */
+const canonical = (project: unknown) => JSON.stringify(sanitizeProject(project)?.input ?? project);
 
-export default function ProjectEditor({
-  initial,
-  saved: initiallySaved,
-  takenSlugs,
-  siteHost,
-  storyPrompts = STORY_PROMPTS,
-}: ProjectEditorProps) {
-  const router = useRouter();
-  const [draft, setDraft] = useState<ProjectInput>(initial);
-  const [savedJson, setSavedJson] = useState(() => JSON.stringify(initial));
-  const [saved, setSaved] = useState<SavedState | null>(initiallySaved);
-  const [autoSlug, setAutoSlug] = useState(() => slugFollowsTitle(initial, initiallySaved));
+/** "14:02" */
+const clock = (iso: string) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+export default function ProjectEditor({ initial, stored: initialStored, live: initialLive, stale: initialStale, takenSlugs, siteHost }: ProjectEditorProps) {
+  const { state: adminState, refresh } = useAdmin();
+  const [draft, setDraft] = useState<EditableProject>(initial);
+  const [savedJson, setSavedJson] = useState(() => (initialStored || initialLive ? JSON.stringify(initial) : ''));
+  const [stored, setStored] = useState<StoredDraft | null>(initialStored);
+  const [live] = useState<Project | null>(initialLive);
+  const [stale, setStale] = useState(initialStale);
+  const [autoSlug, setAutoSlug] = useState(() => !initialLive && (initial.slug === '' || initial.slug === slugify(initial.title)));
   const [taken, setTaken] = useState(() => new Set(takenSlugs));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [checkedForPublishing, setCheckedForPublishing] = useState(false);
-  const [busy, setBusy] = useState<Intent | 'delete' | null>(null);
+  const [busy, setBusy] = useState<Busy>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirming, setConfirming] = useState<Confirm>(null);
   const [pendingFocus, setPendingFocus] = useState<string | null>(null);
   const [uploads, track] = useUploadCount();
   const focusFirstInvalid = useFocusFirstInvalid();
   const bar = useRef<HTMLDivElement>(null);
+  const saving = useRef<Promise<StoredDraft | null> | null>(null);
   useStickyBarHeight(bar);
 
   const dirty = useMemo(() => JSON.stringify(draft) !== savedJson, [draft, savedJson]);
-  const isPublished = saved?.status === 'published';
-  const folder = `projects/${draft.slug || draft.id || 'new'}`;
+  const onSite = Boolean(live);
+  const folder = draft.id;
   useUnsavedWarning(dirty || uploads > 0);
 
   const findErrors = useCallback(
@@ -118,13 +116,11 @@ export default function ProjectEditor({
     [taken],
   );
 
-  // Once errors are showing, each one disappears as soon as it's fixed. New ones only appear on the next save.
+  // Once errors are showing, each one disappears as soon as it's fixed. New ones only appear on the next check.
   useEffect(() => {
     setErrors((current) => {
       if (errorCount(current) === 0) return current;
       const now = findErrors(draft, checkedForPublishing);
-      // Only the server knows the highlight limit: its refusal stands until the switch is off or the next save asks again.
-      if (draft.featured && current.featured) now.featured = current.featured;
       const still = Object.keys(current).filter((key) => key in now);
       if (still.length === errorCount(current) && still.every((key) => now[key] === current[key])) return current;
       return Object.fromEntries(still.map((key) => [key, now[key]]));
@@ -135,20 +131,19 @@ export default function ProjectEditor({
     if (errorCount(errors) === 0) setNotice((n) => (n?.fromFields ? null : n));
   }, [errors]);
 
-  // Opening or closing the delete question swaps the bar's buttons; put keyboard focus on the one that replaced it.
   useEffect(() => {
     if (!pendingFocus) return;
     document.getElementById(pendingFocus)?.focus();
     setPendingFocus(null);
-  }, [pendingFocus, confirmingDelete]);
+  }, [pendingFocus, confirming]);
 
   /** Any edit retires "Saved" and other passing notices; errors stay until they're fixed. */
-  function edit(change: (project: ProjectInput) => ProjectInput) {
+  function edit(change: (project: EditableProject) => EditableProject) {
     setDraft(change);
     setNotice((n) => (n && n.tone !== 'error' ? null : n));
   }
 
-  function set<K extends keyof ProjectInput>(key: K, value: ProjectInput[K]) {
+  function set<K extends keyof EditableProject>(key: K, value: EditableProject[K]) {
     edit((project) => ({ ...project, [key]: value }));
   }
 
@@ -178,127 +173,268 @@ export default function ProjectEditor({
     edit((project) => ({ ...project, blocks: change(project.blocks) }));
   }
 
-  async function save(intent: Intent): Promise<Project | null> {
-    if (busy) return null;
-    if (uploads > 0) {
-      setNotice({ tone: 'error', text: 'A file is still uploading. Save again when it finishes.' });
-      return null;
-    }
-
-    const publishing = intent === 'publish';
-    const before = draft;
-    const outgoing: ProjectInput = {
-      ...draft,
-      status: publishing ? 'published' : 'draft',
-      expectedUpdatedAt: saved?.updatedAt,
-    };
-    const verb = publishing ? 'publishing' : 'saving';
-
-    setCheckedForPublishing(publishing);
-    const found = findErrors(outgoing, publishing);
-    if (errorCount(found) > 0) {
-      setErrors(found);
-      setNotice({ tone: 'error', text: errorSummary(found, verb), fromFields: true });
-      focusFirstInvalid();
-      return null;
-    }
-
-    setErrors({});
-    setNotice(null);
-    setBusy(intent);
-    const result = await callServer(() => saveProject(outgoing), (error) => ({ ok: false as const, error, fieldErrors: {} }));
-    setBusy(null);
-
-    if (!result.ok) {
-      const fieldErrors = result.fieldErrors;
-      if (fieldErrors.slug === SLUG_TAKEN_MESSAGE) setTaken((current) => new Set(current).add(outgoing.slug));
-      setErrors(fieldErrors);
-      setNotice({ tone: 'error', text: result.error, fromFields: errorCount(fieldErrors) > 0 });
-      if (errorCount(fieldErrors) > 0) focusFirstInvalid();
-      return null;
-    }
-
-    const { project } = result;
-    const stored = toInput(project);
-    // If the owner kept typing while the save was in flight, keep their newer text; it stays "unsaved".
-    setDraft((current) => (current === before ? stored : { ...current, id: project.id, status: project.status }));
-    setSavedJson(JSON.stringify(stored));
-    setSaved({ status: project.status, slug: project.slug, publishedAt: project.publishedAt, updatedAt: project.updatedAt });
-    if (project.publishedAt) setAutoSlug(false);
-    if (!before.id) window.history.replaceState(null, '', editPath(project.id));
-
-    const address = `${siteHost}${caseStudyPath(project.slug)}`;
-    const text =
-      intent === 'draft'
-        ? 'Draft saved. Only you can see it.'
-        : intent === 'unpublish'
-          ? 'Unpublished. It’s a draft again and hidden from the site.'
-          : isPublished
-            ? 'Updated. The live page now shows these changes.'
-            : `Published. It’s live at ${address}.`;
-    setNotice({ tone: 'saved', text });
-    return project;
+  /** A new cover lights the case file with its own colour, unless an accent was already chosen. */
+  function changeCover(cover: Media | null) {
+    set('cover', cover);
+    if (cover?.kind !== 'image' || !cover.src || draft.accent.toUpperCase() !== DEFAULT_ACCENT) return;
+    sampleAccent(cover.srcSmall || cover.src)
+      .then((hex) => edit((project) => (project.accent.toUpperCase() === DEFAULT_ACCENT ? { ...project, accent: hex } : project)))
+      .catch(() => {});
   }
 
-  async function openPreview() {
+  // ---------------------------------------------------------------- saving
+
+  /** Saves the draft as it is now. Resolves to what the server holds, or null when it refused. */
+  async function save(action: Draft['action'] = stored?.action ?? 'publish', quiet = false): Promise<StoredDraft | null> {
+    if (saving.current) await saving.current;
+    const work = (async (): Promise<StoredDraft | null> => {
+      const outgoing = draft;
+      const found = findErrors(outgoing, false);
+      if (errorCount(found) > 0) {
+        if (!quiet) {
+          setCheckedForPublishing(false);
+          setErrors(found);
+          setNotice({ tone: 'error', text: errorSummary(found, 'saving'), fromFields: true });
+          focusFirstInvalid();
+        }
+        return null;
+      }
+      let etag = stored?.etag ?? null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const result = await api.saveDraft(outgoing.id, outgoing, action, etag);
+        if (result.ok) {
+          const next: StoredDraft = { etag: result.etag, savedAt: result.savedAt, state: stored?.state === 'hidden' ? 'hidden' : 'editing', action };
+          setStored(next);
+          setSavedJson(JSON.stringify(outgoing));
+          if (!initialStored && !initialLive) window.history.replaceState(null, '', editPath(outgoing.id));
+          return next;
+        }
+        if (result.status === 409 && attempt === 0) {
+          // The server may have changed the draft's state itself (after a publish); then its content is still ours.
+          const remote = await api.draft(outgoing.id);
+          if (remote.ok && canonical(remote.draft.project) === canonical(JSON.parse(savedJson || 'null'))) {
+            etag = remote.etag;
+            continue;
+          }
+          if (!remote.ok && remote.status === 404 && !stored) {
+            etag = null;
+            continue;
+          }
+          setNotice({ tone: 'error', text: 'Changed in another tab: reload', reload: true });
+          return null;
+        }
+        if (result.errors?.[outgoing.id]) {
+          setErrors(result.errors[outgoing.id]);
+          focusFirstInvalid();
+        }
+        setNotice({ tone: 'error', text: result.error, fromFields: Boolean(result.errors) });
+        return null;
+      }
+      return null;
+    })();
+    saving.current = work;
+    try {
+      return await work;
+    } finally {
+      saving.current = null;
+    }
+  }
+
+  // Autosave, 3 s after the last change, unless a file is still uploading or something else is happening.
+  useEffect(() => {
+    if (!dirty || uploads > 0 || busy || notice?.reload) return;
+    const timer = window.setTimeout(() => {
+      setBusy('save');
+      void save(undefined, true).finally(() => setBusy(null));
+    }, AUTOSAVE_MS);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft, dirty, uploads, busy, notice?.reload]);
+
+  async function saveNow() {
     if (busy) return;
-    // Open the tab during the click so pop-up blockers allow it, then send it to the preview once there's one to show.
+    if (uploads > 0) {
+      setNotice({ tone: 'error', text: 'A file is still uploading. Save again when it finishes.' });
+      return;
+    }
+    setBusy('save');
+    const result = await save();
+    setBusy(null);
+    if (result) setNotice({ tone: 'saved', text: `Saved ${clock(result.savedAt)}. Only you can see it until you publish.` });
+  }
+
+  /** Saves with `action`, then publishes this project (and the home page's draft, if there is one). */
+  async function publishAs(action: Draft['action'], kind: Exclude<Busy, null>) {
+    if (busy) return;
+    if (uploads > 0) {
+      setNotice({ tone: 'error', text: 'A file is still uploading. Publish when it finishes.' });
+      return;
+    }
+    if (action === 'publish') {
+      setCheckedForPublishing(true);
+      const found = findErrors(draft, true);
+      if (errorCount(found) > 0) {
+        setErrors(found);
+        setNotice({ tone: 'error', text: errorSummary(found, 'publishing'), fromFields: true });
+        focusFirstInvalid();
+        return;
+      }
+    }
+    setBusy(kind);
+    setNotice(null);
+    const saved = dirty || !stored || stored.action !== action ? await save(action) : stored;
+    if (!saved) {
+      setBusy(null);
+      return;
+    }
+    const result = await api.publish([{ id: draft.id, etag: saved.etag }], adminState.homeDraft?.etag ?? null);
+    if (!result.ok) {
+      setBusy(null);
+      if (result.errors?.[draft.id]) {
+        setErrors(result.errors[draft.id]);
+        if (result.errors[draft.id].slug === SLUG_TAKEN_MESSAGE) setTaken((t) => new Set(t).add(draft.slug));
+        setNotice({ tone: 'error', text: errorSummary(result.errors[draft.id], 'publishing'), fromFields: true });
+        focusFirstInvalid();
+      } else if (result.conflicts?.length) {
+        const own = result.conflicts.find((c) => c.id === draft.id) ?? result.conflicts[0];
+        if (own.reason.startsWith('Changed on the site')) setStale(true);
+        setNotice({ tone: 'error', text: own.id === 'home' ? `The home page order: ${own.reason}. Reload the project list.` : own.reason });
+      } else {
+        setNotice({ tone: 'error', text: result.error });
+      }
+      await refresh();
+      return;
+    }
+    if (result.commit === null) {
+      // Nothing differed from the site: the draft is done with.
+      setStored(null);
+      setNotice({ tone: 'saved', text: 'Nothing to publish: the site already shows this.' });
+    } else {
+      const fresh = await api.draft(draft.id);
+      setStored(fresh.ok ? { etag: fresh.etag, savedAt: fresh.draft.savedAt, state: fresh.draft.state, action: fresh.draft.action } : null);
+      const text =
+        action === 'delete'
+          ? 'Deleting. It leaves the site once the build is live, in 2 to 4 minutes.'
+          : action === 'unpublish'
+            ? 'Taking it off the site. The build takes 2 to 4 minutes; it then waits here as a hidden project.'
+            : `Publishing. It is live at ${siteHost}${caseStudyPath(draft.slug)} once the build finishes, in 2 to 4 minutes.`;
+      setNotice({ tone: 'info', text });
+    }
+    setBusy(null);
+    setConfirming(null);
+    await refresh();
+  }
+
+  async function openPreview(view: PreviewView) {
+    if (busy) return;
+    // Open the tab during the click so pop-up blockers allow it, then send it to the preview once the draft is saved.
     const tab = window.open('', '_blank');
-    let id = draft.id;
-    if (!id || (dirty && !isPublished)) {
-      const project = await save('draft');
-      if (!project) {
+    if (dirty || !stored) {
+      const saved = await save();
+      if (!saved && !live) {
         tab?.close();
         return;
       }
-      id = project.id;
-    } else if (dirty) {
-      setNotice({ tone: 'info', text: 'The preview shows the published version. Choose Update to include your latest changes.' });
     }
-    if (tab) tab.location.href = previewPath(id);
-    else window.open(previewPath(id), '_blank');
+    const href = previewPath(draft.id, view);
+    if (tab) tab.location.href = href;
+    else window.open(href, '_blank');
   }
 
-  function startDelete() {
-    setConfirmingDelete(true);
-    setPendingFocus('adm-delete-cancel');
-  }
-
-  function cancelDelete() {
-    setConfirmingDelete(false);
-    setPendingFocus('adm-delete-start');
-  }
-
-  async function confirmDelete() {
-    if (!draft.id || busy) return;
-    setBusy('delete');
-    const id = draft.id;
-    const result = await callServer(() => deleteProject(id), (error) => ({ ok: false as const, error }));
+  /** Back to the project as the site shows it: the draft goes. */
+  async function discard() {
+    if (busy) return;
+    setBusy('discard');
+    const result = await api.deleteDraft(draft.id);
+    setBusy(null);
+    setConfirming(null);
     if (!result.ok) {
-      setBusy(null);
-      // The focused "Delete project" button goes with the question; land on Delete again, next to the message.
-      cancelDelete();
       setNotice({ tone: 'error', text: result.error });
       return;
     }
-    // A client-side navigation, so the unsaved-changes prompt doesn't ask about a project that no longer exists.
-    router.replace('/admin');
-    router.refresh();
+    if (!live) {
+      window.location.assign('/admin');
+      return;
+    }
+    const fresh = { ...live } as EditableProject;
+    setDraft(fresh);
+    setSavedJson(JSON.stringify(fresh));
+    setStored(null);
+    setStale(false);
+    setErrors({});
+    setNotice({ tone: 'saved', text: 'Changes discarded. This is the project as the site shows it.' });
+    await refresh();
+  }
+
+  /** "Keep my draft": it now starts from the project as the site shows it. */
+  async function keepDraft() {
+    if (busy) return;
+    setBusy('resolve');
+    const result = await api.resolve(draft.id);
+    setBusy(null);
+    if (!result.ok) {
+      setNotice({ tone: 'error', text: result.error });
+      return;
+    }
+    setStored((s) => (s ? { ...s, etag: result.etag, savedAt: result.savedAt } : s));
+    setStale(false);
+    setNotice({ tone: 'saved', text: 'Kept. Publishing this draft replaces the version on the site.' });
+    await refresh();
+  }
+
+  async function deleteProject() {
+    if (live) return publishAs('delete', 'delete');
+    if (busy) return;
+    setBusy('delete');
+    const result = stored ? await api.deleteDraft(draft.id) : ({ ok: true } as const);
+    if (!result.ok) {
+      setBusy(null);
+      setConfirming(null);
+      setNotice({ tone: 'error', text: result.error });
+      return;
+    }
+    // Nothing left to lose, so the unsaved-changes prompt has nothing to ask about.
+    setSavedJson(JSON.stringify(draft));
+    window.location.assign('/admin');
+  }
+
+  function ask(which: Confirm) {
+    setConfirming(which);
+    setPendingFocus(which ? 'adm-confirm-cancel' : null);
   }
 
   const status: Status = busy
-    ? { tone: 'busy', text: busyText(busy, isPublished) }
+    ? { tone: 'busy', text: busyText(busy) }
     : uploads > 0
-      ? { tone: 'busy', text: 'Uploading. Save when it finishes.' }
+      ? { tone: 'busy', text: 'Uploading. It saves when the file is in.' }
       : notice
         ? notice
         : dirty
           ? { tone: 'dirty', text: 'Unsaved changes' }
-          : saved
-            ? { tone: 'saved', text: isPublished ? 'Published. No unsaved changes.' : 'Draft saved. No unsaved changes.' }
-            : { tone: 'idle', text: 'Not saved yet' };
+          : stored
+            ? { tone: 'saved', text: `Saved ${clock(stored.savedAt)}` }
+            : live
+              ? { tone: 'saved', text: 'No changes from the site.' }
+              : { tone: 'idle', text: 'Not saved yet' };
 
-  const heading = draft.title.trim() || (saved ? 'Untitled project' : 'New project');
+  const badge = statusOf(onSite, stored);
+  const stateLine =
+    badge === 'live'
+      ? 'Live on the site.'
+      : badge === 'changed'
+        ? stored?.action === 'delete'
+          ? 'Live. Marked to be deleted when you publish.'
+          : stored?.action === 'unpublish'
+            ? 'Live. Marked to come off the site when you publish.'
+            : 'Live. Your changes are a draft until you publish.'
+        : badge === 'publishing'
+          ? 'Publishing: the site is rebuilding.'
+          : badge === 'failed'
+            ? 'The last publish failed. The site shows the previous version.'
+            : badge === 'hidden'
+              ? 'Taken off the site. Publish to put it back.'
+              : 'Not on the site. Only you can see it.';
+  const heading = draft.title.trim() || (stored || live ? 'Untitled project' : 'New project');
   const lock = busy ? true : undefined;
 
   return (
@@ -311,13 +447,23 @@ export default function ProjectEditor({
             </p>
             <h1 className="adm-h1">{heading}</h1>
             <p className="adm-lede adm-state-line">
-              <StatusBadge status={saved?.status ?? null} />
-              <span>
-                {!saved ? 'Not saved yet.' : isPublished ? 'Live on the site.' : 'Only you can see drafts.'}
-              </span>
+              <StatusBadge status={stored || live ? badge : 'new'} />
+              <span>{stateLine}</span>
             </p>
           </div>
         </div>
+
+        {stale && (
+          <div className="adm-alert adm-list-alert" role="alert">
+            <p>Changed on the site since this draft began. Keep your draft to publish it over the site&apos;s version, or discard it.</p>
+            <button type="button" className="adm-btn adm-btn-small" onClick={keepDraft} aria-disabled={lock}>
+              {busy === 'resolve' ? 'Keeping…' : 'Keep my draft'}
+            </button>
+            <button type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={discard} aria-disabled={lock}>
+              Discard
+            </button>
+          </div>
+        )}
 
         <div className="adm-editor">
           <nav className="adm-toc" aria-label="Sections of this form">
@@ -422,10 +568,17 @@ export default function ProjectEditor({
                 kind="image"
                 required
                 value={draft.cover}
-                onChange={(cover) => set('cover', cover)}
+                onChange={changeCover}
                 folderHint={`${folder}/cover`}
                 error={errors.cover}
                 altError={errors['cover.alt']}
+              />
+              <AccentField
+                id={fieldId('accent')}
+                value={draft.accent}
+                onChange={(accent) => set('accent', accent)}
+                cover={draft.cover}
+                error={errors.accent}
               />
             </section>
 
@@ -500,7 +653,7 @@ export default function ProjectEditor({
               <div className="adm-prompts">
                 <p>A strong {categoryLabel(draft.category).toLowerCase()} case study covers:</p>
                 <ul>
-                  {storyPrompts[draft.category].map((prompt) => (
+                  {STORY_PROMPTS[draft.category].map((prompt) => (
                     <li key={prompt.heading}>
                       <strong>{prompt.heading}</strong>
                       {prompt.hint && `: ${prompt.hint}`}
@@ -529,21 +682,9 @@ export default function ProjectEditor({
               <h2 className="adm-h2" id="home-title">
                 Home page
               </h2>
-              <SwitchField
-                id={fieldId('featured')}
-                label="Highlight on the home page"
-                help={`Shows it large on the home page, with up to ${MAX_HIGHLIGHTS} highlighted at a time. Otherwise it's in the list under the highlights. Set the order on the Projects page.`}
-                error={errors.featured}
-                checked={draft.featured}
-                onChange={(featured) => set('featured', featured)}
-              />
-              <AccentField
-                id={fieldId('accent')}
-                value={draft.accent}
-                onChange={(accent) => set('accent', accent)}
-                cover={draft.cover}
-                error={errors.accent}
-              />
+              <p className="adm-help adm-help-flush">
+                Highlight it on the home page from the <a href="/admin">project list</a>.
+              </p>
             </section>
           </div>
         </div>
@@ -551,45 +692,71 @@ export default function ProjectEditor({
         <div className="adm-bar" ref={bar} role="region" aria-label="Save and publish">
           <p className="adm-bar-status" data-tone={status.tone} role="status">
             {status.text}
+            {notice?.reload && (
+              <>
+                {' '}
+                <button type="button" className="adm-btn adm-btn-small" onClick={() => window.location.reload()}>
+                  Reload
+                </button>
+              </>
+            )}
           </p>
-          {confirmingDelete ? (
-            <div className="adm-confirm" role="group" aria-labelledby="adm-delete-question">
-              <p id="adm-delete-question">
-                Delete “{draft.title || 'this project'}”? It disappears from the site straight away, and this can’t be undone.
-              </p>
-              <button type="button" className="adm-btn adm-btn-danger" onClick={confirmDelete} aria-disabled={lock}>
-                {busy === 'delete' ? 'Deleting…' : 'Delete project'}
+          {confirming ? (
+            <div className="adm-confirm" role="group" aria-labelledby="adm-confirm-question">
+              <p id="adm-confirm-question">{confirmQuestion(confirming, draft.title, onSite)}</p>
+              <button
+                type="button"
+                className={`adm-btn ${confirming === 'discard' ? 'adm-btn-primary' : 'adm-btn-danger'}`}
+                onClick={() => (confirming === 'delete' ? deleteProject() : confirming === 'unpublish' ? publishAs('unpublish', 'unpublish') : discard())}
+                aria-disabled={lock}
+              >
+                {confirmButton(confirming, busy)}
               </button>
-              <button id="adm-delete-cancel" type="button" className="adm-btn" onClick={cancelDelete} aria-disabled={lock}>
+              <button id="adm-confirm-cancel" type="button" className="adm-btn" onClick={() => ask(null)} aria-disabled={lock}>
                 Keep it
               </button>
             </div>
           ) : (
             <div className="adm-bar-buttons">
-              {saved && (
-                <button id="adm-delete-start" type="button" className="adm-btn adm-btn-quiet" onClick={startDelete} aria-disabled={lock}>
+              {(stored || live) && (
+                <button type="button" className="adm-btn adm-btn-quiet" onClick={() => ask('delete')} aria-disabled={lock}>
                   Delete
                 </button>
               )}
-              <button type="button" className="adm-btn" onClick={openPreview} aria-disabled={lock}>
-                Preview<span className="adm-vh"> (opens in a new tab)</span>
-              </button>
-              {isPublished && saved && (
-                <a className="adm-btn" href={caseStudyPath(saved.slug)} target="_blank" rel="noopener">
+              {live && stored && (
+                <button type="button" className="adm-btn adm-btn-quiet" onClick={() => ask('discard')} aria-disabled={lock}>
+                  Discard changes
+                </button>
+              )}
+              {live && (
+                <button type="button" className="adm-btn adm-btn-quiet" onClick={() => ask('unpublish')} aria-disabled={lock}>
+                  Take off the site
+                </button>
+              )}
+              <details className="adm-menu">
+                <summary className="adm-btn">Preview</summary>
+                <div className="adm-menu-list" role="group" aria-label="Preview, in a new tab">
+                  <button type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={() => openPreview('case')}>
+                    Case file<span className="adm-vh"> (opens in a new tab)</span>
+                  </button>
+                  <button type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={() => openPreview('home')}>
+                    Home<span className="adm-vh"> (opens in a new tab)</span>
+                  </button>
+                  <button type="button" className="adm-btn adm-btn-small adm-btn-quiet" onClick={() => openPreview('work')}>
+                    All projects<span className="adm-vh"> (opens in a new tab)</span>
+                  </button>
+                </div>
+              </details>
+              {live && (
+                <a className="adm-btn" href={caseStudyPath(live.slug)} target="_blank" rel="noopener">
                   View live<span className="adm-vh"> (opens in a new tab)</span>
                 </a>
               )}
-              {isPublished ? (
-                <button type="button" className="adm-btn" onClick={() => save('unpublish')} aria-disabled={lock}>
-                  Unpublish
-                </button>
-              ) : (
-                <button type="button" className="adm-btn" onClick={() => save('draft')} aria-disabled={lock}>
-                  Save draft
-                </button>
-              )}
-              <button type="button" className="adm-btn adm-btn-primary" onClick={() => save('publish')} aria-disabled={lock}>
-                {isPublished ? 'Update' : 'Publish'}
+              <button type="button" className="adm-btn" onClick={saveNow} aria-disabled={lock}>
+                Save
+              </button>
+              <button type="button" className="adm-btn adm-btn-primary" onClick={() => publishAs('publish', 'publish')} aria-disabled={lock}>
+                Publish
               </button>
             </div>
           )}
@@ -599,15 +766,44 @@ export default function ProjectEditor({
   );
 }
 
-function busyText(busy: Intent | 'delete', isPublished: boolean): string {
-  switch (busy) {
-    case 'draft':
-      return 'Saving draft…';
-    case 'publish':
-      return isPublished ? 'Updating…' : 'Publishing…';
+function confirmQuestion(which: Exclude<Confirm, null>, title: string, onSite: boolean): string {
+  const name = `“${title.trim() || 'this project'}”`;
+  switch (which) {
+    case 'delete':
+      return onSite
+        ? `Delete ${name}? It leaves the site when the build is live, its address leads to All projects, and this can’t be undone here.`
+        : `Delete ${name}? It was never on the site, and this can’t be undone.`;
     case 'unpublish':
-      return 'Unpublishing…';
+      return `Take ${name} off the site? Its address will lead to All projects. It stays here, hidden, to publish again later.`;
+    case 'discard':
+      return `Discard your changes to ${name}? The project goes back to how the site shows it.`;
+  }
+}
+
+function confirmButton(which: Exclude<Confirm, null>, busy: Busy): string {
+  switch (which) {
+    case 'delete':
+      return busy === 'delete' ? 'Deleting…' : 'Delete project';
+    case 'unpublish':
+      return busy === 'unpublish' ? 'Taking it off…' : 'Take it off the site';
+    case 'discard':
+      return busy === 'discard' ? 'Discarding…' : 'Discard changes';
+  }
+}
+
+function busyText(busy: Exclude<Busy, null>): string {
+  switch (busy) {
+    case 'save':
+      return 'Saving…';
+    case 'publish':
+      return 'Publishing…';
+    case 'unpublish':
+      return 'Taking it off the site…';
     case 'delete':
       return 'Deleting…';
+    case 'discard':
+      return 'Discarding…';
+    case 'resolve':
+      return 'Keeping your draft…';
   }
 }

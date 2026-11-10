@@ -1,4 +1,8 @@
-// Samples an accent colour from a cover image in the browser.
+// Samples an accent colour from a cover image in the browser: from the copy on this computer right after an upload,
+// otherwise through the admin's same-origin address for the file, since reading pixels needs the same origin.
+
+import { readableUrl } from '@/lib/admin-api/client';
+import { localCopyOf } from '@/lib/upload-client';
 
 const SAMPLE_SIZE = 48;
 
@@ -8,8 +12,7 @@ const SAMPLE_SIZE = 48;
  */
 export async function sampleAccent(src: string): Promise<string> {
   const image = new Image();
-  image.crossOrigin = 'anonymous';
-  image.src = src;
+  image.src = localCopyOf(src) ?? readableUrl(src);
   await image.decode();
 
   const canvas = document.createElement('canvas');

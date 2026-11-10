@@ -1444,3 +1444,207 @@ html:has(.adm-bar) {
   margin-top: -16px;
   max-width: 64ch;
 }
+
+/* ---------- states a project can be in ---------- */
+.adm-badge[data-status='changed'],
+.adm-badge[data-status='publishing'] {
+  border-color: rgba(111, 243, 255, 0.3);
+  color: var(--a-text);
+}
+.adm-badge[data-status='changed']::before {
+  border-color: var(--a-accent);
+}
+.adm-badge[data-status='failed'] {
+  border-color: var(--a-warn);
+  color: var(--a-text);
+}
+.adm-badge[data-status='failed']::before {
+  border-color: var(--a-warn);
+  background: var(--a-warn);
+}
+
+/* ---------- publishing: the bar under the header, and its dialog ---------- */
+.adm-publish {
+  border-bottom: 1px solid var(--a-line);
+  background: var(--a-panel);
+}
+.adm-publish-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px var(--a-gutter);
+}
+.adm-publish-status {
+  display: grid;
+  gap: 8px;
+  flex: 1 1 320px;
+  font-size: 15px;
+}
+p.adm-publish-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.adm-publish-status[data-tone='error'] {
+  padding: 10px 12px;
+  border-left: 3px solid var(--a-warn);
+  background: var(--a-warn-wash);
+}
+.adm-publish-status a {
+  color: var(--a-text);
+  font-weight: 500;
+  text-decoration-color: var(--a-accent);
+  text-underline-offset: 4px;
+}
+.adm-publish-log {
+  max-height: 12rem;
+  margin: 0;
+  overflow: auto;
+  padding: 10px;
+  background: var(--a-bg);
+  color: var(--a-muted);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+.adm-publish-actions,
+.adm-dialog-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.adm-dialog {
+  width: min(560px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid var(--a-line-strong);
+  background: var(--a-panel);
+  color: var(--a-text);
+  font-family: var(--a-font);
+  font-weight: 300;
+}
+.adm-dialog::backdrop {
+  background: rgba(2, 4, 6, 0.7);
+}
+.adm-dialog > * + * {
+  margin-top: 16px;
+}
+.adm-dialog-buttons {
+  justify-content: flex-end;
+}
+.adm-publish-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.adm-publish-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--a-line);
+}
+.adm-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  font-weight: 500;
+}
+.adm-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--a-accent);
+}
+.adm-alert ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* ---------- Preview's choice of view, in the editor's bar ---------- */
+.adm-menu {
+  position: relative;
+}
+.adm-menu summary {
+  list-style: none;
+  cursor: pointer;
+}
+.adm-menu summary::-webkit-details-marker {
+  display: none;
+}
+.adm-menu-list {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 20;
+  display: grid;
+  min-width: 180px;
+  padding: 6px;
+  border: 1px solid var(--a-line-strong);
+  background: var(--a-panel);
+}
+.adm-menu-list .adm-btn {
+  justify-content: flex-start;
+}
+
+/* ---------- storage ---------- */
+.adm-storage > * + * {
+  margin-top: 12px;
+}
+.adm-tidy-list {
+  max-height: 14rem;
+  overflow: auto;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--a-muted);
+  font-size: 14px;
+}
+
+/* ---------- preview: the bar sits low for the home page and All projects, where the site's own bar is on top ---------- */
+.adm-preview-bar-low {
+  top: auto;
+  bottom: 0;
+  min-height: 52px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid var(--a-line);
+  border-bottom: 0;
+}
+.adm-preview-views {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.adm-preview-phone {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--a-line-strong);
+  background: transparent;
+  color: var(--a-text);
+  font: 500 14px/1 var(--a-font);
+  cursor: pointer;
+}
+.adm-preview-phone[aria-pressed='true'] {
+  border-color: var(--a-accent);
+  color: var(--a-accent);
+}
+.adm-phone-frame {
+  display: grid;
+  place-items: start center;
+  min-height: 100vh;
+  padding: 88px 16px 40px;
+  background: #020304;
+}
+.adm-phone-frame iframe {
+  max-width: 100%;
+  border: 1px solid rgba(234, 243, 246, 0.3);
+  background: #04070a;
+}

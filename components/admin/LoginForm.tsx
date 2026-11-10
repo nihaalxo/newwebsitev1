@@ -1,36 +1,44 @@
 'use client';
 
-import { useActionState } from 'react';
-import { signIn } from '@/app/admin/actions';
-import type { SignInState } from './rules';
+import { useState, type FormEvent } from 'react';
+import { api } from '@/lib/admin-api/client';
 
-const INITIAL: SignInState = { error: null, email: '' };
+function waitText(seconds: number): string {
+  const minutes = Math.ceil(seconds / 60);
+  return minutes <= 1 ? 'about a minute' : `${minutes} minutes`;
+}
 
 export default function LoginForm({ next }: { next: string }) {
-  const [state, action, pending] = useActionState(signIn, INITIAL);
-  const invalid = state.error ? true : undefined;
-  const describedBy = state.error ? 'login-error' : undefined;
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pending) return;
+    const password = String(new FormData(event.currentTarget).get('password') ?? '');
+    if (!password) {
+      setError('Enter the password.');
+      return;
+    }
+    setPending(true);
+    setError(null);
+    const result = await api.signIn(password);
+    if (result.ok) {
+      window.location.assign(next);
+      return;
+    }
+    setPending(false);
+    if (result.status === 429) setError(`Too many tries. Wait ${waitText(result.retryAfter ?? 60)}, then try again.`);
+    else setError(result.error);
+  }
+
+  const invalid = error ? true : undefined;
+  const describedBy = error ? 'login-error' : undefined;
 
   return (
-    <form className="adm-login-form" action={action} noValidate>
-      <input type="hidden" name="next" value={next} />
-      <div className="adm-field">
-        <label className="adm-label" htmlFor="login-email">
-          Email
-        </label>
-        <input
-          id="login-email"
-          className="adm-input"
-          name="email"
-          type="email"
-          autoComplete="username"
-          spellCheck={false}
-          required
-          defaultValue={state.email}
-          aria-invalid={invalid}
-          aria-describedby={describedBy}
-        />
-      </div>
+    <form className="adm-login-form" onSubmit={submit} noValidate>
+      {/* For password managers, which file a password under a username. */}
+      <input type="text" name="username" autoComplete="username" value="admin" readOnly hidden />
       <div className="adm-field">
         <label className="adm-label" htmlFor="login-password">
           Password
@@ -48,9 +56,9 @@ export default function LoginForm({ next }: { next: string }) {
       </div>
       {/* Always present, so a new message is announced the moment it appears. */}
       <div role="alert">
-        {state.error && (
+        {error && (
           <p className="adm-alert" id="login-error">
-            {state.error}
+            {error}
           </p>
         )}
       </div>
@@ -58,7 +66,6 @@ export default function LoginForm({ next }: { next: string }) {
         type="submit"
         className="adm-btn adm-btn-primary adm-btn-block"
         aria-disabled={pending || undefined}
-        onClick={(event) => pending && event.preventDefault()}
       >
         {pending ? 'Signing in…' : 'Sign in'}
       </button>
