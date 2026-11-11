@@ -2,10 +2,13 @@ import type { ReactNode } from 'react';
 import { LAIR_URL } from './config';
 import { InlineText } from './RichText';
 
-/** A link to the Lair, which always opens in a new tab. On buttons the mockup's hidden note has no leading space. */
+/**
+ * A link to the Lair, which always opens in a new tab. On buttons the mockup's hidden note has no leading space. `data-lair` lets
+ * LairBoarding answer a press at once, because the ship takes a few seconds to come up on a phone.
+ */
 export function LairLink({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <a className={className} href={LAIR_URL} target="_blank" rel="noopener">
+    <a className={className} href={LAIR_URL} target="_blank" rel="noopener" data-lair="">
       {children}
       <svg className="icon" aria-hidden="true">
         <use href="#ext" />

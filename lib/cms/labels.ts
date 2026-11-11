@@ -23,6 +23,7 @@ export const LABEL_KEYS = [
   'catPrint',
   // The Lair, About and CV
   'enterLair',
+  'lairOpening',
   'howBuilt',
   'factStudied',
   'factTools',

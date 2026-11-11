@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Settings } from '@/lib/cms/types';
+import LairBoarding from './LairBoarding';
 import MailPill from './MailPill';
 import SeamLap from './SeamLap';
 import SiteFooter from './SiteFooter';
@@ -7,7 +8,7 @@ import SiteHeader from './SiteHeader';
 
 /**
  * Everything around a page's content: the shared icons, the bar, the footer, the phone email pill, the status line
- * for screen readers and the plates' glimmer. Used by every public page, the 404 page and the admin's preview.
+ * for screen readers, the note that answers a Lair link and the plates' glimmer. Used by every public page, the 404 page and the admin's preview.
  */
 export default function SiteChrome({ settings, children }: { settings: Settings; children: ReactNode }) {
   return (
@@ -28,6 +29,7 @@ export default function SiteChrome({ settings, children }: { settings: Settings;
       <SiteFooter settings={settings} />
       {settings.email && <MailPill email={settings.email} label={settings.labels.mailPill} />}
       <p className="vh" id="sr-status" role="status" aria-live="polite"></p>
+      <LairBoarding label={settings.labels.lairOpening} />
       <SeamLap />
     </>
   );

@@ -175,6 +175,7 @@ export const SITE: Settings = {
     catInterface: 'Interface',
     catPrint: 'Print and motion',
     enterLair: 'Enter the Lair',
+    lairOpening: 'Opening the ship in a new tab',
     howBuilt: 'How I built it',
     factStudied: 'Studied',
     factTools: 'Tools',
