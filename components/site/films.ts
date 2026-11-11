@@ -17,8 +17,9 @@ const TALL_SCREEN = '(max-aspect-ratio: 1/1)';
 export function playFilm(video: HTMLVideoElement): void {
   video.muted = !isSoundOn();
   video.play().catch((error: unknown) => {
-    // A pause or a new src cut the play short: nothing was refused, and playing again would undo that pause.
-    if ((error as { name?: string } | null)?.name === 'AbortError') return;
+    // Muting cures only a refusal to play with sound. A pause or a new src (AbortError) or a file that won't load
+    // (NotSupportedError) is no refusal: playing again would undo the pause, or fail again and leave the film muted.
+    if ((error as { name?: string } | null)?.name !== 'NotAllowedError') return;
     video.muted = true;
     video.play().catch(() => undefined);
   });
@@ -33,31 +34,50 @@ function filmSrc(video: HTMLVideoElement): string | undefined {
  * Follows the screen turning, for a film with a tall cut: once loaded, it swaps to the other cut and carries on from
  * the same moment, playing if it was and is still on screen. Before its first sight there is nothing to swap; that
  * sight picks the cut. A turn can also move the film off screen: whichever of the turn and the screen check comes
- * first, the film ends up paused there.
+ * first, the film ends up paused there. If the other cut won't load, the film goes back to the one that did.
  */
 function followTurns(video: HTMLVideoElement, onScreen: () => boolean): () => void {
   if (!video.dataset.srcTall) return () => undefined;
   const shape = matchMedia(TALL_SCREEN);
+  // The swap still loading, if any: the moment it carries on from, and how to stop listening to it.
+  let pending: { at: number; done: () => void } | null = null;
+
+  const swap = (src: string, at: number, play: boolean, back: string | null) => {
+    pending?.done();
+    video.src = src;
+    const loaded = () => {
+      pending?.done();
+      if (at > 0 && at < video.duration) video.currentTime = at;
+    };
+    const failed = () => {
+      pending?.done();
+      if (back) swap(back, at, play, null);
+    };
+    video.addEventListener('loadedmetadata', loaded);
+    video.addEventListener('error', failed);
+    pending = {
+      at,
+      done: () => {
+        video.removeEventListener('loadedmetadata', loaded);
+        video.removeEventListener('error', failed);
+        pending = null;
+      },
+    };
+    if (play && onScreen()) playFilm(video);
+  };
+
   const onTurn = () => {
     const now = video.getAttribute('src');
     const wanted = filmSrc(video);
     if (!now || !wanted || now === wanted) return;
-    const at = video.currentTime;
-    const playing = !video.paused;
-    video.src = wanted;
-    video.addEventListener(
-      'loadedmetadata',
-      () => {
-        if (at > 0 && at < video.duration) video.currentTime = at;
-      },
-      { once: true },
-    );
-    if (playing && onScreen()) playFilm(video);
+    // Turned again before the last swap loaded: that swap's moment still holds, as the new load is still at 0.
+    swap(wanted, pending ? pending.at : video.currentTime, !video.paused, now);
   };
   // Safari before 14 has only the old listener methods.
   if (shape.addEventListener) shape.addEventListener('change', onTurn);
   else shape.addListener(onTurn);
   return () => {
+    pending?.done();
     if (shape.removeEventListener) shape.removeEventListener('change', onTurn);
     else shape.removeListener(onTurn);
   };
