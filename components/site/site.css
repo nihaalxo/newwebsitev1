@@ -35,6 +35,8 @@ html::-webkit-scrollbar, .case::-webkit-scrollbar { display: none; }
    with its own padding. Sections taller than the window still scroll freely inside; the footer has its own stop
    so strict snapping can't put it out of reach. */
 @media (prefers-reduced-motion: no-preference) { html:has(.hero) { scroll-snap-type: y mandatory; } }
+/* phones scroll freely, upright or turned on its side: the phone layout, and a coarse pointer on a short screen */
+@media (max-width: 719px), (pointer: coarse) and (max-height: 500px) { html:has(.hero) { scroll-snap-type: none; } }
 .hero, .work, .lair, .about, .cv, .contact { scroll-snap-align: start; }
 .work, .lair, .about, .cv, .contact { min-height: 100vh; min-height: 100svh; }
 .foot { scroll-snap-align: end; }
