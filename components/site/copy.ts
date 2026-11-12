@@ -145,7 +145,8 @@ export const SITE: Settings = {
     },
   ],
   contactTitle: 'Everybody needs some help at times. Who better to ask, but a superhero?',
-  contactFallback: 'Everybody needs some help at times.',
+  // The film opens on these words itself, so nothing is drawn behind it while it loads.
+  contactFallback: '',
   contactLead: "Tell me what you're working on: a brand, an interface or a whole world.",
   email: 'nihaalnazeerxo@gmail.com',
   linkedin: 'https://www.linkedin.com/in/nihaal-nazeer-b6187117a/',
